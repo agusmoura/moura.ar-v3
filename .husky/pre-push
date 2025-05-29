@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Verificar tipos de TypeScript y Astro
+echo "🔎 Verificando tipos..."
+bun run check
+
+# Construir el proyecto para verificar que no hay errores
+echo "🏗️  Verificando build..."
+bun run build

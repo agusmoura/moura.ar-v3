@@ -1,0 +1,5 @@
+# Ignorar mensajes de merge
+MERGE_HEAD
+
+# Ignorar commits de release automáticos
+release: *

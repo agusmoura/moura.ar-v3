@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Formatear archivos modificados
+echo "🎨 Formateando archivos..."
+bun run format
+
+# Ejecutar linting
+echo "🔍 Verificando linting..."
+bun run lint
+
+# Si lint falla, el commit será cancelado
