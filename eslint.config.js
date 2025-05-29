@@ -13,20 +13,20 @@ export default [
       parser: typescriptParser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
-      }
+        sourceType: 'module',
+      },
     },
     plugins: {
-      '@typescript-eslint': typescript
+      '@typescript-eslint': typescript,
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn'
-    }
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
   },
 
   // Ignorar archivos de build y dependencias
   {
-    ignores: ['dist/**', 'node_modules/**', '.astro/**']
-  }
+    ignores: ['dist/**', 'node_modules/**', '.astro/**'],
+  },
 ];

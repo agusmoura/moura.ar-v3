@@ -20,9 +20,9 @@ Sitio web personal desarrollado con **Astro v5** y **Tailwind CSS v4**, utilizan
 - **Estilos:** Tailwind CSS v4.1.8
 - **Runtime:** Bun
 - **Lenguaje:** TypeScript
-- **Linting:** ESLint + Prettier
+- **Linting:** ESLint v9 + Prettier
 - **Optimización:** LightningCSS, Sharp
-- **Git Hooks:** Husky + Commitlint
+- **Git Hooks:** Husky v9 + Commitlint
 
 ## 🚀 Inicio rápido
 
@@ -95,12 +95,12 @@ bunx --bun astro
 #### `bun run lint`
 
 ```bash
-eslint . --ext .js,.ts,.astro
+eslint .
 ```
 
-- Analiza todo el código en busca de errores y problemas de estilo
-- Revisa archivos `.js`, `.ts` y `.astro`
-- Usa las reglas definidas en `.eslintrc.json`
+- Analiza todo el código usando ESLint v9
+- Configurado con el nuevo formato flat config (`eslint.config.js`)
+- Incluye soporte para archivos `.astro`
 
 #### `bun run format`
 
@@ -138,7 +138,7 @@ bunx --bun vite-bundle-visualizer
 
 ## 🪝 Git Hooks y Commits Convencionales
 
-Este proyecto utiliza **Husky** para automatizar tareas de calidad de código y **Commitlint** para asegurar mensajes de commit consistentes.
+Este proyecto utiliza **Husky v9** para automatizar tareas de calidad de código y **Commitlint** para asegurar mensajes de commit consistentes.
 
 ### Git Hooks configurados:
 
@@ -200,6 +200,7 @@ git commit -m "perf: optimizar carga de imágenes con lazy loading"
 git commit -m "Actualizar archivo"          # Sin tipo
 git commit -m "feat: Añadir Nueva Feature"  # Mayúsculas no permitidas
 git commit -m "feat: añadir nueva feature." # Punto al final
+git commit -m "feat: añadir una nueva feature increíble para mejorar la experiencia" # >72 caracteres
 ```
 
 ### 🔄 Si un commit es rechazado:
@@ -214,7 +215,7 @@ git commit -m "feat: añadir nueva feature." # Punto al final
 # 1. Desarrollo diario
 bun run dev
 
-# 2. Antes de commit
+# 2. Antes de commit (opcional, los hooks lo harán automáticamente)
 bun run format
 bun run lint
 bun run check

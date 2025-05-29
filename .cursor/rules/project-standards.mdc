@@ -1,0 +1,172 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Estándares del Proyecto Moura.ar v3
+
+## 🚀 Tecnologías y Herramientas
+
+Este proyecto utiliza:
+- **Astro v5** como framework principal
+- **Tailwind CSS v4** para estilos (con el nuevo sistema basado en CSS)
+- **Bun** como runtime de JavaScript (NO usar npm, yarn o pnpm)
+- **TypeScript** con configuración estricta
+- **ESLint v9** con flat config
+- **Prettier** para formateo de código
+- **Husky v9** para Git hooks
+- **Commitlint** para mensajes de commit convencionales
+
+## 📋 Reglas de Desarrollo
+
+### 1. Runtime y Comandos
+- **SIEMPRE** usar `bun` para instalar dependencias: `bun add` o `bun add -D`
+- **SIEMPRE** usar `bunx` para ejecutar binarios: `bunx --bun astro dev`
+- **NUNCA** usar `npm`, `yarn`, `pnpm` o `npx`
+
+### 2. Imports y Path Aliases
+Los siguientes path aliases están configurados:
+```typescript
+import Component from '@/components/Component.astro';
+import Layout from '@layouts/Layout.astro';
+import { algo } from '@/utils/helper';
+```
+
+### 3. Estructura de Archivos
+```
+src/
+├── assets/      # Imágenes y recursos estáticos
+├── components/  # Componentes reutilizables (.astro)
+├── layouts/     # Layouts de página
+├── pages/       # Páginas del sitio (routing)
+├── styles/      # Archivos CSS globales
+└── utils/       # Funciones helper y utilidades
+```
+
+### 4. Estilos con Tailwind CSS v4
+- Usar el nuevo sistema de Tailwind v4 con `@import "tailwindcss"`
+- NO crear archivo `tailwind.config.js` (no es necesario en v4)
+- Preferir clases de utilidad sobre CSS personalizado
+- Para temas personalizados, usar el sistema `@theme` en CSS
+
+### 5. Componentes Astro
+- Preferir componentes `.astro` sobre frameworks JS cuando sea posible
+- Usar TypeScript en el frontmatter de Astro
+- Props tipadas con interfaces:
+```astro
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+```
+
+### 6. TypeScript
+- Configuración `strict` habilitada
+- NO usar `any` - usar `unknown` si es necesario
+- Tipar todas las funciones, props e interfaces
+- Usar tipos de utilidad cuando sea apropiado
+
+### 7. Commits Convencionales
+
+**OBLIGATORIO** seguir el formato:
+```
+<tipo>(<alcance opcional>): <descripción>
+```
+
+Tipos permitidos:
+- `feat`: Nueva funcionalidad
+- `fix`: Corrección de bugs
+- `docs`: Cambios en documentación
+- `style`: Cambios de formato
+- `refactor`: Refactorización
+- `perf`: Mejoras de rendimiento
+- `test`: Tests
+- `build`: Cambios en build/dependencias
+- `ci`: Configuración CI
+- `chore`: Tareas de mantenimiento
+- `revert`: Revertir cambios
+
+Reglas:
+- Mensaje en **minúsculas**
+- **Sin punto final**
+- **Máximo 72 caracteres**
+- En español o inglés (consistente)
+
+### 8. Código Limpio
+- El código debe pasar `bun run lint` sin errores
+- Formatear con Prettier antes de commit (automático con Husky)
+- No dejar `console.log` en producción
+- Comentarios solo cuando sean necesarios y en español
+
+### 9. Performance
+- Optimizar imágenes con el componente `<Image>` de Astro
+- Lazy loading para componentes pesados
+- Minimizar JavaScript del cliente
+- Preferir SSG sobre SSR cuando sea posible
+
+### 10. SEO y Accesibilidad
+- Todas las imágenes deben tener `alt` descriptivo
+- Usar etiquetas semánticas HTML5
+- Estructura de headings correcta (h1, h2, h3...)
+- Meta tags en cada página
+
+## 🚫 NO HACER
+
+1. **NO** usar `npm`, `yarn` o `pnpm`
+2. **NO** commitear sin pasar los hooks
+3. **NO** usar `var` - solo `const` y `let`
+4. **NO** dejar código comentado
+5. **NO** usar `!important` en CSS sin justificación
+6. **NO** ignorar errores de TypeScript
+7. **NO** subir archivos `.env` al repositorio
+8. **NO** hacer commits con mensajes genéricos
+
+## ✅ SIEMPRE
+
+1. **SIEMPRE** usar Bun como runtime
+2. **SIEMPRE** seguir commits convencionales
+3. **SIEMPRE** tipar el código TypeScript
+4. **SIEMPRE** optimizar para performance
+5. **SIEMPRE** pensar en accesibilidad
+6. **SIEMPRE** documentar decisiones importantes
+7. **SIEMPRE** testear en desarrollo antes de commit
+
+## 🔧 Comandos Útiles
+
+```bash
+# Desarrollo
+bun run dev
+
+# Verificar código
+bun run lint
+bun run check
+
+# Formatear
+bun run format
+
+# Build
+bun run build
+bun run preview
+
+# Analizar bundle
+bun run analyze
+```
+
+## 📝 Ejemplo de Flujo de Trabajo
+
+1. Crear rama feature: `git checkout -b feat/nueva-funcionalidad`
+2. Desarrollar con: `bun run dev`
+3. Antes de commit: `bun run check`
+4. Commit: `git commit -m "feat: añadir componente de navegación"`
+5. Push: `git push origin feat/nueva-funcionalidad`
+6. Crear Pull Request con descripción detallada
+
+---
+
+**Recuerda**: Estos estándares existen para mantener la calidad, consistencia y mantenibilidad del código. Husky se encargará de validar muchas de estas reglas automáticamente.
+
+
