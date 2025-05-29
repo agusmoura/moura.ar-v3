@@ -1,0 +1,44 @@
+---
+/** https://developers.google.com/search/docs/appearance/structured-data/organization */
+const organizationSchema = {
+	"@context": "https://schema.org",
+	"@type": "Organization",
+	"url": "https://www.moura.ar",
+	"image": "https://cdn.moura.ar/og.jpg",
+	"sameAs": [
+		"https://www.instagram.com/agus_moura1",
+		"https://x.com/agus_moura",
+		"https://github.com/agusmoura",
+	],
+	"logo": "https://cdn.moura.ar/og.jpg",
+	"name": "Agustin Mouriño",
+	"alternateName": "Agus Moura",
+	"description": "Web Oficial de Agustin Mouriño, desarrollador y diseñador",
+}
+
+const FAQs = [
+	{
+		question: "¿Quién es Agustin Mouriño?",
+		answer: `Agustin Mouriño es un <strong>desarrollador de software y diseñador web ux/ui</strong>`,
+	},
+]
+
+/** https://developers.google.com/search/docs/appearance/structured-data/faqpage */
+const FAQSchema = {
+	"@context": "https://schema.org",
+	"@type": "FAQPage",
+	"mainEntity": [
+		FAQs.map(({ answer, question }) => ({
+			"@type": "Question",
+			"name": question,
+			"acceptedAnswer": {
+				"@type": "Answer",
+				"text": answer,
+			},
+		})),
+	],
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+<script type="application/ld+json" set:html={JSON.stringify(FAQSchema)} />
