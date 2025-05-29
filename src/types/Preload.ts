@@ -4,23 +4,23 @@
  */
 export interface Preload {
   /** The URL of the resource to preload */
-  href: string
+  href: string;
 
   /** The type of content being preloaded (e.g., 'style', 'script', 'font', 'image') */
-  as?: string
+  as?: string;
 
   /** The MIME type of the resource */
-  type?: string
+  type?: string;
 
   /** The relationship attribute (defaults to 'preload') */
-  rel?: 'preload' | 'prefetch' | 'dns-prefetch' | 'preconnect'
+  rel?: 'preload' | 'prefetch' | 'dns-prefetch' | 'preconnect';
 
   /** CORS settings for cross-origin requests */
-  crossorigin?: boolean | 'anonymous' | 'use-credentials'
+  crossorigin?: boolean | 'anonymous' | 'use-credentials';
 
   /** Media query for conditional loading */
-  media?: string
+  media?: string;
 
   /** Importance hint for the browser */
-  importance?: 'high' | 'low' | 'auto'
+  importance?: 'high' | 'low' | 'auto';
 }
