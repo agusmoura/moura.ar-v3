@@ -3,12 +3,12 @@
 /* Tema personalizado con Tailwind v4 */
 @theme {
   /* Colores base - nombres descriptivos */
-  --color-midnight: #10100E;        /* Negro profundo */
-  --color-cream: #E1DBCD;            /* Blanco cálido */
-  --color-gold: #EFBB47;             /* Amarillo dorado */
-  --color-gold-dark: #D4A53D;        /* Amarillo dorado oscuro */
-  --color-charcoal: #1A1A18;        /* Gris carbón */
-  --color-graphite: #2e2e2b;        /* Gris grafito */
+  --color-midnight: #10100e; /* Negro profundo */
+  --color-cream: #e1dbcd; /* Blanco cálido */
+  --color-gold: #efbb47; /* Amarillo dorado */
+  --color-gold-dark: #d4a53d; /* Amarillo dorado oscuro */
+  --color-charcoal: #1a1a18; /* Gris carbón */
+  --color-graphite: #2e2e2b; /* Gris grafito */
 
   /* Alias semánticos - para uso en componentes */
   --color-background: var(--color-midnight);
@@ -27,7 +27,9 @@
   --color-accent-hover: var(--color-accent-emphasis);
 
   /* Fuentes personalizadas */
-  --font-family-sans: 'Space Mono', ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-family-sans:
+    'Space Mono', ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
   --font-family-serif: 'Noto Serif JP', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
   /* Espaciado personalizado */
