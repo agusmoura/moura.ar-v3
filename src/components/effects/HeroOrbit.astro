@@ -1,0 +1,130 @@
+<div class="orbit-container" data-animate="fade" data-delay="100">
+  <svg class="orbit-svg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <mask id="center-mask">
+        <rect width="100%" height="100%" fill="white"></rect>
+        <rect x="-20" y="200" class="mask-left"></rect>
+        <rect x="300" y="200" class="mask-right"></rect>
+      </mask>
+    </defs>
+    <g class="orbit-group">
+      <circle class="orbit-inner" cx="300" cy="300" r="250"></circle>
+      <circle class="orbit-outer" cx="300" cy="300" r="290"></circle>
+
+      <g class="planet-group-inner">
+        <circle class="planet planet-inner" cx="300" cy="50" r="8"></circle>
+        <circle class="planet planet-inner" cx="50" cy="300" r="8"></circle>
+        <circle class="planet planet-inner" cx="300" cy="550" r="8"></circle>
+        <circle class="planet planet-inner" cx="550" cy="300" r="8"></circle>
+      </g>
+
+      <g class="planet-group-outer">
+        <circle class="planet planet-outer" cx="300" cy="10" r="8"></circle>
+        <circle class="planet planet-outer" cx="10" cy="300" r="8"></circle>
+        <circle class="planet planet-outer" cx="495" cy="515" r="8"></circle>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .orbit-container {
+    --orbit-color: var(--color-muted);
+    position: absolute;
+    z-index: -10;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 1;
+    pointer-events: none;
+    transition: all 300ms;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  @media (min-width: 1024px) {
+    .orbit-container {
+      width: 550px;
+      transform: translate(-20%, -50%);
+    }
+  }
+
+  .orbit-svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .orbit-group {
+    mask: url(#center-mask);
+  }
+
+  .mask-right,
+  .mask-left {
+    width: 400px;
+    height: 210px;
+  }
+
+  .mask-right {
+    display: none;
+  }
+
+  .orbit-inner,
+  .orbit-outer {
+    fill: none;
+    stroke: var(--color-foreground);
+    stroke-width: 1.5;
+  }
+
+  .planet {
+    stroke: var(--color-foreground);
+    stroke-width: 1.5;
+    fill: var(--color-background);
+    transform-origin: 300px 300px;
+  }
+
+  .planet-group-inner .planet-inner {
+    animation: planet-rotate 60s linear infinite;
+  }
+
+  .planet-group-outer .planet-outer {
+    animation: planet-rotate 120s linear infinite;
+  }
+
+  @media (max-width: 1024px) {
+    .orbit-container {
+      max-width: 400px;
+    }
+
+    .mask-right {
+      display: block;
+      height: 250px;
+      y: 180px;
+    }
+
+    .mask-left {
+      display: block;
+      height: 250px;
+      y: 180px;
+    }
+  }
+
+  @keyframes orbit-rotate {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  @keyframes planet-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
