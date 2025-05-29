@@ -5,6 +5,8 @@
       "name": "moura.ar-v3",
       "dependencies": {
         "@astrojs/check": "^0.9.4",
+        "@fontsource/noto-serif-jp": "^5.2.5",
+        "@fontsource/space-mono": "^5.2.5",
         "astro": "^5.8.1",
         "typescript": "^5.8.3",
       },
@@ -176,6 +178,10 @@
     "@eslint/object-schema": ["@eslint/object-schema@2.1.6", "", {}, "sha512-RBMg5FRL0I0gs51M/guSAj5/e14VQ4tpZnQNWwuDT66P14I43ItmPfIZRhO9fUVIPOAQXU47atlywZ/czoqFPA=="],
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.3.1", "", { "dependencies": { "@eslint/core": "^0.14.0", "levn": "^0.4.1" } }, "sha512-0J+zgWxHN+xXONWIyPWKFMgVuJoZuGiIFu8yxk7RJjxkzpGmyja5wRFqZIVtjDVOQpV+Rw0iOAjYPE2eQyjr0w=="],
+
+    "@fontsource/noto-serif-jp": ["@fontsource/noto-serif-jp@5.2.5", "", {}, "sha512-SL1XItZarPv+3KXo/D0Xa8hXChZN7kkuWuAqrRqilWLn/UKbCPIPoDr/rnbqmVMlCGzshX7PAPR+FW1ka5oKIw=="],
+
+    "@fontsource/space-mono": ["@fontsource/space-mono@5.2.5", "", {}, "sha512-yFU6K17ko4LEDHl5554n6mCrmDbuc2xYGCZZkCRpAvRtCaJisUjxFdDdph2d2hiIElaiMlinmkmV8IWlbQCMJA=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

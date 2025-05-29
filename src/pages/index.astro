@@ -6,24 +6,24 @@ import Layout from '@/layouts/Layout.astro';
 ---
 
 <Layout>
-  <main class="container mx-auto px-4 py-16 max-w-4xl">
+  <main class="container mx-auto px-4 py-16 max-w-7xl">
     <section class="text-center space-y-8">
-      <h1 class="text-4xl md:text-6xl font-bold tracking-tight">Agustín Moura</h1>
+      <h1 class="font-serif text-4xl md:text-6xl font-normal tracking-tight">Agustín Mouriño</h1>
 
-      <p class="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto">
+      <p class="text-xl md:text-2xl max-w-2xl mx-auto">
         Desarrollador Full Stack especializado en crear experiencias web modernas y performantes.
       </p>
 
       <div class="flex flex-wrap justify-center gap-4 pt-8">
         <a
           href="#proyectos"
-          class="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+          class="px-6 py-3 bg-accent text-background rounded-lg hover:bg-accent-emphasis transition-colors font-medium"
         >
           Ver Proyectos
         </a>
         <a
           href="#contacto"
-          class="px-6 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
+          class="px-6 py-3 border border-border rounded-lg hover:border-border-emphasis transition-colors"
         >
           Contacto
         </a>
@@ -31,14 +31,14 @@ import Layout from '@/layouts/Layout.astro';
     </section>
 
     <!-- Secciones placeholder para futuro desarrollo -->
-    <section id="proyectos" class="mt-32">
-      <h2 class="text-3xl font-bold mb-8">Proyectos</h2>
-      <p class="text-gray-600">Próximamente...</p>
+    <section id="proyectos" class="mt-32 p-8 bg-[var(--color-surface)] rounded-lg">
+      <h2 class="font-serif text-3xl font-bold mb-8">Proyectos</h2>
+      <p class="opacity-70">Próximamente...</p>
     </section>
 
-    <section id="contacto" class="mt-32">
-      <h2 class="text-3xl font-bold mb-8">Contacto</h2>
-      <p class="text-gray-600">Próximamente...</p>
+    <section id="contacto" class="mt-16 p-8 bg-[var(--color-surface)] rounded-lg">
+      <h2 class="font-serif text-3xl font-bold mb-8">Contacto</h2>
+      <p class="opacity-70">Próximamente...</p>
     </section>
   </main>
 </Layout>

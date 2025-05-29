@@ -2,13 +2,33 @@
 
 /* Tema personalizado con Tailwind v4 */
 @theme {
-  /* Colores personalizados */
-  --color-primary: #1a1a1a;
-  --color-accent: #0066cc;
-  --color-accent-hover: #0052a3;
+  /* Colores base - nombres descriptivos */
+  --color-midnight: #10100E;        /* Negro profundo */
+  --color-cream: #E1DBCD;            /* Blanco cálido */
+  --color-gold: #EFBB47;             /* Amarillo dorado */
+  --color-gold-dark: #D4A53D;        /* Amarillo dorado oscuro */
+  --color-charcoal: #1A1A18;        /* Gris carbón */
+  --color-graphite: #2e2e2b;        /* Gris grafito */
+
+  /* Alias semánticos - para uso en componentes */
+  --color-background: var(--color-midnight);
+  --color-surface: var(--color-charcoal);
+  --color-foreground: var(--color-cream);
+  --color-muted: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+  --color-accent: var(--color-gold);
+  --color-accent-emphasis: var(--color-gold-dark);
+  --color-border: var(--color-graphite);
+  --color-border-emphasis: var(--color-gold);
+
+  /* Colores Tailwind personalizados */
+  --color-primary: var(--color-background);
+  --color-background-alt: var(--color-surface);
+  --color-text: var(--color-foreground);
+  --color-accent-hover: var(--color-accent-emphasis);
 
   /* Fuentes personalizadas */
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-sans: 'Space Mono', ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-family-serif: 'Noto Serif JP', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
   /* Espaciado personalizado */
   --spacing-18: 4.5rem;
@@ -24,6 +44,7 @@
 
   /* Mejora la legibilidad del texto */
   body {
+    font-family: var(--font-family-sans);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -38,7 +59,7 @@
   /* Selección de texto personalizada */
   ::selection {
     background-color: var(--color-accent);
-    color: white;
+    color: var(--color-primary);
   }
 }
 
