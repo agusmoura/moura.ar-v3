@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+:root {
+  --font-serif:
+    'Noto Serif JP Variable', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-mono:
+    'Space Mono', ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
 /* Tema personalizado con Tailwind v4 */
 @theme {
   /* Colores base - nombres descriptivos */
@@ -26,12 +34,6 @@
   --color-text: var(--color-foreground);
   --color-accent-hover: var(--color-accent-emphasis);
 
-  /* Fuentes personalizadas */
-  --font-family-sans:
-    'Space Mono', ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
-  --font-family-serif: 'Noto Serif JP', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-
   /* Espaciado personalizado */
   --spacing-18: 4.5rem;
   --spacing-22: 5.5rem;
@@ -46,7 +48,7 @@
 
   /* Mejora la legibilidad del texto */
   body {
-    font-family: var(--font-family-sans);
+    font-family: var(--font-mono);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
