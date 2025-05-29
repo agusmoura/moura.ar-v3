@@ -3,12 +3,12 @@
 /* Tema personalizado con Tailwind v4 */
 @theme {
   /* Colores base - nombres descriptivos */
-  --color-midnight: #10100e; /* Negro profundo */
-  --color-cream: #e1dbcd; /* Blanco cálido */
-  --color-gold: #efbb47; /* Amarillo dorado */
-  --color-gold-dark: #d4a53d; /* Amarillo dorado oscuro */
-  --color-charcoal: #1a1a18; /* Gris carbón */
-  --color-graphite: #2e2e2b; /* Gris grafito */
+  --color-midnight: oklch(17.22% 0.41% 106.82); /* Negro profundo */
+  --color-cream: oklch(89.23% 0.2% 87.52); /* Blanco cálido */
+  --color-gold: oklch(78.65% 0.1551 80.72); /* Amarillo dorado */
+  --color-gold-dark: oklch(71.51% 0.1447 79.85); /* Amarillo dorado oscuro */
+  --color-charcoal: oklch(21.7% 0.38% 106.71); /* Gris carbón */
+  --color-graphite: oklch(30.01% 0.53% 106.71); /* Gris grafito */
 
   /* Alias semánticos - para uso en componentes */
   --color-background: var(--color-midnight);
