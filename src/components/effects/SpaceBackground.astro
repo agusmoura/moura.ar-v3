@@ -654,15 +654,6 @@ const {
         ctx.clearRect(0, 0, this.width, this.height);
       }
 
-      // Get gravity center for lensing effect
-      const gravityCoords = this.getGravityCoordinates();
-
-      // Debug: log gravity coordinates occasionally
-      if (Math.random() < 0.001) {
-        console.log('Gravity center:', gravityCoords.x, gravityCoords.y);
-        console.log('Canvas size:', this.width, this.height);
-      }
-
       // Draw stars with gravitational lensing
       ctx.fillStyle = '#fff';
       const time = performance.now() * 0.001;

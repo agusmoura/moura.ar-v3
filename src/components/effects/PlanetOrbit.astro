@@ -1,0 +1,75 @@
+<div class="planet-orbit-container">
+  <svg class="planet-orbit-svg" viewBox="0 0 370 370" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <mask id="planet-mask">
+        <rect width="100%" height="100%" fill="white"></rect>
+        <rect x="100" y="16" class="mask-left"></rect>
+        <rect x="350" y="40" class="mask-right"></rect>
+      </mask>
+    </defs>
+    <g class="orbit-group" data-animate="fade" data-delay="500">
+      <circle class="orbit-ring orbit-inner" cx="185" cy="185" r="130"></circle>
+      <g class="planet-group-inner">
+        <circle class="planet planet-inner" cx="185" cy="55" r="5"></circle>
+        <circle class="planet planet-inner" cx="55" cy="185" r="5"></circle>
+        <circle class="planet planet-inner" cx="185" cy="315" r="5"></circle>
+        <circle class="planet planet-inner" cx="315" cy="185" r="5"></circle>
+      </g>
+    </g>
+  </svg>
+
+  <style>
+    .planet-orbit-container {
+      pointer-events: none;
+      position: absolute;
+      z-index: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    .planet-orbit-svg {
+      pointer-events: none;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+
+    .orbit-ring {
+      fill: none;
+      stroke: var(--color-muted);
+      stroke-width: 1.5;
+      opacity: 0.6;
+    }
+
+    .planet {
+      fill: var(--color-background);
+      stroke: var(--color-muted);
+      stroke-width: 1;
+    }
+
+    .planet-group-inner .planet-inner {
+      animation: planet-rotate 40s linear infinite;
+      transform-origin: 185px 185px;
+    }
+
+    .orbit-group {
+      mask: url(#planet-mask);
+    }
+
+    .mask-right,
+    .mask-left {
+      height: 60px;
+      width: 60px;
+      transform: rotate(32deg);
+    }
+
+    @keyframes planet-rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</div>
