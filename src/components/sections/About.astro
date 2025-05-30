@@ -1,0 +1,192 @@
+---
+import { parseText } from '@/utils/textParser';
+import PlanetOrbit from '@components/effects/PlanetOrbit.astro';
+import PhilosophyCard from '@components/ui/PhilosophyCard.astro';
+import { Image } from 'astro:assets';
+const pt = (text: string) => parseText(text);
+
+const cards = [
+  {
+    number: 1,
+    title: 'Excelencia como Viaje',
+    subtitle: '(Kaizen – 改善)',
+    text: 'No persigo metas fijas; construyo caminos donde la perfección actúa como el [[catalizador]] que enciende una búsqueda y crecimiento sin fin.',
+    icon: '🚀',
+    color: 'from-blue-500/20 to-purple-500/20',
+  },
+  {
+    number: 2,
+    title: 'Mejora como Proceso',
+    subtitle: '(Wabi-Sabi – 侘寂)',
+    text: 'Cada proyecto se transforma en un [[laboratorio vivo]], donde la experimentación convierte imperfecciones en soluciones singulares y llenas de carácter.',
+    icon: '🔬',
+    color: 'from-pink-500/20 to-orange-500/20',
+  },
+  {
+    number: 3,
+    title: 'Fracaso como Oportunidad',
+    subtitle: '(Síntesis)',
+    text: 'Cada proyecto es una oportunidad para aprender y mejorar, transformando errores en enseñanzas valiosas.',
+    icon: '⚡',
+    color: 'from-yellow-500/20 to-green-500/20',
+  },
+];
+---
+
+<section id="about" class="relative py-40">
+  <div class="container relative mx-auto px-4 lg:px-8 xl:max-w-6xl">
+    <!-- Main Header with animated text -->
+    <div class="mb-20 text-center">
+      <div class="mb-4 inline-block">
+        <p class="mb-2 text-sm font-medium uppercase tracking-widest text-accent-light opacity-80">
+          Filosofía de Creación
+        </p>
+        <div class="h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+      </div>
+      <h2 class="relative font-serif text-5xl font-bold md:text-6xl lg:text-7xl">
+        <span class="relative">
+          Balance entre
+          <span class="relative inline-block">
+            <span class="relative z-10 text-accent">Orden</span>
+          </span>
+          <!-- <span class="mx-3 text-4xl opacity-70">&</span> -->
+          y
+          <span class="relative inline-block">
+            <span class="relative z-10 text-accent">Caos</span>
+          </span>
+        </span>
+      </h2>
+    </div>
+
+    <!-- Two Column Layout with overlap -->
+    <div class="relative mb-32 grid gap-16 lg:grid-cols-2 lg:gap-8">
+      <!-- Left Column: Story with card-like design -->
+      <div class="lg:pr-12">
+        <div class="relative">
+          <!-- Decorative number -->
+          <span class="absolute -left-8 -top-8 text-8xl font-bold text-white/5">01</span>
+
+          <div
+            class="relative space-y-8 rounded-2xl border border-white/5 bg-background/10 p-8 backdrop-blur-sm"
+          >
+            <div>
+              <h3 class="mb-6 text-3xl font-bold">
+                <span class="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                  Mi historia
+                </span>
+              </h3>
+              <div class="space-y-4">
+                <p
+                  class="relative pl-4 leading-relaxed text-light-2 before:absolute before:left-0 before:top-2 before:h-4 before:w-px before:bg-accent"
+                  set:html={pt(
+                    'Desde pequeño me fascinó descubrir el [[porqué]] y el [[cómo]] de las cosas. Esa curiosidad me llevó a convertirme en [[desarrollador full-stack]] y [[diseñador UX/UI]].'
+                  )}
+                />
+                <p
+                  class="relative pl-4 leading-relaxed text-light-2 before:absolute before:left-0 before:top-2 before:h-4 before:w-px before:bg-accent-light"
+                  set:html={pt(
+                    'Hoy, cada proyecto es un diálogo entre [[posibilidades técnicas]] y [[necesidades humanas]]. Me sumerjo en la esencia de cada desafío, transformando ideas en realidades palpables.'
+                  )}
+                />
+                <p
+                  class="relative pl-4 leading-relaxed text-light-2 before:absolute before:left-0 before:top-2 before:h-4 before:w-px before:bg-accent"
+                  set:html={pt(
+                    'Con la mirada puesta en el futuro, exploro [[nuevas fronteras]] en diseño y tecnología, abriendo caminos hacia experiencias innovadoras y memorables.'
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Visual with overlap effect -->
+      <div class="relative flex items-center justify-center lg:-mt-20">
+        <div
+          class="group relative h-[400px] w-[400px] rotate-[0deg] transition-all duration-500 hover:rotate-[-12deg] lg:h-[450px] lg:w-[450px]"
+        >
+          <!-- Glow effect -->
+
+          <PlanetOrbit />
+          <Image
+            src="https://cdn.moura.ar/planet1.webp"
+            alt="Planeta representando el balance entre orden y caos"
+            width={500}
+            height={500}
+            class="relative z-10 h-full w-full rotate-[-12deg] object-contain opacity-80 hover:opacity-90"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Philosophy Cards - Creative Layout -->
+    <div class="relative">
+      <!-- Section Header -->
+      <div class="mb-16 text-center">
+        <span class="mb-4 inline-block text-8xl font-bold text-white/5">02</span>
+        <h3 class="relative -mt-12 mb-4 text-3xl font-bold">
+          <span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
+            Mis principios de trabajo
+          </span>
+        </h3>
+        <p class="mx-auto max-w-2xl text-lg text-light-2">
+          Métodos inspirados en principios japoneses milenarios,
+          <span class="font-semibold text-white">reinventados</span> para la complejidad creativa de
+          la era digital
+        </p>
+      </div>
+
+      <!-- Creative Cards Grid -->
+      <div class="relative mx-auto max-w-5xl">
+        <!-- Connection lines -->
+        <svg class="absolute inset-0 h-full w-full" style="z-index: -1">
+          <path
+            d="M 200 150 Q 400 100 600 150"
+            stroke="url(#gradient1)"
+            stroke-width="1"
+            fill="none"
+            opacity="0.3"
+            class="hidden lg:block"></path>
+          <path
+            d="M 600 150 Q 800 200 1000 150"
+            stroke="url(#gradient2)"
+            stroke-width="1"
+            fill="none"
+            opacity="0.3"
+            class="hidden lg:block"></path>
+          <defs>
+            <linearGradient id="gradient1">
+              <stop offset="0%" stop-color="#FFB800"></stop>
+              <stop offset="100%" stop-color="#FF6B6B"></stop>
+            </linearGradient>
+            <linearGradient id="gradient2">
+              <stop offset="0%" stop-color="#FF6B6B"></stop>
+              <stop offset="100%" stop-color="#4ECDC4"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <!-- Cards with staggered layout -->
+        <div class="hidden gap-8 md:grid-cols-3 md:grid">
+          {
+            cards.map((card, index) => (
+              <div
+                class={`relative ${index === 1 ? 'md:-mt-8' : ''} ${index === 2 ? 'md:mt-8' : ''}`}
+              >
+                <PhilosophyCard {...card} />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Mobile Philosophy Cards -->
+      <div class="mt-12 block md:hidden">
+        <div class="space-y-6">
+          {cards.map((card) => <PhilosophyCard {...card} />)}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

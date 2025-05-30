@@ -1,0 +1,81 @@
+---
+import { parseTextOptimized } from '@/utils/textParser';
+
+interface Props {
+  number: number;
+  title: string;
+  subtitle: string;
+  text: string;
+  icon?: string;
+  color?: string;
+}
+
+const {
+  number,
+  title,
+  subtitle,
+  text,
+  icon = '✨',
+  color = 'from-accent/20 to-accent-light/20',
+} = Astro.props;
+---
+
+<div
+  class="group relative h-full overflow-hidden rounded-2xl border border-white/5 bg-background/5 p-1 transition-all duration-500 hover:scale-[1.02] hover:border-white/10"
+>
+  <!-- Gradient background -->
+  <div
+    class={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
+  >
+  </div>
+
+  <!-- Inner card -->
+  <div class="relative h-full rounded-xl bg-background/90 p-6 backdrop-blur-sm">
+    <!-- Icon background -->
+    <div
+      class="absolute -right-4 -top-4 text-6xl opacity-10 transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 group-hover:opacity-20"
+    >
+      {icon}
+    </div>
+
+    <!-- Number with creative styling -->
+    <div class="mb-4 flex items-center gap-3">
+      <div class="relative">
+        <span
+          class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-sm font-medium text-accent"
+        >
+          {number}
+        </span>
+        <span class="absolute inset-0 animate-pulse rounded-full bg-accent/10"></span>
+      </div>
+
+      <!-- Title -->
+      <h4
+        class="text-xl font-bold text-white transition-all duration-300 group-hover:translate-x-1"
+      >
+        {title}
+      </h4>
+    </div>
+
+    <!-- Subtitle with decorative line -->
+    <div class="mb-4 flex items-center gap-2">
+      <div class="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      <p class="font-serif text-sm text-accent-light">
+        {subtitle}
+      </p>
+      <div class="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+    </div>
+
+    <!-- Text with hover effect -->
+    <p
+      class="relative text-sm leading-relaxed text-light-2 transition-all duration-300 group-hover:text-light-1"
+      set:html={parseTextOptimized(text)}
+    />
+
+    <!-- Bottom accent -->
+    <div
+      class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    >
+    </div>
+  </div>
+</div>
