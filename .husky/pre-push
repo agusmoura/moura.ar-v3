@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Verificar tipos de TypeScript y Astro
 echo "🔎 Verificando tipos..."
 bun run check
