@@ -1,0 +1,894 @@
+---
+interface Props {
+  // Stars Background props
+  starDensity?: number;
+  allStarsTwinkle?: boolean;
+  twinkleProbability?: number;
+  minTwinkleSpeed?: number;
+  maxTwinkleSpeed?: number;
+
+  // Shooting Stars props
+  shootingStarsEnabled?: boolean;
+  minSpeed?: number;
+  maxSpeed?: number;
+  minDelay?: number;
+  maxDelay?: number;
+  starColor?: string;
+  trailColor?: string;
+  starWidth?: number;
+  starHeight?: number;
+
+  // Background props
+  backgroundColor?: string | null;
+
+  // Gravity props
+  gravityEnabled?: boolean;
+  gravityStrength?: number;
+  gravityX?: number | null; // null = center
+  gravityY?: number | null; // null = center
+
+  // Mouse Gravity props
+  mouseGravityEnabled?: boolean;
+  mouseGravityStrength?: number;
+  mouseGravityRadius?: number;
+}
+
+const {
+  // Stars Background defaults
+  starDensity = 0.00015,
+  allStarsTwinkle = true,
+  twinkleProbability = 0.7,
+  minTwinkleSpeed = 0.5,
+  maxTwinkleSpeed = 1,
+
+  // Shooting Stars defaults
+  shootingStarsEnabled = true,
+  minSpeed = 15,
+  maxSpeed = 30,
+  minDelay = 1200,
+  maxDelay = 4200,
+  starColor = '#9E00FF',
+  trailColor = '#2EB9DF',
+  starWidth = 10,
+  starHeight = 1,
+
+  // Background defaults
+  backgroundColor = '#000',
+
+  // Gravity defaults
+  gravityEnabled = true,
+  gravityStrength = 8000,
+  gravityX = null,
+  gravityY = null,
+
+  // Mouse Gravity defaults
+  mouseGravityEnabled = true,
+  mouseGravityStrength = 0.6,
+  mouseGravityRadius = 0.15,
+} = Astro.props;
+---
+
+<space-background
+  transition:name="space-background"
+  data-config={JSON.stringify({
+    stars: {
+      starDensity,
+      allStarsTwinkle,
+      twinkleProbability,
+      minTwinkleSpeed,
+      maxTwinkleSpeed,
+    },
+    shootingStars: {
+      enabled: shootingStarsEnabled,
+      minSpeed,
+      maxSpeed,
+      minDelay,
+      maxDelay,
+      starColor,
+      trailColor,
+      starWidth,
+      starHeight,
+    },
+    backgroundColor,
+    gravity: {
+      enabled: gravityEnabled,
+      strength: gravityStrength,
+      x: gravityX,
+      y: gravityY,
+    },
+    mouseGravity: {
+      enabled: mouseGravityEnabled,
+      strength: mouseGravityStrength,
+      radius: mouseGravityRadius,
+    },
+  })}
+>
+  <canvas class="space-canvas" aria-hidden="true"></canvas>
+</space-background>
+
+<script>
+  interface Star {
+    x: number;
+    y: number;
+    radius: number;
+    opacity: number;
+    twinkleSpeed: number | null;
+    twinklePhase: number;
+  }
+
+  interface ShootingStar {
+    x: number;
+    y: number;
+    angle: number;
+    speed: number;
+    length: number;
+    opacity: number;
+    active: boolean;
+    trail: Array<{ x: number; y: number; opacity: number }>;
+    maxTrailLength: number;
+  }
+
+  interface Config {
+    stars: {
+      starDensity: number;
+      allStarsTwinkle: boolean;
+      twinkleProbability: number;
+      minTwinkleSpeed: number;
+      maxTwinkleSpeed: number;
+    };
+    shootingStars: {
+      enabled: boolean;
+      minSpeed: number;
+      maxSpeed: number;
+      minDelay: number;
+      maxDelay: number;
+      starColor: string;
+      trailColor: string;
+      starWidth: number;
+      starHeight: number;
+    };
+    backgroundColor: string | null;
+    gravity: {
+      enabled: boolean;
+      strength: number;
+      x: number | null;
+      y: number | null;
+    };
+    mouseGravity: {
+      enabled: boolean;
+      strength: number;
+      radius: number;
+    };
+  }
+
+  class SpaceBackground extends HTMLElement {
+    private config: Config;
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D | null;
+    private stars: Star[] = [];
+    private shootingStars: ShootingStar[] = [];
+    private shootingStarPool: ShootingStar[] = [];
+    private animationId: number | null = null;
+    private resizeTimeout: number | null = null;
+    private lastTime: number = 0;
+    private nextShootingStarTime: number = 0;
+    private width: number = 0;
+    private height: number = 0;
+    private dpr: number = 1;
+    private shootingStarColors: { r: number; g: number; b: number };
+    private trailColors: { r: number; g: number; b: number };
+    private orbitContainer: Element | null = null;
+    private orbitRect: DOMRect | null = null;
+    private mouseX: number = -1000; // Start off-screen
+    private mouseY: number = -1000;
+    private mouseGravityStrength: number;
+    private mouseGravityRadius: number;
+
+    constructor() {
+      super();
+      this.canvas = this.querySelector('.space-canvas') as HTMLCanvasElement;
+      this.ctx = this.canvas?.getContext('2d', { alpha: false });
+
+      try {
+        this.config = JSON.parse(this.dataset.config || '{}');
+      } catch (e) {
+        console.warn('Failed to parse space background config:', e);
+        this.config = {
+          stars: {
+            starDensity: 0.00015,
+            allStarsTwinkle: true,
+            twinkleProbability: 0.7,
+            minTwinkleSpeed: 0.5,
+            maxTwinkleSpeed: 1,
+          },
+          shootingStars: {
+            enabled: true,
+            minSpeed: 10,
+            maxSpeed: 30,
+            minDelay: 1200,
+            maxDelay: 4200,
+            starColor: '#9E00FF',
+            trailColor: '#2EB9DF',
+            starWidth: 10,
+            starHeight: 1,
+          },
+          backgroundColor: '#000',
+          gravity: {
+            enabled: true,
+            strength: 8000,
+            x: null,
+            y: null,
+          },
+          mouseGravity: {
+            enabled: true,
+            strength: 0.6,
+            radius: 0.15,
+          },
+        };
+      }
+
+      // Set mouse gravity values from config
+      this.mouseGravityStrength = this.config.mouseGravity.strength;
+      this.mouseGravityRadius = this.config.mouseGravity.radius;
+
+      // Parse colors once
+      this.shootingStarColors = this.hexToRgb(this.config.shootingStars.starColor);
+      this.trailColors = this.hexToRgb(this.config.shootingStars.trailColor);
+
+      this.setupBackground();
+    }
+
+    private hexToRgb(hex: string): { r: number; g: number; b: number } {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16),
+          }
+        : { r: 255, g: 255, b: 255 };
+    }
+
+    private setupBackground(): void {
+      if (!this.canvas || !this.ctx) return;
+
+      // Set canvas styles
+      this.canvas.style.position = 'absolute';
+      this.canvas.style.inset = '0';
+      this.canvas.style.width = '100%';
+      this.canvas.style.height = '100%';
+
+      // Find orbit container for gravity
+      this.findOrbitContainer();
+
+      // Add mouse tracking
+      this.setupMouseTracking();
+
+      // Skip animations if user prefers reduced motion
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        this.setupCanvas();
+        this.initializeStars();
+        this.renderStatic();
+        return;
+      }
+
+      // Setup and start
+      this.setupCanvas();
+      this.initializeStars();
+      this.initializeShootingStarPool();
+
+      // Schedule first shooting star
+      if (this.config.shootingStars.enabled) {
+        this.scheduleNextShootingStar();
+      }
+
+      // Add resize listener with debouncing
+      window.addEventListener('resize', this.handleResize.bind(this));
+
+      // Start animation
+      this.lastTime = performance.now();
+      this.animateFrame();
+    }
+
+    private setupMouseTracking(): void {
+      // Only set up mouse tracking if mouse gravity is enabled
+      if (this.config.mouseGravity.enabled) {
+        // Add event listeners
+        window.addEventListener('mousemove', this.handleMouseMove);
+        this.canvas.addEventListener('mouseleave', this.handleMouseLeave);
+      }
+    }
+
+    private setupCanvas(): void {
+      const rect = this.canvas.getBoundingClientRect();
+      this.width = rect.width;
+      this.height = rect.height;
+      this.dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance
+
+      this.canvas.width = this.width * this.dpr;
+      this.canvas.height = this.height * this.dpr;
+
+      if (this.ctx) {
+        this.ctx.scale(this.dpr, this.dpr);
+        // Set background once
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(0, 0, this.width, this.height);
+      }
+    }
+
+    private initializeStars(): void {
+      const { starDensity, allStarsTwinkle, twinkleProbability, minTwinkleSpeed, maxTwinkleSpeed } =
+        this.config.stars;
+
+      const area = this.width * this.height;
+      const numStars = Math.floor(area * starDensity);
+
+      this.stars = Array.from({ length: numStars }, () => {
+        const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
+        return {
+          x: Math.random() * this.width,
+          y: Math.random() * this.height,
+          radius: Math.random() * 0.05 + 0.5,
+          opacity: Math.random() * 0.5 + 0.5,
+          twinkleSpeed: shouldTwinkle
+            ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
+            : null,
+          twinklePhase: Math.random() * Math.PI * 2,
+        };
+      });
+    }
+
+    private initializeShootingStarPool(): void {
+      // Pre-create shooting stars for object pooling
+      const poolSize = 5;
+      for (let i = 0; i < poolSize; i++) {
+        this.shootingStarPool.push({
+          x: 0,
+          y: 0,
+          angle: 0,
+          speed: 0,
+          length: this.config.shootingStars.starWidth,
+          opacity: 1,
+          active: false,
+          trail: [],
+          maxTrailLength: 10,
+        });
+      }
+      this.shootingStarPool.push({
+        x: 0,
+        y: 0,
+        angle: 0,
+        speed: 0,
+        length: this.config.shootingStars.starWidth,
+        opacity: 1,
+        active: false,
+        trail: [],
+        maxTrailLength: 10,
+      });
+    }
+
+    private getShootingStar(): ShootingStar | null {
+      // Get from pool or create new one
+      let star = this.shootingStarPool.find((s) => !s.active);
+      if (!star && this.shootingStarPool.length < 10) {
+        star = {
+          x: 0,
+          y: 0,
+          angle: 0,
+          speed: 0,
+          length: this.config.shootingStars.starWidth,
+          opacity: 1,
+          active: false,
+          trail: [],
+          maxTrailLength: 20,
+        };
+        this.shootingStarPool.push(star);
+      }
+      return star || null;
+    }
+
+    private scheduleNextShootingStar(): void {
+      const { minDelay, maxDelay } = this.config.shootingStars;
+      const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+      this.nextShootingStarTime = performance.now() + delay;
+    }
+
+    private createShootingStar(): void {
+      const star = this.getShootingStar();
+      if (!star) return;
+
+      const { minSpeed, maxSpeed } = this.config.shootingStars;
+      const side = Math.floor(Math.random() * 4);
+      const offset = Math.random();
+
+      // Set starting position based on side
+      switch (side) {
+        case 0: // Top
+          star.x = offset * this.width;
+          star.y = -50;
+          star.angle = Math.PI / 4 + (Math.random() * Math.PI) / 2;
+          break;
+        case 1: // Right
+          star.x = this.width + 50;
+          star.y = offset * this.height;
+          star.angle = (3 * Math.PI) / 4 + (Math.random() * Math.PI) / 2;
+          break;
+        case 2: // Bottom
+          star.x = offset * this.width;
+          star.y = this.height + 50;
+          star.angle = (5 * Math.PI) / 4 + (Math.random() * Math.PI) / 2;
+          break;
+        case 3: // Left
+          star.x = -50;
+          star.y = offset * this.height;
+          star.angle = (7 * Math.PI) / 4 + (Math.random() * Math.PI) / 2;
+          break;
+      }
+
+      star.speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+      star.opacity = 1;
+      star.active = true;
+      star.length = this.config.shootingStars.starWidth;
+      star.trail = []; // Reset trail for new shooting star
+
+      this.shootingStars.push(star);
+    }
+
+    private findOrbitContainer(): void {
+      // Try different possible selectors for orbit container
+      this.orbitContainer =
+        document.querySelector('.orbit-container') ||
+        document.querySelector('#orbit-container') ||
+        document.querySelector('[class*="orbit"]') ||
+        document.querySelector('[id*="orbit"]');
+
+      if (this.orbitContainer) {
+        this.updateOrbitRect();
+      }
+    }
+
+    private updateOrbitRect(): void {
+      if (this.orbitContainer) {
+        this.orbitRect = this.orbitContainer.getBoundingClientRect();
+      }
+    }
+
+    private getGravityCoordinates(): { x: number; y: number; width: number; height: number } {
+      // Update orbit rect in case element moved
+      this.updateOrbitRect();
+
+      if (this.orbitRect) {
+        // Use orbit container center and dimensions
+        return {
+          x: this.orbitRect.left + this.orbitRect.width / 2,
+          y: this.orbitRect.top + this.orbitRect.height / 2,
+          width: this.orbitRect.width,
+          height: this.orbitRect.height,
+        };
+      }
+
+      // Fallback to configured coordinates or screen center
+      return {
+        x: this.config.gravity.x ?? this.width / 2,
+        y: this.config.gravity.y ?? this.height / 2,
+        width: Math.min(this.width, this.height) * 0.3, // 30% of smaller dimension
+        height: Math.min(this.width, this.height) * 0.3,
+      };
+    }
+
+    private applyGravity(star: ShootingStar, deltaTime: number): void {
+      if (!this.config.gravity.enabled) return;
+
+      const gravity = this.getGravityCoordinates();
+
+      // Calculate distance to gravity center
+      const dx = gravity.x - star.x;
+      const dy = gravity.y - star.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Avoid division by zero and too strong forces when very close
+      if (distance < Math.min(gravity.width, gravity.height) / 4) return;
+
+      // Calculate gravitational force - stronger within orbit area
+      const orbitRadius = Math.max(gravity.width, gravity.height) / 2;
+      const strengthMultiplier = distance < orbitRadius ? 2 : 1;
+      const force = (this.config.gravity.strength * strengthMultiplier) / (distance * distance);
+      const normalizedDelta = deltaTime / 16.67; // Normalize to 60fps
+
+      // Apply force to velocity components
+      const forceX = (dx / distance) * force * normalizedDelta;
+      const forceY = (dy / distance) * force * normalizedDelta;
+
+      // Get current velocity components
+      const currentVelX = Math.cos(star.angle) * star.speed;
+      const currentVelY = Math.sin(star.angle) * star.speed;
+
+      // Update velocity
+      const newVelX = currentVelX + forceX;
+      const newVelY = currentVelY + forceY;
+
+      // Update star angle and speed
+      star.angle = Math.atan2(newVelY, newVelX);
+      star.speed = Math.sqrt(newVelX * newVelX + newVelY * newVelY);
+    }
+
+    private applyMultipleGravitationalLensing(star: Star): { x: number; y: number } {
+      // Get orbit gravity center
+      const gravityCoords = this.getGravityCoordinates();
+
+      // Apply orbit center gravity
+      const orbitLensed = this.applySingleGravitationalLensing(
+        star,
+        {
+          x: gravityCoords.x,
+          y: gravityCoords.y,
+        },
+        2.0,
+        0.3
+      );
+
+      // Apply mouse gravity if enabled and mouse is on screen
+      if (
+        this.config.mouseGravity.enabled &&
+        this.mouseX > 0 &&
+        this.mouseY > 0 &&
+        this.mouseX < this.width &&
+        this.mouseY < this.height
+      ) {
+        const mouseLensed = this.applySingleGravitationalLensing(
+          {
+            x: orbitLensed.x,
+            y: orbitLensed.y,
+            radius: star.radius,
+            opacity: star.opacity,
+            twinkleSpeed: star.twinkleSpeed,
+            twinklePhase: star.twinklePhase,
+          },
+          {
+            x: this.mouseX,
+            y: this.mouseY,
+          },
+          this.mouseGravityStrength,
+          this.mouseGravityRadius
+        );
+
+        return mouseLensed;
+      }
+
+      return orbitLensed;
+    }
+
+    private applySingleGravitationalLensing(
+      star: Star,
+      gravityCenter: { x: number; y: number },
+      strength: number,
+      maxRadiusRatio: number
+    ): { x: number; y: number } {
+      const dx = star.x - gravityCenter.x;
+      const dy = star.y - gravityCenter.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Only apply lensing within a certain radius
+      const maxLensingRadius = Math.min(this.width, this.height) * maxRadiusRatio;
+      if (distance > maxLensingRadius) {
+        return { x: star.x, y: star.y };
+      }
+
+      // Calculate lensing strength
+      const lensingStrength = (1 - distance / maxLensingRadius) * strength;
+
+      // Apply distortion
+      const angle = Math.atan2(dy, dx);
+      const distortedDistance = distance * (1 + lensingStrength);
+
+      // Add tangential distortion to create swirl
+      const tangentialDistortion = lensingStrength * 0.5;
+      const newAngle = angle + tangentialDistortion;
+
+      return {
+        x: gravityCenter.x + Math.cos(newAngle) * distortedDistance,
+        y: gravityCenter.y + Math.sin(newAngle) * distortedDistance,
+      };
+    }
+
+    private updateShootingStars(deltaTime: number): void {
+      const padding = 100;
+
+      for (let i = this.shootingStars.length - 1; i >= 0; i--) {
+        const star = this.shootingStars[i];
+
+        // Apply gravity first
+        this.applyGravity(star, deltaTime);
+
+        // Add current position to trail history
+        star.trail.push({
+          x: star.x,
+          y: star.y,
+          opacity: 1,
+        });
+
+        // Limit trail length for performance
+        if (star.trail.length > star.maxTrailLength) {
+          star.trail.shift();
+        }
+
+        // Update position
+        const distance = (star.speed * deltaTime) / 16.67; // Normalize to 60fps
+        star.x += Math.cos(star.angle) * distance;
+        star.y += Math.sin(star.angle) * distance;
+
+        // Update trail opacities (fade older points)
+        star.trail.forEach((point, index) => {
+          point.opacity = index / star.trail.length;
+        });
+
+        // Check if off screen
+        if (
+          star.x < -padding ||
+          star.x > this.width + padding ||
+          star.y < -padding ||
+          star.y > this.height + padding
+        ) {
+          star.active = false;
+          this.shootingStars.splice(i, 1);
+        }
+      }
+
+      // Create new shooting star if it's time
+      if (this.config.shootingStars.enabled && performance.now() >= this.nextShootingStarTime) {
+        this.createShootingStar();
+        this.scheduleNextShootingStar();
+      }
+    }
+
+    private render(): void {
+      if (!this.ctx) return;
+
+      const ctx = this.ctx; // Store reference to avoid null checks
+
+      // Clear canvas - only if background color is set
+      if (this.config.backgroundColor) {
+        ctx.fillStyle = this.config.backgroundColor;
+        ctx.fillRect(0, 0, this.width, this.height);
+      } else {
+        ctx.clearRect(0, 0, this.width, this.height);
+      }
+
+      // Get gravity center for lensing effect
+      const gravityCoords = this.getGravityCoordinates();
+
+      // Debug: log gravity coordinates occasionally
+      if (Math.random() < 0.001) {
+        console.log('Gravity center:', gravityCoords.x, gravityCoords.y);
+        console.log('Canvas size:', this.width, this.height);
+      }
+
+      // Draw stars with gravitational lensing
+      ctx.fillStyle = '#fff';
+      const time = performance.now() * 0.001;
+
+      for (const star of this.stars) {
+        let opacity = star.opacity;
+
+        if (star.twinkleSpeed !== null) {
+          opacity = 0.5 + 0.5 * Math.sin(time / star.twinkleSpeed + star.twinklePhase);
+        }
+
+        // Apply gravitational lensing to star position
+        const lensedPosition = this.applyMultipleGravitationalLensing(star);
+
+        ctx.globalAlpha = opacity;
+        ctx.beginPath();
+        ctx.arc(lensedPosition.x, lensedPosition.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw shooting stars
+      ctx.globalAlpha = 1;
+      for (const star of this.shootingStars) {
+        if (!star.active || star.trail.length < 2) continue;
+
+        // Draw curved trail using path history
+        ctx.lineWidth = this.config.shootingStars.starHeight;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Draw trail segments with varying opacity
+        for (let i = 1; i < star.trail.length; i++) {
+          const currentPoint = star.trail[i];
+          const prevPoint = star.trail[i - 1];
+
+          // Calculate opacity based on position in trail and point opacity
+          const segmentOpacity = currentPoint.opacity * star.opacity;
+
+          // Create gradient for this segment
+          const gradient = ctx.createLinearGradient(
+            prevPoint.x,
+            prevPoint.y,
+            currentPoint.x,
+            currentPoint.y
+          );
+
+          const startAlpha = i === 1 ? 0 : star.trail[i - 1].opacity * star.opacity;
+          gradient.addColorStop(
+            0,
+            `rgba(${this.trailColors.r}, ${this.trailColors.g}, ${this.trailColors.b}, ${startAlpha})`
+          );
+          gradient.addColorStop(
+            1,
+            `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${segmentOpacity})`
+          );
+
+          // Draw segment
+          ctx.strokeStyle = gradient;
+          ctx.beginPath();
+          ctx.moveTo(prevPoint.x, prevPoint.y);
+          ctx.lineTo(currentPoint.x, currentPoint.y);
+          ctx.stroke();
+        }
+
+        // Draw bright head with glow
+        const head = star.trail[star.trail.length - 1];
+        const headRadius = this.config.shootingStars.starHeight;
+
+        // Save context for glow effect
+        ctx.save();
+
+        // Draw glow layers (outer to inner)
+        const glowLayers = [
+          { radius: headRadius * 4, opacity: 0.1 },
+          { radius: headRadius * 3, opacity: 0.2 },
+          { radius: headRadius * 2, opacity: 0.4 },
+          { radius: headRadius * 1.5, opacity: 0.6 },
+        ];
+
+        glowLayers.forEach((layer) => {
+          ctx.fillStyle = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${layer.opacity * star.opacity})`;
+          ctx.beginPath();
+          ctx.arc(head.x, head.y, layer.radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Draw core with shadow glow
+        ctx.shadowColor = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, 0.8)`;
+        ctx.shadowBlur = headRadius * 3;
+        ctx.fillStyle = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${star.opacity})`;
+        ctx.beginPath();
+        ctx.arc(head.x, head.y, headRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Restore context
+        ctx.restore();
+      }
+    }
+
+    private renderStatic(): void {
+      if (!this.ctx) return;
+
+      // Only fill background if color is set
+      if (this.config.backgroundColor) {
+        this.ctx.fillStyle = this.config.backgroundColor;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+      } else {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+      }
+
+      // Get gravity center for lensing effect
+      const gravityCoords = this.getGravityCoordinates();
+
+      // Debug: log gravity coordinates for static render
+      console.log('Static render - Gravity center:', gravityCoords.x, gravityCoords.y);
+      console.log('Static render - Canvas size:', this.width, this.height);
+
+      this.ctx.fillStyle = '#fff';
+
+      for (const star of this.stars) {
+        // Apply gravitational lensing to star position
+        const lensedPosition = this.applyMultipleGravitationalLensing(star);
+
+        this.ctx.globalAlpha = star.opacity;
+        this.ctx.beginPath();
+        this.ctx.arc(lensedPosition.x, lensedPosition.y, star.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    }
+
+    private animateFrame(): void {
+      const currentTime = performance.now();
+      const deltaTime = Math.min(currentTime - this.lastTime, 33.33); // Cap at 30fps minimum
+      this.lastTime = currentTime;
+
+      this.updateShootingStars(deltaTime);
+      this.render();
+
+      this.animationId = requestAnimationFrame(() => this.animateFrame());
+    }
+
+    private handleResize(): void {
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+      }
+
+      this.resizeTimeout = window.setTimeout(() => {
+        const oldWidth = this.width;
+        const oldHeight = this.height;
+
+        this.setupCanvas();
+
+        // Update orbit container position after resize
+        this.findOrbitContainer();
+
+        // Reposition stars proportionally instead of regenerating
+        const widthRatio = this.width / oldWidth;
+        const heightRatio = this.height / oldHeight;
+
+        for (const star of this.stars) {
+          star.x *= widthRatio;
+          star.y *= heightRatio;
+        }
+
+        // Add new stars if canvas grew significantly
+        if (this.width * this.height > oldWidth * oldHeight * 1.5) {
+          this.initializeStars();
+        }
+      }, 150);
+    }
+
+    disconnectedCallback(): void {
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = null;
+      }
+
+      // Clean up event listeners
+      window.removeEventListener('resize', this.handleResize.bind(this));
+      window.removeEventListener('mousemove', this.handleMouseMove);
+      if (this.canvas) {
+        this.canvas.removeEventListener('mouseleave', this.handleMouseLeave);
+      }
+    }
+
+    private handleMouseMove = (event: MouseEvent) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.mouseX = event.clientX - rect.left;
+      this.mouseY = event.clientY - rect.top;
+    };
+
+    private handleMouseLeave = () => {
+      // Move mouse "gravity" off-screen when mouse leaves
+      this.mouseX = -1000;
+      this.mouseY = -1000;
+    };
+  }
+
+  // Define the custom element
+  if (!customElements.get('space-background')) {
+    customElements.define('space-background', SpaceBackground);
+  }
+</script>
+
+<style>
+  space-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: layout style paint;
+    will-change: transform;
+  }
+
+  .space-canvas {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+</style>

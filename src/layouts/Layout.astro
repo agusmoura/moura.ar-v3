@@ -1,4 +1,5 @@
 ---
+import SpaceBackground from '@/components/effects/SpaceBackground.astro';
 import type { Preload } from '@/types/Preload';
 import SEO from '@components/seo/SEO.astro';
 import '@fontsource-variable/noto-serif-jp';
@@ -24,6 +25,24 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(canonical, Astro.url);
+
+const backgroundConfig = {
+  starDensity: 0.0012,
+  minTwinkleSpeed: 0.4,
+  maxTwinkleSpeed: 1.5,
+  minDelay: 2000,
+  maxDelay: 6000,
+  starColor: '#ecad22',
+  trailColor: '#e1dbcd',
+  starWidth: 15,
+  starHeight: 2,
+  backgroundColor: '#10100E ',
+  gravityEnabled: true,
+  gravityStrength: 80000,
+  mouseGravityEnabled: true,
+  mouseGravityStrength: 1.2,
+  mouseGravityRadius: 0.12,
+};
 ---
 
 <!doctype html>
@@ -39,6 +58,7 @@ const canonicalURL = new URL(canonical, Astro.url);
     <ClientRouter />
   </head>
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
+    <SpaceBackground {...backgroundConfig} />
     <slot />
   </body>
 </html>
