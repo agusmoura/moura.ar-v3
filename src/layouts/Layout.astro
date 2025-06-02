@@ -1,6 +1,6 @@
 ---
-import SpaceBackground from '@/components/effects/SpaceBackground.astro';
 import type { Preload } from '@/types/Preload';
+import SpaceBackground from '@components/effects/SpaceBackground.astro';
 import SEO from '@components/seo/SEO.astro';
 import '@fontsource-variable/noto-serif-jp';
 import '@fontsource/space-mono/400.css';
@@ -27,7 +27,7 @@ const {
 const canonicalURL = new URL(canonical, Astro.url);
 
 const backgroundConfig = {
-  starDensity: 0.0012,
+  starDensity: 0.0015,
   minTwinkleSpeed: 0.4,
   maxTwinkleSpeed: 1.5,
   minDelay: 2000,
