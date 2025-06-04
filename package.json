@@ -22,6 +22,8 @@
     "typescript": "^5.8.3"
   },
   "devDependencies": {
+    "astro-icon": "^1.1.5",
+    "@iconify-json/simple-icons": "^1.2.37",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@tailwindcss/vite": "^4.1.8",
