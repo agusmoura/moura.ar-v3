@@ -687,38 +687,82 @@ const {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
-        // Draw trail segments with varying opacity
-        for (let i = 1; i < star.trail.length; i++) {
-          const currentPoint = star.trail[i];
-          const prevPoint = star.trail[i - 1];
-
-          // Calculate opacity based on position in trail and point opacity
-          const segmentOpacity = currentPoint.opacity * star.opacity;
-
-          // Create gradient for this segment
+        // Draw smooth trail using quadratic curves
+        if (star.trail.length >= 3) {
+          // Start with a path for the entire trail
           const gradient = ctx.createLinearGradient(
-            prevPoint.x,
-            prevPoint.y,
-            currentPoint.x,
-            currentPoint.y
+            star.trail[0].x,
+            star.trail[0].y,
+            star.trail[star.trail.length - 1].x,
+            star.trail[star.trail.length - 1].y
           );
 
-          const startAlpha = i === 1 ? 0 : star.trail[i - 1].opacity * star.opacity;
-          gradient.addColorStop(
-            0,
-            `rgba(${this.trailColors.r}, ${this.trailColors.g}, ${this.trailColors.b}, ${startAlpha})`
-          );
+          // Create gradient stops based on trail opacity
+          for (let i = 0; i < star.trail.length; i++) {
+            const stop = i / (star.trail.length - 1);
+            const opacity = star.trail[i].opacity * star.opacity;
+            gradient.addColorStop(
+              stop,
+              `rgba(${this.trailColors.r}, ${this.trailColors.g}, ${this.trailColors.b}, ${opacity * 0.6})`
+            );
+          }
           gradient.addColorStop(
             1,
-            `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${segmentOpacity})`
+            `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${star.opacity})`
           );
 
-          // Draw segment
           ctx.strokeStyle = gradient;
           ctx.beginPath();
-          ctx.moveTo(prevPoint.x, prevPoint.y);
-          ctx.lineTo(currentPoint.x, currentPoint.y);
+          ctx.moveTo(star.trail[0].x, star.trail[0].y);
+
+          // Draw smooth curves between points
+          for (let i = 1; i < star.trail.length - 1; i++) {
+            const currentPoint = star.trail[i];
+            const nextPoint = star.trail[i + 1];
+
+            // Calculate control point for smooth curve
+            const controlX = currentPoint.x;
+            const controlY = currentPoint.y;
+            const endX = (currentPoint.x + nextPoint.x) / 2;
+            const endY = (currentPoint.y + nextPoint.y) / 2;
+
+            ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+          }
+
+          // Draw to the final point
+          const lastPoint = star.trail[star.trail.length - 1];
+          ctx.lineTo(lastPoint.x, lastPoint.y);
           ctx.stroke();
+        } else {
+          // Fallback for short trails (less than 3 points)
+          for (let i = 1; i < star.trail.length; i++) {
+            const currentPoint = star.trail[i];
+            const prevPoint = star.trail[i - 1];
+            const segmentOpacity = currentPoint.opacity * star.opacity;
+
+            const gradient = ctx.createLinearGradient(
+              prevPoint.x,
+              prevPoint.y,
+              currentPoint.x,
+              currentPoint.y
+            );
+
+            const startAlpha = i === 1 ? 0 : star.trail[i - 1].opacity * star.opacity;
+            gradient.addColorStop(
+              0,
+              `rgba(${this.trailColors.r}, ${this.trailColors.g}, ${this.trailColors.b}, ${startAlpha})`
+            );
+            gradient.addColorStop(
+              1,
+              `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${segmentOpacity})`
+            );
+
+            ctx.strokeStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(prevPoint.x, prevPoint.y);
+            ctx.lineTo(currentPoint.x, currentPoint.y);
+            ctx.stroke();
+          }
         }
 
         // Draw bright head with glow
