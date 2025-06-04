@@ -321,7 +321,10 @@ const {
         this.config.stars;
 
       const area = this.width * this.height;
-      const numStars = Math.floor(area * starDensity);
+      const numStars = Math.min(
+        Math.floor(area * starDensity),
+        2500 // Maximum stars limit for performance
+      );
 
       this.stars = Array.from({ length: numStars }, () => {
         const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
@@ -809,18 +812,23 @@ const {
         // Update orbit container position after resize
         this.findOrbitContainer();
 
-        // Reposition stars proportionally instead of regenerating
-        const widthRatio = this.width / oldWidth;
-        const heightRatio = this.height / oldHeight;
+        // Calculate correct number of stars for new canvas size
+        const area = this.width * this.height;
+        const targetStarCount = Math.floor(area * this.config.stars.starDensity);
+        const currentStarCount = this.stars.length;
 
-        for (const star of this.stars) {
-          star.x *= widthRatio;
-          star.y *= heightRatio;
-        }
-
-        // Add new stars if canvas grew significantly
-        if (this.width * this.height > oldWidth * oldHeight * 1.5) {
+        if (targetStarCount !== currentStarCount) {
+          // Recalculate stars to maintain consistent density
           this.initializeStars();
+        } else {
+          // Just reposition existing stars proportionally
+          const widthRatio = this.width / oldWidth;
+          const heightRatio = this.height / oldHeight;
+
+          for (const star of this.stars) {
+            star.x *= widthRatio;
+            star.y *= heightRatio;
+          }
         }
       }, 150);
     }
