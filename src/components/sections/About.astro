@@ -1,8 +1,6 @@
 ---
 import { parseText } from '@/utils/textParser';
-import PlanetOrbit from '@components/effects/PlanetOrbit.astro';
-import PhilosophyCard from '@components/ui/PhilosophyCard.astro';
-import { Image } from 'astro:assets';
+import PersonalCarousel from '@components/ui/PersonalCarousel.astro';
 const pt = (text: string) => parseText(text);
 
 const cards = [
@@ -114,7 +112,7 @@ const cards = [
                     ))
                   }
                 </div>
-                <p class="*text-xs text-foreground/70 uppercase tracking-wider">
+                <p class="text-xs text-foreground/70 uppercase tracking-wider">
                   Desarrollador • Diseñador • Explorador
                 </p>
               </div>
@@ -125,28 +123,14 @@ const cards = [
 
       <!-- Right Column: Visual with overlap effect -->
       <div class="relative flex items-center justify-center lg:-mt-20">
-        <div
-          class="group relative h-[400px] w-[400px] rotate-[0deg] transition-all duration-500 hover:rotate-[-12deg] lg:h-[450px] lg:w-[450px]"
-        >
-          <!-- Glow effect -->
-
-          <PlanetOrbit />
-          <Image
-            src="https://cdn.moura.ar/planet1.webp"
-            alt="Planeta representando el balance entre orden y caos"
-            width={500}
-            height={500}
-            class="relative z-10 h-full w-full rotate-[-12deg] object-contain opacity-80 hover:opacity-90"
-            loading="lazy"
-          />
-        </div>
+        <PersonalCarousel />
       </div>
     </div>
 
     <!-- Philosophy Cards - Creative Layout -->
-    <div class="relative">
-      <!-- Section Header -->
-      <div class="mb-16 text-center">
+    <!-- <div class="relative"> -->
+    <!-- Section Header -->
+    <!-- <div class="mb-16 text-center">
         <span class="mb-4 inline-block text-8xl font-bold text-white/5">02</span>
         <h3 class="relative -mt-12 mb-4 text-3xl font-bold">
           <span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
@@ -158,12 +142,12 @@ const cards = [
           <span class="font-semibold text-white">reinventados</span> para la complejidad creativa de
           la era digital
         </p>
-      </div>
+      </div> -->
 
-      <!-- Creative Cards Grid -->
-      <div class="relative mx-auto max-w-5xl">
-        <!-- Connection lines -->
-        <svg class="absolute inset-0 h-full w-full" style="z-index: -1">
+    <!-- Creative Cards Grid -->
+    <!-- <div class="relative mx-auto max-w-5xl"> -->
+    <!-- Connection lines -->
+    <!-- <svg class="absolute inset-0 h-full w-full" style="z-index: -1">
           <path
             d="M 200 150 Q 400 100 600 150"
             stroke="url(#gradient1)"
@@ -188,10 +172,10 @@ const cards = [
               <stop offset="100%" stop-color="#4ECDC4"></stop>
             </linearGradient>
           </defs>
-        </svg>
+        </svg> -->
 
-        <!-- Cards with staggered layout -->
-        <div class="hidden gap-8 md:grid-cols-3 md:grid">
+    <!-- Cards with staggered layout -->
+    <!-- <div class="hidden gap-8 md:grid-cols-3 md:grid">
           {
             cards.map((card, index) => (
               <div
@@ -201,15 +185,15 @@ const cards = [
               </div>
             ))
           }
-        </div>
-      </div>
+        </div> -->
+    <!-- </div> -->
 
-      <!-- Mobile Philosophy Cards -->
-      <div class="mt-12 block md:hidden">
+    <!-- Mobile Philosophy Cards -->
+    <!-- <div class="mt-12 block md:hidden">
         <div class="space-y-6">
           {cards.map((card) => <PhilosophyCard {...card} />)}
         </div>
-      </div>
-    </div>
+      </div> -->
+    <!-- </div> -->
   </div>
 </section>
