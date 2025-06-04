@@ -112,7 +112,7 @@ const cards = [
                     ))
                   }
                 </div>
-                <p class="text-xs text-foreground/70 uppercase tracking-wider">
+                <p class="text-xs text-foreground/70 uppercase tracking-wider text-right">
                   Desarrollador • Diseñador • Explorador
                 </p>
               </div>
@@ -126,74 +126,5 @@ const cards = [
         <PersonalCarousel />
       </div>
     </div>
-
-    <!-- Philosophy Cards - Creative Layout -->
-    <!-- <div class="relative"> -->
-    <!-- Section Header -->
-    <!-- <div class="mb-16 text-center">
-        <span class="mb-4 inline-block text-8xl font-bold text-white/5">02</span>
-        <h3 class="relative -mt-12 mb-4 text-3xl font-bold">
-          <span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
-            Mis principios de trabajo
-          </span>
-        </h3>
-        <p class="mx-auto max-w-2xl text-lg text-light-2">
-          Métodos inspirados en principios japoneses milenarios,
-          <span class="font-semibold text-white">reinventados</span> para la complejidad creativa de
-          la era digital
-        </p>
-      </div> -->
-
-    <!-- Creative Cards Grid -->
-    <!-- <div class="relative mx-auto max-w-5xl"> -->
-    <!-- Connection lines -->
-    <!-- <svg class="absolute inset-0 h-full w-full" style="z-index: -1">
-          <path
-            d="M 200 150 Q 400 100 600 150"
-            stroke="url(#gradient1)"
-            stroke-width="1"
-            fill="none"
-            opacity="0.3"
-            class="hidden lg:block"></path>
-          <path
-            d="M 600 150 Q 800 200 1000 150"
-            stroke="url(#gradient2)"
-            stroke-width="1"
-            fill="none"
-            opacity="0.3"
-            class="hidden lg:block"></path>
-          <defs>
-            <linearGradient id="gradient1">
-              <stop offset="0%" stop-color="#FFB800"></stop>
-              <stop offset="100%" stop-color="#FF6B6B"></stop>
-            </linearGradient>
-            <linearGradient id="gradient2">
-              <stop offset="0%" stop-color="#FF6B6B"></stop>
-              <stop offset="100%" stop-color="#4ECDC4"></stop>
-            </linearGradient>
-          </defs>
-        </svg> -->
-
-    <!-- Cards with staggered layout -->
-    <!-- <div class="hidden gap-8 md:grid-cols-3 md:grid">
-          {
-            cards.map((card, index) => (
-              <div
-                class={`relative ${index === 1 ? 'md:-mt-8' : ''} ${index === 2 ? 'md:mt-8' : ''}`}
-              >
-                <PhilosophyCard {...card} />
-              </div>
-            ))
-          }
-        </div> -->
-    <!-- </div> -->
-
-    <!-- Mobile Philosophy Cards -->
-    <!-- <div class="mt-12 block md:hidden">
-        <div class="space-y-6">
-          {cards.map((card) => <PhilosophyCard {...card} />)}
-        </div>
-      </div> -->
-    <!-- </div> -->
   </div>
 </section>

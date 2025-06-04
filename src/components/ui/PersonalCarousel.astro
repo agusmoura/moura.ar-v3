@@ -40,7 +40,7 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
                       <div
                         class={`relative h-full w-full overflow-hidden rounded-xl ${styles.bg || 'bg-gray-900'} bg-[url('/bgCardFront.webp')] bg-[length:368px_490px] bg-no-repeat bg-center`}
                       >
-                        <div class="shimmer absolute inset-0 opacity-0 z-1" />
+                        <div class="shimmer absolute inset-0 opacity-0 z-1 pointer-events-none" />
 
                         <div class="relative flex h-full flex-col">
                           {card.specialTag && (
@@ -95,7 +95,7 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
 
                           <div class="p-4 pt-2">
                             <div class="mb-2 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                            <p class="text-center text-xs italic text-white/60 font-serif">
+                            <p class="text-center text-xs italic text-white/60 font-serif text-balance">
                               "{card.description}"
                             </p>
                           </div>
