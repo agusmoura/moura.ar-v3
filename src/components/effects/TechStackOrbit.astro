@@ -319,32 +319,6 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
     }
   }
 
-  /* @media (max-width: 768px) {
-    .mobile-orbit {
-      margin: 190px auto 0;
-    }
-  }
-
-  @media (max-width: 580px) {
-    .mobile-orbit {
-      margin: 220px auto 0;
-      width: 80%;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .mobile-orbit {
-      margin: 270px auto 0;
-      width: 90%;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .mobile-orbit {
-      margin: 320px auto 0;
-    }
-  } */
-
   /* Animation for mobile icon groups */
   @keyframes cycleIconGroups {
     0%,
@@ -376,5 +350,19 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
     .group-4 {
       animation: cycleIconGroups 120s -96s infinite;
     }
+  }
+
+  /* Performance optimizations */
+  @media (prefers-reduced-motion: reduce) {
+    .tech-icon animateMotion {
+      animation-play-state: paused;
+    }
+  }
+
+  /* GPU acceleration hints */
+  .tech-icon,
+  .icon-wrapper {
+    will-change: transform;
+    backface-visibility: hidden;
   }
 </style>
