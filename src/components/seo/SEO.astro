@@ -15,7 +15,7 @@ const {
   description,
   preload,
   canonical,
-  image = 'https://cdn.lavelada.dev/og.jpg',
+  image = 'https://cdn.moura.ar/og.jpg',
 } = Astro.props as Props;
 
 const determineCanonicalURL = () => {
@@ -31,32 +31,52 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 <meta charset="UTF-8" />
 <meta name="description" content={description} />
 
+<!-- Resource Hints -->
 <link rel="preconnect" href="https://cdn.moura.ar" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="dns-prefetch" href="https://www.google-analytics.com" />
+<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+<!-- HTTP/2 Server Push equivalent -->
 {
   preload?.map(({ href, as, type, rel = 'preload', crossorigin }) => (
     <link {rel} {href} {as} {type} {crossorigin} />
   ))
 }
 
+<!-- Critical Resources - removed invalid modulepreload -->
+
 <link rel="canonical" href={canonicalURL} />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#efbb47" />
+<meta name="color-scheme" content="dark" />
+
+<!-- Performance hints -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 <meta
   name="keywords"
-  content="moura, agustin, mourino,mouriño, developer, designer, full-stack, ux, ui"
+  content="moura, agustin, mourino,mouriño, developer, designer, full-stack, ux, ui, argentina, buenos aires"
 />
 
+<!-- Enhanced Social Media Meta -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content="@agus_moura" />
 <meta name="twitter:creator" content="@agus_moura" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={new URL(image, Astro.url)} />
+<meta
+  name="twitter:image:alt"
+  content="Agustín Mouriño - Desarrollador Full-Stack & Diseñador UX/UI"
+/>
 
 <meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta
+  property="og:image:alt"
+  content="Agustín Mouriño - Desarrollador Full-Stack & Diseñador UX/UI"
+/>
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={Astro.url} />
@@ -64,9 +84,19 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="es_ES" />
 
-<meta name="robots" content="index, follow" />
+<!-- Enhanced SEO -->
+<meta
+  name="robots"
+  content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+/>
 <meta name="googlebot" content="index, follow" />
+<meta name="bingbot" content="index, follow" />
 
+<!-- Favicon optimized -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="manifest" href="/site.webmanifest" />
 
 <RichResults />
