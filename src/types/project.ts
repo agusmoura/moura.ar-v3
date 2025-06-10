@@ -12,6 +12,7 @@ export interface Project {
   role: string;
   duration: string;
   technologies: string[];
+  highContrast?: boolean;
   grid: {
     cols: {
       base?: number;

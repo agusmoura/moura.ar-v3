@@ -16,6 +16,7 @@ technologies:
   - 'figma'
   - 'photoshop'
   - 'illustrator'
+highContrast: true
 links:
   live: 'https://www.paycloud.com.ar/landing/#/'
 images:

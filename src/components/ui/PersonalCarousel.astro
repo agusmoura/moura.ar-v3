@@ -45,6 +45,33 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
                             <div class="shimmer absolute inset-0 opacity-0 z-1 pointer-events-none" />
 
                             <div class="relative flex h-full flex-col">
+                              {/* Flip indicator - subtle corner indicator */}
+                              <div
+                                class={`absolute ${card.specialTag ? 'top-12 right-2' : 'top-2 right-2'} z-40`}
+                              >
+                                <div
+                                  class={`flip-indicator group/flip relative bg-gradient-to-br ${styles.gradient} p-px rounded-full shadow-sm`}
+                                >
+                                  <div
+                                    class={`${styles.bg || 'bg-gray-900'} rounded-full p-2 backdrop-blur-sm border border-white/5`}
+                                  >
+                                    <svg
+                                      class="h-3 w-3 opacity-50 transition-all duration-500 group-hover/flip:rotate-180 group-hover/flip:opacity-80"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                      />
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
+
                               {card.specialTag && (
                                 <div class="absolute -top-1 right-0 z-30 translate-x-1">
                                   <div
@@ -346,6 +373,29 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
     /* Swiper shadows */
     :global(.swiper-3d .swiper-slide-shadow-cards) {
       background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5)) !important;
+    }
+
+    /* Custom flip indicator animation */
+    .flip-indicator {
+      animation: very-subtle-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes very-subtle-pulse {
+      0%,
+      100% {
+        opacity: 0.6;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
+    }
+
+    .flip-indicator:hover {
+      animation: none;
+      opacity: 1;
+      transform: scale(1.1);
     }
 
     @media (max-width: 640px) {

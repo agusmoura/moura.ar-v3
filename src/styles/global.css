@@ -39,6 +39,8 @@
   /* Espaciado personalizado */
   --spacing-18: 4.5rem;
   --spacing-22: 5.5rem;
+
+  --breakpoint-xs: 30rem; /* 480px */
 }
 
 /* Estilos base adicionales */

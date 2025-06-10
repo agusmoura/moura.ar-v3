@@ -40,16 +40,18 @@ const getGridStyles = (project: Project) => {
   };
 };
 
-// Determine text sizes based on grid size
+const showOneTech = (project: Project) => project.grid.cols.lg && project.grid.cols.lg <= 5;
+
+// Optimized text sizes for better mobile readability
 const getTitleSize = (project: Project) => {
   const { cols } = project.grid;
   const maxCols = Math.max(cols.base || 1, cols.sm || 0, cols.md || 0, cols.lg || 0, cols.xl || 0);
 
   return maxCols >= 8
-    ? 'text-xl sm:text-lg md:text-xl lg:text-2xl'
+    ? 'text-lg sm:text-xl md:text-xl lg:text-xl'
     : maxCols >= 4
-      ? 'text-lg sm:text-xl md:text-xl'
-      : 'text-lg sm:text-xl';
+      ? 'text-base sm:text-lg md:text-xl lg:text-xl'
+      : 'text-sm sm:text-base md:text-lg';
 };
 
 const getDescriptionSize = (project: Project) => {
@@ -57,9 +59,9 @@ const getDescriptionSize = (project: Project) => {
   const maxCols = Math.max(cols.base || 1, cols.sm || 0, cols.md || 0, cols.lg || 0, cols.xl || 0);
 
   return maxCols >= 8
-    ? 'text-sm sm:text-sm line-clamp-2'
+    ? 'text-sm sm:text-base md:text-base line-clamp-3 sm:line-clamp-2'
     : maxCols >= 4
-      ? 'text-xs sm:text-sm line-clamp-2'
+      ? 'text-xs sm:text-sm md:text-sm line-clamp-2'
       : 'text-xs sm:text-sm line-clamp-1';
 };
 
@@ -80,7 +82,7 @@ const gridStyles = getGridStyles(project);
 ---
 
 <article
-  class="group relative overflow-hidden rounded-2xl bg-gray-900 transition-all duration-500 cursor-pointer"
+  class="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-900 border-2 border-accent/20 hover:border-accent/80 transition-all duration-500 cursor-pointer touch-manipulation"
   style={gridStyles}
 >
   <!-- Link para navegación (toda la tarjeta es clickeable) -->
@@ -90,14 +92,14 @@ const gridStyles = getGridStyles(project);
     aria-label={`Ver proyecto ${project.title}`}></a>
 
   <!-- Contenedor de imágenes -->
-  <div class="relative w-full h-full overflow-hidden rounded-2xl">
+  <div class="relative w-full h-full overflow-hidden rounded-xl sm:rounded-2xl">
     <!-- Imagen de cover -->
     {
       project.images?.cover && (
         <Image
           src={project.images.cover.src}
           alt={project.images.cover.alt}
-          class="absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-110 z-0"
+          class="absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-active:scale-105 z-0"
           width={dimensions.width}
           height={dimensions.height}
           loading={index < 3 ? 'eager' : 'lazy'}
@@ -106,13 +108,13 @@ const gridStyles = getGridStyles(project);
       )
     }
 
-    <!-- Imagen de comp (visible en hover) -->
+    <!-- Imagen de comp (visible en hover en desktop, siempre visible en mobile para cards grandes) -->
     {
       project.images?.comp && (
         <Image
           src={project.images.comp.src}
           alt={project.images.comp.alt}
-          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-10"
+          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-active:opacity-100 md:opacity-0 z-10"
           width={dimensions.width}
           height={dimensions.height}
           loading="lazy"
@@ -120,83 +122,100 @@ const gridStyles = getGridStyles(project);
       )
     }
 
-    <!-- Overlay con pseudo-elemento para el blur -->
+    <!-- Overlay optimizado para mobile -->
     <div class="absolute inset-0 z-20 pointer-events-none">
       <div
         data-blur-overlay
-        class="absolute bottom-0 -inset-x-px transition-all duration-500 before:absolute before:inset-0 before:backdrop-blur-xs before:bg-gradient-to-t before:from-black/60 before:via-black/20 before:to-transparent before:group-hover:from-black/95 before:group-hover:via-black/70 before:transition-all before:duration-500 before:[mask-image:linear-gradient(to_top,black_85%,transparent_100%)] before:content-['']"
+        class={`absolute bottom-0 -inset-x-px transition-all duration-500 before:absolute before:inset-0 before:backdrop-blur-xs before:bg-gradient-to-t before:transition-all before:duration-500 before:[mask-image:linear-gradient(to_top,black_85%,transparent_100%)] before:content-[''] ${
+          project.highContrast
+            ? 'before:from-black/80 before:via-black/40 before:to-transparent before:group-hover:from-black/90 before:group-hover:via-black/85 before:group-active:from-black/98 before:group-active:via-black/85 sm:before:from-black/80 sm:before:via-black/45'
+            : 'before:from-black/80 before:via-black/40 before:to-transparent before:group-hover:from-black/90 before:group-hover:via-black/70 before:group-active:from-black/95 before:group-active:via-black/70 sm:before:from-black/60 sm:before:via-black/20'
+        }`}
         style="height: var(--base-height)"
       >
       </div>
     </div>
 
-    <!-- Contenido de la tarjeta -->
-    <div class="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 lg:p-8 z-30">
-      <!-- Badge de categoría -->
-      <div class="mb-auto">
+    <!-- Contenido de la tarjeta con padding optimizado -->
+    <div class="absolute inset-0 flex flex-col justify-end p-3 sm:p-4 md:p-6 lg:p-8 z-30">
+      <!-- Badge de categoría - siempre visible en mobile, hover en desktop -->
+      <div class="mb-auto flex justify-end sm:justify-start">
         <span
-          class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-background/20 backdrop-blur-sm px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transform -translate-y-20 group-hover:translate-y-0 transition-all duration-500"
+          class="inline-flex items-center gap-1 text-xs font-bold text-white bg-background/30 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transform translate-y-0 sm:-translate-y-20 sm:group-hover:translate-y-0 transition-all duration-500"
         >
           <Icon name={`heroicons:${getCategoryIcon(project.category)}`} class="h-3 w-3" />
-          {project.category}
+          <span class="hidden md:inline">{project.category}</span>
         </span>
       </div>
 
       <!-- Contenido inferior -->
-      <div class="space-y-1">
-        <!-- Título siempre visible -->
+      <div class="space-y-1 sm:space-y-1.5">
+        <!-- Título con mejor legibilidad -->
         <h3
           data-title
-          class={`font-bold text-white leading-tight transition-all duration-500 translate-y-25 group-hover:translate-y-0 group-hover:mt-4 ${getTitleSize(project)}`}
-          style="text-shadow: 1px 1px 5px #00000094;"
+          class={`font-bold text-white leading-tight transition-all duration-500 translate-y-0 group-hover:translate-y-0 group-hover:mt-2 md:translate-y-20 lg:translate-y-25 sm:group-hover:translate-y-0 sm:group-hover:mt-4 ${getTitleSize(project)}`}
+          style="text-shadow: 2px 2px 8px rgba(0,0,0,0.8);"
         >
           {project.title}
         </h3>
 
-        <!-- Información expandida (visible en hover) -->
+        <!-- Información expandida - más visible en mobile -->
         <div
           data-expanded-content
-          class="space-y-1 transform transition-all duration-500 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0"
+          class="space-y-1.5 sm:space-y-1 hidden md:block transform transition-all duration-500 opacity-100 translate-y-0 sm:opacity-0 sm:translate-y-4 sm:group-hover:opacity-100 sm:group-hover:translate-y-0"
         >
           <!-- Descripción -->
-          <p class={`text-white/90 leading-relaxed ${getDescriptionSize(project)}`}>
+          <p
+            class={`text-white/95 sm:text-white/90 leading-relaxed font-medium sm:font-normal ${getDescriptionSize(project)}`}
+          >
             {project.description}
           </p>
 
-          <!-- Fila inferior: Año, tecnologías y CTA -->
-          <div class="flex items-center justify-between gap-4 flex-wrap">
-            <div class="flex items-center gap-3">
-              <span class="text-sm text-white/70 font-medium">{project.date}</span>
+          <!-- Fila inferior optimizada para mobile -->
+          <div class="flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
+            <div class="flex items-center gap-2 sm:gap-3">
+              <span class="text-xs sm:text-sm text-white/80 sm:text-white/70 font-medium"
+                >{project.date}</span
+              >
 
-              <!-- Mostrar tecnologías solo en cards grandes -->
+              <!-- Tecnologías: mostrar 1-2 en mobile, más en tablet+ -->
               {
-                project.grid.cols.lg && project.grid.cols.lg >= 8 && project.technologies && (
-                  <div class="hidden sm:flex items-center gap-1.5">
-                    {project.technologies.slice(0, 3).map((tech) => (
-                      <span class="text-xs bg-white/10 backdrop-blur-sm px-2 py-1 rounded-full text-white/80 border border-white/10">
+                project.technologies && (
+                  <div class="flex items-center gap-1 sm:gap-1.5">
+                    {project.technologies.slice(0, showOneTech(project) ? 1 : 2).map((tech, i) => (
+                      <span
+                        class={`text-xs bg-white/15 backdrop-blur-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-white/90 border border-white/20 ${i >= 1 ? 'hidden md:inline-block' : ''}`}
+                      >
                         {tech}
                       </span>
                     ))}
-                    {project.technologies.length > 3 && (
-                      <span class="text-xs text-white/60">+{project.technologies.length - 3}</span>
+                    {project.technologies.length > 2 && (
+                      <span class="text-xs text-white/70 hidden md:inline">
+                        +{project.technologies.length - 2}
+                      </span>
+                    )}
+                    {project.technologies.length > 1 && (
+                      <span class="text-xs text-white/70 md:hidden">
+                        +{project.technologies.length - 1}
+                      </span>
                     )}
                   </div>
                 )
               }
             </div>
 
+            <!-- CTA más prominente en mobile -->
             <div class="relative z-20">
-              {
-                (
-                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-white/90 hover:text-white transition-colors">
-                    Ver más
-                    <Icon
-                      name="heroicons:arrow-right"
-                      class="h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform"
-                    />
-                  </span>
-                )
-              }
+              <span
+                class="inline-flex items-center gap-1 text-xs sm:text-xs font-semibold sm:font-medium text-white bg-white/10 sm:bg-transparent backdrop-blur-sm sm:backdrop-blur-none px-2 py-1 sm:px-0 sm:py-0 rounded-full sm:rounded-none border border-white/20 sm:border-none sm:text-white/90 hover:text-white transition-colors"
+              >
+                <span class="hidden sm:inline">Ver más</span>
+                <span class="sm:hidden">Ver</span>
+                <Icon
+                  name="heroicons:arrow-right"
+                  class="h-3 w-3 sm:h-3.5 sm:w-3.5 transform group-hover:translate-x-1 transition-transform"
+                />
+              </span>
             </div>
           </div>
         </div>
