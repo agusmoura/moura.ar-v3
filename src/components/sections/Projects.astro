@@ -1,14 +1,28 @@
 ---
 import TechStackOrbit from '@/components/effects/TechStackOrbit.astro';
+import BentoProjectCard from '@/components/ui/BentoProjectCard.astro';
+import type { Project } from '@/types/project';
 import { parseText } from '@/utils/textParser';
 import { Icon } from 'astro-icon/components';
+
 const pt = (text: string) => parseText(text);
+
+// Cargar todos los proyectos
+const projectFiles = await Astro.glob<Project>('/src/data/projects/*.md');
+const projects = projectFiles
+  .map((file) => file.frontmatter)
+  .filter((project): project is Project => project !== undefined);
+
+// Filtrar y ordenar proyectos
+const filteredProjects = projects
+  .filter((project) => project.showInHome)
+  .sort((a, b) => a.order - b.order);
 ---
 
 <div>
   <section
     id="projects"
-    class="relative container mx-auto px-4 md:pt-10 md:pb-10 pb-20 lg:px-8 xl:max-w-5xl"
+    class="relative container mx-auto px-4 md:pt-10 md:pb-10 pb-20 lg:px-8 xl:max-w-7xl"
   >
     <div class="sm:-bottom-20 absolute right-0 -bottom-25 left-0 w-full md:-bottom-40 lg:-bottom-4">
       <TechStackOrbit />
@@ -17,7 +31,7 @@ const pt = (text: string) => parseText(text);
     <header class="mb-20 space-y-8 text-center md:mb-24">
       <div class="mb-4 inline-block">
         <p
-          class="mb-2 text-sm font-medium uppercase tracking-widest text-accent-light opacity-80 flex items-center gap-2"
+          class="mb-2 text-sm font-medium uppercase tracking-widest text-balance text-accent-light opacity-80 flex items-center gap-2"
         >
           <Icon name="heroicons:rocket-launch" class="h-5 w-5" aria-hidden="true" />
           Cosas que no explotaron (y algunas que sí)
@@ -27,9 +41,8 @@ const pt = (text: string) => parseText(text);
       </div>
 
       <div class="space-y-6">
-        <!-- set:html={pt('Proyectos que [[**Transforman Negocios**]]')} -->
         <h2
-          class="font-serif text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl leading-tight"
+          class="font-serif text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl leading-tight text-balance"
           set:html={pt('Proyectos [[**únicos**]] para problemas [[**reales**]]')}
         />
 
@@ -42,4 +55,109 @@ const pt = (text: string) => parseText(text);
       </div>
     </header>
   </section>
+
+  <!-- Bento Grid de Proyectos -->
+  <section class="relative z-10 container mx-auto px-4 lg:px-8 xl:max-w-7xl mt-20">
+    <div
+      class="grid grid-cols-12 xl:grid-cols-16 auto-rows-[120px] sm:auto-rows-[190px] md:auto-rows-[190px] lg:auto-rows-[140px] gap-3 sm:gap-2 md:gap-3 lg:gap-4"
+    >
+      {
+        filteredProjects.map((project, index) => (
+          <BentoProjectCard project={project} index={index} />
+        ))
+      }
+    </div>
+
+    <!-- Opcional: Link para ver todos los proyectos -->
+    <div class="mt-16 text-center">
+      <a
+        href="/projects"
+        class="inline-flex items-center gap-2 px-6 py-3 text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-300 group"
+      >
+        <span>Ver todos los proyectos</span>
+        <Icon
+          name="heroicons:arrow-right"
+          class="h-4 w-4 transform group-hover:translate-x-1 transition-transform"
+        />
+      </a>
+    </div>
+  </section>
 </div>
+
+<script>
+  // Usar IntersectionObserver para optimizar el rendimiento
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target);
+          initializeCard(entry.target as HTMLElement);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  // Función para calcular y aplicar alturas
+  const initializeCard = (article: HTMLElement) => {
+    const title = article.querySelector<HTMLElement>('[data-title]');
+    const expandedContent = article.querySelector<HTMLElement>('[data-expanded-content]');
+    const blurOverlay = article.querySelector<HTMLElement>('[data-blur-overlay]');
+
+    if (!title || !expandedContent || !blurOverlay) return;
+
+    // Usar ResizeObserver para manejar cambios de tamaño
+    const resizeObserver = new ResizeObserver(() =>
+      updateHeights(title, expandedContent, blurOverlay)
+    );
+    resizeObserver.observe(title);
+    resizeObserver.observe(expandedContent);
+
+    function updateHeights(title: HTMLElement, content: HTMLElement, overlay: HTMLElement) {
+      const { height: titleHeight } = title.getBoundingClientRect();
+      const { height: contentHeight } = content.getBoundingClientRect();
+
+      // Solo el espacio necesario para el título + un pequeño aire
+      const basePadding = 24; // Pequeño aire arriba y abajo del título
+      const expandedPadding = 48; // Suficiente espacio para cubrir título + contenido + aire
+
+      // Usar CSS custom properties
+      overlay.style.setProperty('--base-height', `${titleHeight + basePadding}px`);
+      overlay.style.setProperty(
+        '--expanded-height',
+        `${titleHeight + contentHeight + expandedPadding}px`
+      );
+    }
+
+    // Event listeners optimizados
+    const handleHover = (expanded: boolean) => {
+      requestAnimationFrame(() => {
+        blurOverlay.style.height = expanded ? 'var(--expanded-height)' : 'var(--base-height)';
+      });
+    };
+
+    // Usar event delegation para mejor performance
+    const enterHandler = () => handleHover(true);
+    const leaveHandler = () => handleHover(false);
+
+    article.addEventListener('mouseenter', enterHandler, { passive: true });
+    article.addEventListener('mouseleave', leaveHandler, { passive: true });
+
+    // Cleanup function
+    return () => {
+      resizeObserver.disconnect();
+      article.removeEventListener('mouseenter', enterHandler);
+      article.removeEventListener('mouseleave', leaveHandler);
+    };
+  };
+
+  // Inicializar cards
+  const initializeCards = () => {
+    const articles = document.querySelectorAll<HTMLElement>('article');
+    articles.forEach((article) => observer.observe(article));
+  };
+
+  // Event listeners globales optimizados
+  document.addEventListener('astro:page-load', initializeCards, { once: true });
+  window.addEventListener('load', initializeCards, { once: true });
+</script>

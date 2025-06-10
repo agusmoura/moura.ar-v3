@@ -1,0 +1,119 @@
+---
+import type { Project } from '@/types/project';
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+
+export interface Props {
+  project: Project;
+  featured?: boolean;
+}
+
+const { project, featured = false } = Astro.props;
+
+// Determinar las clases de columnas según si es featured o no
+const colSpanClass = featured
+  ? 'col-span-1 md:col-span-4 lg:col-span-2'
+  : 'col-span-1 md:col-span-2';
+---
+
+<article
+  class={`group relative overflow-hidden rounded-2xl bg-gray-900 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl cursor-pointer ${colSpanClass}`}
+>
+  <!-- Link para navegación (toda la tarjeta es clickeable) -->
+  <a
+    href={`/projects/${project.slug}`}
+    class="absolute inset-0 z-0"
+    aria-label={`Ver proyecto ${project.title}`}></a>
+
+  <!-- Contenedor de imágenes -->
+  <div class="relative aspect-[4/3] w-full overflow-hidden">
+    <!-- Imagen de cover (por defecto) -->
+    {
+      project.images?.cover && (
+        <Image
+          src={project.images.cover.src}
+          alt={project.images.cover.alt}
+          class="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+          width={featured ? 800 : 600}
+          height={featured ? 600 : 450}
+          loading="lazy"
+        />
+      )
+    }
+
+    <!-- Imagen de comp (visible en hover) -->
+    {
+      project.images?.comp && (
+        <Image
+          src={project.images.comp.src}
+          alt={project.images.comp.alt}
+          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          width={featured ? 800 : 600}
+          height={featured ? 600 : 450}
+          loading="lazy"
+        />
+      )
+    }
+
+    <!-- Overlay gradient para contraste del texto (siempre visible) -->
+    <div
+      class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+    >
+    </div>
+  </div>
+
+  <!-- Contenido de la tarjeta -->
+  <div class="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
+    <!-- Título siempre visible -->
+    <div class="transform transition-all duration-500 group-hover:-translate-y-6">
+      <h3
+        class={`font-bold text-white mb-2 ${featured ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'}`}
+      >
+        {project.title}
+      </h3>
+    </div>
+
+    <!-- Información expandida (visible en hover) -->
+    <div
+      class="transform transition-all duration-500 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0"
+    >
+      <!-- Descripción -->
+      <p class="text-white/90 text-sm mb-3 leading-relaxed">
+        {project.description}
+      </p>
+
+      <!-- Fila inferior: Año y CTA -->
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-white/80 font-medium">{project.date}</span>
+
+        <div class="relative z-20">
+          {
+            project.links?.live && (
+              <a
+                href={project.links.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-accent-dark hover:scale-105"
+              >
+                <Icon name="heroicons:globe-alt" class="h-3 w-3" />
+                Ver proyecto
+              </a>
+            )
+          }
+
+          {
+            !project.links?.live && project.links?.case && (
+              <a
+                href={project.links.case}
+                class="inline-flex items-center gap-1.5 text-xs font-medium text-white/90 hover:text-accent-light transition-colors"
+              >
+                Ver más
+                <Icon name="heroicons:arrow-right" class="h-3 w-3" />
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,242 @@
+---
+import type { Project } from '@/types/project';
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+
+export interface Props {
+  project: Project;
+  index?: number;
+}
+
+const { project, index = 0 } = Astro.props;
+
+// Helper function to get category icon
+function getCategoryIcon(category: string): string {
+  const icons: Record<string, string> = {
+    'E-commerce': 'shopping-cart',
+    'Web Design': 'paint-brush',
+    'Web App': 'device-phone-mobile',
+    Branding: 'sparkles',
+    'Augmented Reality Game': 'cube-transparent',
+  };
+  return icons[category] || 'squares-2x2';
+}
+
+// Generate CSS Grid styles directly
+const getGridStyles = (project: Project) => {
+  const { cols, rows } = project.grid;
+
+  return {
+    '--grid-col-base': cols.base || 1,
+    '--grid-col-sm': cols.sm || cols.base || 1,
+    '--grid-col-md': cols.md || cols.sm || cols.base || 1,
+    '--grid-col-lg': cols.lg || cols.md || cols.sm || cols.base || 1,
+    '--grid-col-xl': cols.xl || cols.lg || cols.md || cols.sm || cols.base || 1,
+    '--grid-row-base': rows.base || 1,
+    '--grid-row-sm': rows.sm || rows.base || 1,
+    '--grid-row-md': rows.md || rows.sm || rows.base || 1,
+    '--grid-row-lg': rows.lg || rows.md || rows.sm || rows.base || 1,
+    '--grid-row-xl': rows.xl || rows.lg || rows.md || rows.sm || rows.base || 1,
+  };
+};
+
+// Determine text sizes based on grid size
+const getTitleSize = (project: Project) => {
+  const { cols } = project.grid;
+  const maxCols = Math.max(cols.base || 1, cols.sm || 0, cols.md || 0, cols.lg || 0, cols.xl || 0);
+
+  return maxCols >= 8
+    ? 'text-xl sm:text-lg md:text-xl lg:text-2xl'
+    : maxCols >= 4
+      ? 'text-lg sm:text-xl md:text-xl'
+      : 'text-lg sm:text-xl';
+};
+
+const getDescriptionSize = (project: Project) => {
+  const { cols } = project.grid;
+  const maxCols = Math.max(cols.base || 1, cols.sm || 0, cols.md || 0, cols.lg || 0, cols.xl || 0);
+
+  return maxCols >= 8
+    ? 'text-sm sm:text-sm line-clamp-2'
+    : maxCols >= 4
+      ? 'text-xs sm:text-sm line-clamp-2'
+      : 'text-xs sm:text-sm line-clamp-1';
+};
+
+// Default image dimensions based on grid size
+const getImageDimensions = (project: Project) => {
+  const { cols } = project.grid;
+  const maxCols = Math.max(cols.base || 1, cols.sm || 0, cols.md || 0, cols.lg || 0, cols.xl || 0);
+
+  return maxCols >= 8
+    ? { width: 1600, height: 900 }
+    : maxCols >= 4
+      ? { width: 800, height: 1200 }
+      : { width: 1000, height: 1000 };
+};
+
+const dimensions = getImageDimensions(project);
+const gridStyles = getGridStyles(project);
+---
+
+<article
+  class="group relative overflow-hidden rounded-2xl bg-gray-900 transition-all duration-500 cursor-pointer"
+  style={gridStyles}
+>
+  <!-- Link para navegación (toda la tarjeta es clickeable) -->
+  <a
+    href={`/projects/${project.slug}`}
+    class="absolute inset-0 z-10"
+    aria-label={`Ver proyecto ${project.title}`}></a>
+
+  <!-- Contenedor de imágenes -->
+  <div class="relative w-full h-full overflow-hidden rounded-2xl">
+    <!-- Imagen de cover -->
+    {
+      project.images?.cover && (
+        <Image
+          src={project.images.cover.src}
+          alt={project.images.cover.alt}
+          class="absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-110 z-0"
+          width={dimensions.width}
+          height={dimensions.height}
+          loading={index < 3 ? 'eager' : 'lazy'}
+          quality={90}
+        />
+      )
+    }
+
+    <!-- Imagen de comp (visible en hover) -->
+    {
+      project.images?.comp && (
+        <Image
+          src={project.images.comp.src}
+          alt={project.images.comp.alt}
+          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-10"
+          width={dimensions.width}
+          height={dimensions.height}
+          loading="lazy"
+        />
+      )
+    }
+
+    <!-- Overlay con pseudo-elemento para el blur -->
+    <div class="absolute inset-0 z-20 pointer-events-none">
+      <div
+        data-blur-overlay
+        class="absolute bottom-0 -inset-x-px transition-all duration-500 before:absolute before:inset-0 before:backdrop-blur-xs before:bg-gradient-to-t before:from-black/60 before:via-black/20 before:to-transparent before:group-hover:from-black/95 before:group-hover:via-black/70 before:transition-all before:duration-500 before:[mask-image:linear-gradient(to_top,black_85%,transparent_100%)] before:content-['']"
+        style="height: var(--base-height)"
+      >
+      </div>
+    </div>
+
+    <!-- Contenido de la tarjeta -->
+    <div class="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 lg:p-8 z-30">
+      <!-- Badge de categoría -->
+      <div class="mb-auto">
+        <span
+          class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-background/20 backdrop-blur-sm px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transform -translate-y-20 group-hover:translate-y-0 transition-all duration-500"
+        >
+          <Icon name={`heroicons:${getCategoryIcon(project.category)}`} class="h-3 w-3" />
+          {project.category}
+        </span>
+      </div>
+
+      <!-- Contenido inferior -->
+      <div class="space-y-1">
+        <!-- Título siempre visible -->
+        <h3
+          data-title
+          class={`font-bold text-white leading-tight transition-all duration-500 translate-y-25 group-hover:translate-y-0 group-hover:mt-4 ${getTitleSize(project)}`}
+          style="text-shadow: 1px 1px 5px #00000094;"
+        >
+          {project.title}
+        </h3>
+
+        <!-- Información expandida (visible en hover) -->
+        <div
+          data-expanded-content
+          class="space-y-1 transform transition-all duration-500 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0"
+        >
+          <!-- Descripción -->
+          <p class={`text-white/90 leading-relaxed ${getDescriptionSize(project)}`}>
+            {project.description}
+          </p>
+
+          <!-- Fila inferior: Año, tecnologías y CTA -->
+          <div class="flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-3">
+              <span class="text-sm text-white/70 font-medium">{project.date}</span>
+
+              <!-- Mostrar tecnologías solo en cards grandes -->
+              {
+                project.grid.cols.lg && project.grid.cols.lg >= 8 && project.technologies && (
+                  <div class="hidden sm:flex items-center gap-1.5">
+                    {project.technologies.slice(0, 3).map((tech) => (
+                      <span class="text-xs bg-white/10 backdrop-blur-sm px-2 py-1 rounded-full text-white/80 border border-white/10">
+                        {tech}
+                      </span>
+                    ))}
+                    {project.technologies.length > 3 && (
+                      <span class="text-xs text-white/60">+{project.technologies.length - 3}</span>
+                    )}
+                  </div>
+                )
+              }
+            </div>
+
+            <div class="relative z-20">
+              {
+                (
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-white/90 hover:text-white transition-colors">
+                    Ver más
+                    <Icon
+                      name="heroicons:arrow-right"
+                      class="h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform"
+                    />
+                  </span>
+                )
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  /* CSS Grid styles usando custom properties */
+  article {
+    grid-column: span var(--grid-col-base);
+    grid-row: span var(--grid-row-base);
+  }
+
+  @media (min-width: 640px) {
+    article {
+      grid-column: span var(--grid-col-sm);
+      grid-row: span var(--grid-row-sm);
+    }
+  }
+
+  @media (min-width: 768px) {
+    article {
+      grid-column: span var(--grid-col-md);
+      grid-row: span var(--grid-row-md);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    article {
+      grid-column: span var(--grid-col-lg);
+      grid-row: span var(--grid-row-lg);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    article {
+      grid-column: span var(--grid-col-xl);
+      grid-row: span var(--grid-row-xl);
+    }
+  }
+</style>
