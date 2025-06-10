@@ -1,6 +1,7 @@
 ---
 import type { Preload } from '@/types/Preload';
 import SpaceBackground from '@components/effects/SpaceBackground.astro';
+import ScrollAnimations from '@components/effects/ScrollAnimations.astro';
 import SEO from '@components/seo/SEO.astro';
 import '@fontsource-variable/noto-serif-jp';
 import '@fontsource/space-mono/400.css';
@@ -27,7 +28,7 @@ const {
 const canonicalURL = new URL(canonical, Astro.url);
 
 const backgroundConfig = {
-  starDensity: 0.0015,
+  starDensity: 0.0014,
   minTwinkleSpeed: 0.4,
   maxTwinkleSpeed: 1.5,
   minDelay: 2000,
@@ -59,6 +60,45 @@ const backgroundConfig = {
   </head>
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
     <SpaceBackground {...backgroundConfig} />
+    <ScrollAnimations />
     <slot />
+
+    <!-- Simplified Performance Monitoring -->
+    <script>
+      // Only register Service Worker in production
+      if (
+        'serviceWorker' in navigator &&
+        location.hostname !== 'localhost' &&
+        location.hostname !== '127.0.0.1' &&
+        !location.hostname.includes('localhost')
+      ) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered:', registration);
+            })
+            .catch((error) => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+
+      // Simplified performance monitoring
+      if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach((entry) => {
+            if (entry.entryType === 'largest-contentful-paint') {
+              console.log('LCP:', entry.startTime);
+            }
+          });
+        });
+
+        observer.observe({
+          entryTypes: ['largest-contentful-paint'],
+        });
+      }
+    </script>
   </body>
 </html>
