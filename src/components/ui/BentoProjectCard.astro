@@ -84,6 +84,9 @@ const gridStyles = getGridStyles(project);
 <article
   class="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-900 border-2 border-accent/20 hover:border-accent/80 transition-all duration-500 cursor-pointer touch-manipulation"
   style={gridStyles}
+  data-aos="fade-up"
+  data-aos-duration="800"
+  data-aos-delay={index * 100}
 >
   <!-- Link para navegación (toda la tarjeta es clickeable) -->
   <a
@@ -108,13 +111,13 @@ const gridStyles = getGridStyles(project);
       )
     }
 
-    <!-- Imagen de comp (visible en hover en desktop, siempre visible en mobile para cards grandes) -->
+    <!-- Imagen de comp (visible en hover en desktop, auto-cycling, siempre visible en mobile para cards grandes) -->
     {
       project.images?.comp && (
         <Image
           src={project.images.comp.src}
           alt={project.images.comp.alt}
-          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-active:opacity-100 md:opacity-0 z-10"
+          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-active:opacity-100 group-[.cycling]:opacity-100 md:opacity-0 z-10"
           width={dimensions.width}
           height={dimensions.height}
           loading="lazy"
@@ -259,3 +262,78 @@ const gridStyles = getGridStyles(project);
     }
   }
 </style>
+
+<script>
+  // Auto-cycling de imágenes para project cards
+  document.addEventListener('DOMContentLoaded', () => {
+    const projectCards = document.querySelectorAll('[data-aos="fade-up"]');
+
+    projectCards.forEach((card, index) => {
+      const compImage = card.querySelector('img:nth-of-type(2)'); // Segunda imagen (comp)
+
+      // Solo configurar cycling si tiene imagen comp
+      if (compImage) {
+        let cyclingInterval: NodeJS.Timeout | null = null;
+        let isHovering = false;
+
+        const startCycling = () => {
+          if (cyclingInterval) clearInterval(cyclingInterval);
+
+          cyclingInterval = setInterval(
+            () => {
+              if (!isHovering) {
+                card.classList.add('cycling');
+
+                // Volver a imagen principal después de 4 segundos
+                setTimeout(() => {
+                  if (!isHovering) {
+                    card.classList.remove('cycling');
+                  }
+                }, 8000);
+              }
+            },
+            4000 + index * 800
+          ); // Intervalo base + delay para evitar sincronización
+        };
+
+        const stopCycling = () => {
+          if (cyclingInterval) {
+            clearInterval(cyclingInterval);
+            cyclingInterval = null;
+          }
+        };
+
+        // Detectar hover para pausar cycling
+        card.addEventListener('mouseenter', () => {
+          isHovering = true;
+          card.classList.remove('cycling');
+        });
+
+        card.addEventListener('mouseleave', () => {
+          isHovering = false;
+        });
+
+        // Pausar cycling cuando la tarjeta no es visible
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                // Delay inicial antes de empezar el cycling
+                setTimeout(startCycling, 2000 + index * 150);
+              } else {
+                stopCycling();
+                card.classList.remove('cycling');
+              }
+            });
+          },
+          { threshold: 0.3 }
+        );
+
+        observer.observe(card);
+
+        // Cleanup al salir de la página
+        window.addEventListener('beforeunload', stopCycling);
+      }
+    });
+  });
+</script>

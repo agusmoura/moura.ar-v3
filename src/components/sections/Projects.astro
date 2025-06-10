@@ -32,7 +32,7 @@ const filteredProjects = projects
     </div>
 
     <header class="mb-16 space-y-8 text-center md:mb-20 pb-2 sm:pb-4 md:pb-6 lg:pb-8">
-      <div class="mb-4 inline-block">
+      <div class="mb-4 inline-block" data-aos="fade-up" data-aos-duration="600">
         <p
           class="mb-2 text-sm font-medium uppercase tracking-widest text-balance text-accent-light opacity-80 flex items-center gap-2"
         >
@@ -47,6 +47,9 @@ const filteredProjects = projects
         <h2
           class="font-serif text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl leading-tight text-balance"
           set:html={pt('Proyectos [[**únicos**]] para problemas [[**reales**]]')}
+          data-aos="fade-up"
+          data-aos-duration="800"
+          data-aos-delay="200"
         />
 
         <p
@@ -54,12 +57,20 @@ const filteredProjects = projects
           set:html={pt(
             'Acá dejo una muestra de los proyectos en los que estuve metido hasta el fondo. Cada uno con su propia complejidad, desafíos raros y una buena dosis de aprendizaje.'
           )}
+          data-aos="fade-up"
+          data-aos-duration="800"
+          data-aos-delay="400"
         />
       </div>
     </header>
 
     <!-- TechStackOrbit para móviles - posicionado después del header -->
-    <div class="block md:hidden mb-8 -mt-12">
+    <div
+      class="block md:hidden mb-8 -mt-12"
+      data-aos="zoom-in"
+      data-aos-duration="800"
+      data-aos-delay="600"
+    >
       <TechStackOrbit />
     </div>
   </section>
@@ -77,7 +88,7 @@ const filteredProjects = projects
     </div>
 
     <!-- Opcional: Link para ver todos los proyectos -->
-    <div class="mt-16 text-center">
+    <div class="mt-16 text-center" data-aos="fade-up" data-aos-duration="600" data-aos-delay="800">
       <a
         href="/projects"
         class="inline-flex items-center gap-2 px-6 py-3 text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-300 group"
