@@ -22,13 +22,16 @@ const filteredProjects = projects
 <div>
   <section
     id="projects"
-    class="relative container mx-auto px-4 md:pt-10 md:pb-10 pb-20 lg:px-8 xl:max-w-7xl"
+    class="relative container mx-auto px-4 md:pt-10 pb-2 md:pb-10 lg:px-8 xl:max-w-7xl"
   >
-    <div class="sm:-bottom-20 absolute right-0 -bottom-25 left-0 w-full md:-bottom-40 lg:-bottom-4">
+    <!-- TechStackOrbit con mejor posicionamiento responsive -->
+    <div
+      class="absolute right-0 left-0 w-full bottom-4 sm:bottom-2 md:bottom-0 lg:bottom-2 xl:bottom-0 hidden md:block"
+    >
       <TechStackOrbit />
     </div>
 
-    <header class="mb-20 space-y-8 text-center md:mb-24">
+    <header class="mb-16 space-y-8 text-center md:mb-20 pb-2 sm:pb-4 md:pb-6 lg:pb-8">
       <div class="mb-4 inline-block">
         <p
           class="mb-2 text-sm font-medium uppercase tracking-widest text-balance text-accent-light opacity-80 flex items-center gap-2"
@@ -54,10 +57,15 @@ const filteredProjects = projects
         />
       </div>
     </header>
+
+    <!-- TechStackOrbit para móviles - posicionado después del header -->
+    <div class="block md:hidden mb-8 -mt-12">
+      <TechStackOrbit />
+    </div>
   </section>
 
   <!-- Bento Grid de Proyectos -->
-  <section class="relative z-10 container mx-auto px-4 lg:px-8 xl:max-w-7xl mt-20">
+  <section class="relative z-10 container mx-auto px-4 lg:px-8 xl:max-w-7xl mt-0 md:mt-20">
     <div
       class="grid grid-cols-12 xl:grid-cols-16 auto-rows-[120px] sm:auto-rows-[190px] md:auto-rows-[190px] lg:auto-rows-[140px] gap-3 sm:gap-2 md:gap-3 lg:gap-4"
     >

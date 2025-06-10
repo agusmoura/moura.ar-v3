@@ -3,15 +3,18 @@ import HeroOrbit from '@/components/effects/HeroOrbit.astro';
 ---
 
 <section
-  class="container flex sm:min-h-[40vh] md:min-h-[80vh] items-center justify-center lg:justify-start xl:max-w-6xl"
+  class="container flex min-h-[60vh] md:min-h-[80vh] items-center justify-center lg:justify-start xl:max-w-6xl"
 >
   <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-5">
     <div class="relative z-10 col-span-4 space-y-5 py-4 text-center lg:text-right">
       <HeroOrbit />
-      <h1 class="text-accent text-5xl font-bold md:text-6xl lg:text-7xl">Agustin Mouriño</h1>
+      <h1 class="text-accent mb-0 md:mb-2 text-4xl sm:text-5xl font-bold md:text-6xl lg:text-7xl">
+        Agustin Mouriño
+      </h1>
       <div class="space-y-1">
-        <h2 class="font-serif text-2xl font-bold lg:text-3xl">
-          Desarrollador Full-Stack & Diseñador UX/UI
+        <h2 class="font-serif text-xl sm:text-2xl font-bold lg:text-3xl">
+          Desarrollador Full-Stack <br class="block sm:hidden" />
+          <span class="hidden sm:inline">&</span> Diseñador UX/UI
         </h2>
         <p class="text-xl italic lg:text-2xl">
           Transformo <span class="text-accent">ideas</span> en experiencias

@@ -142,9 +142,9 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
 </svg>
 
 <!-- Mobile orbit -->
-<svg class="tech-orbit-svg mobile-orbit" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid meet">
+<svg class="tech-orbit-svg mobile-orbit" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
   <defs>
-    <path id={`orbitPathMobile-${uniqueId}`} d="M-20 10C20 60 100 130 200 130C300 130 380 60 420 10"
+    <path id={`orbitPathMobile-${uniqueId}`} d="M-20 5C20 50 100 110 200 110C300 110 380 50 420 5"
     ></path>
 
     <!-- Edge gradients for mobile -->
@@ -159,9 +159,9 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
     </linearGradient>
 
     <mask id="edgeMobileMask">
-      <rect width="400" height="250" fill="white"></rect>
-      <rect x="0" y="0" width="40" height="250" fill="url(#leftEdgeMobileGradient)"></rect>
-      <rect x="360" y="0" width="40" height="250" fill="url(#rightEdgeMobileGradient)"></rect>
+      <rect width="400" height="200" fill="white"></rect>
+      <rect x="0" y="0" width="40" height="200" fill="url(#leftEdgeMobileGradient)"></rect>
+      <rect x="360" y="0" width="40" height="200" fill="url(#rightEdgeMobileGradient)"></rect>
     </mask>
 
     <!-- Reusing the same glow filters -->
@@ -178,15 +178,15 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
 
     <!-- Mobile tech icons - we'll show 5 groups of icons that rotate -->
     {
-      Array.from({ length: 10 }, (_, groupIndex) => {
+      Array.from({ length: 9 }, (_, groupIndex) => {
         // Each group will show a subset of 7 consecutive icons
         const startIndex = (groupIndex * 3) % techIcons.length;
-        const groupIcons = [...Array(10)].map(
+        const groupIcons = [...Array(9)].map(
           (_, i) => techIcons[(startIndex + i) % techIcons.length]
         );
 
         return groupIcons.map((icon, iconIndex) => {
-          const offset = iconIndex / 10; // 10 icons per group
+          const offset = iconIndex / 9; // 10 icons per group
           const animationDuration = 120; // 2 minutes for mobile rotation
           const groupDelay = groupIndex * 24; // 24 seconds between groups
 
@@ -207,16 +207,16 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
               </animateMotion>
 
               <circle
-                r="20"
+                r="24"
                 fill="#111111"
                 stroke={icon.color}
                 stroke-width="1.5"
                 class="icon-circle"
               />
 
-              <foreignObject width="25" height="25" x="-12.5" y="-12.5">
+              <foreignObject width="30" height="30" x="-15" y="-15">
                 <div class="icon-wrapper" style={`color: ${icon.color};`}>
-                  <Icon name={icon.name} width="25" height="25" />
+                  <Icon name={icon.name} width="30" height="30" />
                 </div>
               </foreignObject>
 
@@ -256,6 +256,7 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
   .tech-orbit-svg {
     width: 100%;
     pointer-events: all;
+    max-height: 400px;
   }
 
   .icon-wrapper {
@@ -282,11 +283,20 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
     opacity: 1;
   }
 
+  /* Desktop orbit */
+  .desktop-orbit {
+    display: block;
+    height: auto;
+    max-height: 350px;
+  }
+
   /* Mobile styles */
   .mobile-orbit {
     display: none;
     max-width: 100%;
-    width: 90%;
+    width: 95%;
+    height: auto;
+    max-height: 250px;
     overflow: visible;
     margin: 0 auto;
   }
@@ -299,7 +309,7 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
 
     .orbit-center-text {
       bottom: 50px;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
 
     .desktop-orbit {
@@ -316,6 +326,27 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
 
     .mobile-icon:active .tech-label {
       opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mobile-orbit {
+      max-height: 220px;
+      width: 100%;
+    }
+
+    .tech-orbit-svg {
+      max-height: 220px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mobile-orbit {
+      max-height: 200px;
+    }
+
+    .tech-orbit-svg {
+      max-height: 200px;
     }
   }
 

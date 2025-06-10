@@ -2,33 +2,6 @@
 import { parseText } from '@/utils/textParser';
 import PersonalCarousel from '@components/ui/PersonalCarousel.astro';
 const pt = (text: string) => parseText(text);
-
-const cards = [
-  {
-    number: 1,
-    title: 'Excelencia como Viaje',
-    subtitle: '(Kaizen – 改善)',
-    text: 'No persigo metas fijas; construyo caminos donde la perfección actúa como el [[catalizador]] que enciende una búsqueda y crecimiento sin fin.',
-    icon: '🚀',
-    color: 'from-blue-500/20 to-purple-500/20',
-  },
-  {
-    number: 2,
-    title: 'Mejora como Proceso',
-    subtitle: '(Wabi-Sabi – 侘寂)',
-    text: 'Cada proyecto se transforma en un [[laboratorio vivo]], donde la experimentación convierte imperfecciones en soluciones singulares y llenas de carácter.',
-    icon: '🔬',
-    color: 'from-pink-500/20 to-orange-500/20',
-  },
-  {
-    number: 3,
-    title: 'Fracaso como Oportunidad',
-    subtitle: '(Síntesis)',
-    text: 'Cada proyecto es una oportunidad para aprender y mejorar, transformando errores en enseñanzas valiosas.',
-    icon: '⚡',
-    color: 'from-yellow-500/20 to-green-500/20',
-  },
-];
 ---
 
 <section id="about" class="relative pt-40 md:pt-20">
