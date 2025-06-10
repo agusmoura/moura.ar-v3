@@ -8,13 +8,18 @@ const pt = (text: string) => parseText(text);
   <div class="container relative mx-auto px-4 lg:px-8 xl:max-w-6xl">
     <!-- Main Header with animated text -->
     <div class="mb-20 text-center">
-      <div class="mb-4 inline-block">
+      <div class="mb-4 inline-block" data-aos="fade-up" data-aos-duration="600">
         <p class="mb-2 text-sm font-medium uppercase tracking-widest text-accent-light opacity-80">
           Filosofía de Creación
         </p>
         <div class="h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent"></div>
       </div>
-      <h2 class="relative font-serif text-5xl font-bold md:text-6xl lg:text-7xl">
+      <h2
+        class="relative font-serif text-5xl font-bold md:text-6xl lg:text-7xl"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="200"
+      >
         <span class="relative">
           Balance entre
           <span class="relative inline-block">
@@ -29,71 +34,87 @@ const pt = (text: string) => parseText(text);
       </h2>
     </div>
 
-    <!-- Two Column Layout with overlap -->
-    <div class="relative mb-32 flex flex-col gap-16 lg:grid lg:grid-cols-2 lg:gap-8">
-      <!-- Left Column: Story with card-like design -->
-      <!-- Decorative number -->
-      <span class="absolute -left-8 -top-8 text-8xl font-bold text-white/5 hidden lg:block">01</span
+    <!-- Two Column Layout optimized for mobile -->
+    <div class="relative mb-16 md:mb-32 mt-8">
+      <!-- Decorative number - only on desktop and properly positioned -->
+      <span
+        class="absolute -left-4 -top-4 text-6xl font-bold text-white/5 hidden xl:block xl:-left-8 xl:-top-8 xl:text-8xl"
+        >01</span
       >
 
       <div
-        class="relative space-y-8 rounded-2xl border border-white/5 bg-background/10 p-8 backdrop-blur-xs"
+        class="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-12 xl:gap-16"
       >
-        <div>
-          <h3 class="mb-6 text-3xl font-bold">
-            <span
-              class="bg-gradient-to-r from-accent-light to-accent bg-clip-text text-transparent font-serif font-bold"
-            >
-              Mi historia
-            </span>
-          </h3>
-          <div class="space-y-4">
-            <p
-              class="relative pl-4 leading-relaxed text-light-2 before:absolute before:left-0 before:top-2 before:h-4 before:w-px before:bg-accent"
-              set:html={pt(
-                'Desde pequeño me fascinó descubrir el [[porqué]] y el [[cómo]] de las cosas. Esa curiosidad me llevó a convertirme en [[desarrollador full-stack]] y [[diseñador UX/UI]].'
-              )}
-            />
-            <p
-              class="relative pl-4 leading-relaxed text-light-2 before:absolute before:left-0 before:top-2 before:h-4 before:w-px before:bg-accent-light"
-              set:html={pt(
-                'Hoy, cada proyecto es un diálogo entre [[posibilidades técnicas]] y [[necesidades humanas]]. Me sumerjo en la esencia de cada desafío, transformando ideas en realidades palpables.'
-              )}
-            />
-            <p
-              class="relative pl-4 leading-relaxed text-light-2 before:absolute before:left-0 before:top-2 before:h-4 before:w-px before:bg-accent"
-              set:html={pt(
-                'Con la mirada puesta en el futuro, exploro [[nuevas fronteras]] en diseño y tecnología, abriendo caminos hacia experiencias innovadoras y memorables.'
-              )}
-            />
-          </div>
-          {/* Decorative elements */}
-          <div
-            class="h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent mt-8 mb-6"
-          >
-          </div>
+        <!-- Left Column: Story with mobile-optimized design -->
+        <div
+          class="relative w-full max-w-sm space-y-6 rounded-2xl border border-white/5 bg-background/10 p-4 backdrop-blur-xs sm:max-w-lg sm:p-6 md:max-w-xl md:p-8 md:space-y-8 lg:max-w-2xl lg:flex-1"
+          data-aos="fade-right"
+          data-aos-duration="800"
+          data-aos-delay="400"
+        >
+          <div>
+            <h3 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">
+              <span
+                class="bg-gradient-to-r from-accent-light to-accent bg-clip-text text-transparent font-serif font-bold"
+              >
+                Mi historia
+              </span>
+            </h3>
 
-          <div class="flex items-center justify-between">
-            <div class="flex space-x-2">
-              {
-                [1, 2, 3].map((i) => (
-                  <div
-                    class="w-2 h-2 bg-accent rounded-full animate-pulse"
-                    style={{ animationDelay: `${i * 0.5}s` }}
-                  />
-                ))
-              }
+            <div class="space-y-4 md:space-y-6">
+              <p
+                class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent md:before:h-4"
+                set:html={pt(
+                  'Desde pequeño me fascinó descubrir el [[porqué]] y el [[cómo]] de las cosas. Esa curiosidad me llevó a convertirme en [[desarrollador full-stack]] y [[diseñador UX/UI]].'
+                )}
+              />
+              <p
+                class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent-light md:before:h-4"
+                set:html={pt(
+                  'Hoy, cada proyecto es un diálogo entre [[posibilidades técnicas]] y [[necesidades humanas]]. Me sumerjo en la esencia de cada desafío, transformando ideas en realidades palpables.'
+                )}
+              />
+              <p
+                class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent md:before:h-4"
+                set:html={pt(
+                  'Con la mirada puesta en el futuro, exploro [[nuevas fronteras]] en diseño y tecnología, abriendo caminos hacia experiencias innovadoras y memorables.'
+                )}
+              />
             </div>
-            <p class="text-xs text-foreground/70 uppercase tracking-wider text-right">
-              Desarrollador • Diseñador • Explorador
-            </p>
+
+            {/* Decorative elements */}
+            <div
+              class="mt-6 mb-4 h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent md:mt-8 md:mb-6"
+            >
+            </div>
+
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex space-x-2">
+                {
+                  [1, 2, 3].map((i) => (
+                    <div
+                      class="w-2 h-2 bg-accent rounded-full animate-pulse"
+                      style={{ animationDelay: `${i * 0.5}s` }}
+                    />
+                  ))
+                }
+              </div>
+              <p class="text-xs text-foreground/70 uppercase tracking-wider">
+                Desarrollador • Diseñador • Explorador
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Right Column: Visual with overlap effect -->
-      <div class="relative flex items-center justify-center lg:-mt-20">
-        <PersonalCarousel />
+        <!-- Right Column: Visual with responsive positioning -->
+        <div
+          class="relative flex w-full max-w-sm items-center justify-center sm:max-w-lg md:max-w-xl lg:max-w-lg lg:flex-1"
+          data-aos="fade-up"
+          data-aos-duration="800"
+          data-aos-delay="600"
+        >
+          <PersonalCarousel />
+        </div>
       </div>
     </div>
   </div>
