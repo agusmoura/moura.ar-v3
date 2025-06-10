@@ -18,10 +18,10 @@ technologies:
   - 'illustrator'
 images:
   cover:
-    src: '/projects/cerveza-meet/cover.webp'
+    src: 'https://cdn.moura.ar/projects/cerveza-meet/cover.webp'
     alt: 'Portada de la identidad de marca de Cerveza Meet'
   comp:
-    src: '/projects/cerveza-meet/comp.webp'
+    src: 'https://cdn.moura.ar/projects/cerveza-meet/comp.webp'
     alt: 'Composición de imagenes de la identidad de marca de Cerveza Meet'
 tags:
   - 'Branding'

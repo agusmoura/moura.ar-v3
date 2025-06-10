@@ -21,10 +21,10 @@ links:
   live: 'https://www.paycloud.com.ar/landing/#/'
 images:
   cover:
-    src: '/projects/paycloud/cover.webp'
+    src: 'https://cdn.moura.ar/projects/paycloud/cover.webp'
     alt: 'Portada del dashboard de Paycloud'
   comp:
-    src: '/projects/paycloud/comp.webp'
+    src: 'https://cdn.moura.ar/projects/paycloud/comp.webp'
     alt: 'Composición de imagenes del juego de busqueda de tesoro en el laberinto de Las Toninas'
 tags:
   - 'UI/UX Design'

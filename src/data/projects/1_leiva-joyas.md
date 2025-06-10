@@ -22,10 +22,10 @@ links:
   live: 'https://shop.leivajoyas.com.ar/'
 images:
   cover:
-    src: '/projects/leiva-joyas/cover.webp'
+    src: 'https://cdn.moura.ar/projects/leiva-joyas/cover.webp'
     alt: 'Portada de la tienda online de Leiva Joyas'
   comp:
-    src: '/projects/leiva-joyas/comp.webp'
+    src: 'https://cdn.moura.ar/projects/leiva-joyas/comp.webp'
     alt: 'Composición de imagenes de la tienda online de Leiva Joyas'
 tags:
   - 'E-commerce'

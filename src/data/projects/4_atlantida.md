@@ -21,10 +21,10 @@ links:
   live: 'https://inscribite.atlantida.edu.ar/'
 images:
   cover:
-    src: '/projects/atlantida/cover.webp'
+    src: 'https://cdn.moura.ar/projects/atlantida/cover.webp'
     alt: 'Portada del sistema de inscripción de la Universidad Atlántida'
   comp:
-    src: '/projects/atlantida/comp.webp'
+    src: 'https://cdn.moura.ar/projects/atlantida/comp.webp'
     alt: 'Composición de imagenes del sistema de inscripción de la Universidad Atlántida'
 tags:
   - 'E-commerce'

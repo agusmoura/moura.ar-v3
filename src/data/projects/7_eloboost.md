@@ -20,7 +20,7 @@ technologies:
   - 'tailwind'
 images:
   cover:
-    src: '/projects/eloboost/cover.webp'
+    src: 'https://cdn.moura.ar/projects/eloboost/cover.webp'
     alt: 'Portada de la calculadora de Eloboost'
 tags:
   - 'Web Development'

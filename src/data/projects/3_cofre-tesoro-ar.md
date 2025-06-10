@@ -21,10 +21,10 @@ links:
   live: 'https://laberinto.experiencia-ar.com.ar/'
 images:
   cover:
-    src: '/projects/cofre-tesoro-ar/cover.webp'
+    src: 'https://cdn.moura.ar/projects/cofre-tesoro-ar/cover.webp'
     alt: 'Portada del juego de busqueda de tesoro en el laberinto de Las Toninas'
   comp:
-    src: '/projects/cofre-tesoro-ar/questions.webp'
+    src: 'https://cdn.moura.ar/projects/cofre-tesoro-ar/questions.webp'
     alt: 'Composición de imagenes del juego de busqueda de tesoro en el laberinto de Las Toninas'
 tags:
   - 'Augmented Reality'

@@ -20,7 +20,7 @@ links:
 live: 'https://wallbit-challenge.agusdev.ar/'
 images:
   cover:
-    src: '/projects/goncy-challenge/cover.webp'
+    src: 'https://cdn.moura.ar/projects/goncy-challenge/cover.webp'
     alt: 'Portada de la landing page de Adminiad'
 tags:
   - 'Frontend Development'

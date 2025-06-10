@@ -21,10 +21,10 @@ links:
   live: 'https://adminiad.com/'
 images:
   cover:
-    src: '/projects/adminiad/cover.webp'
+    src: 'https://cdn.moura.ar/projects/adminiad/cover.webp'
     alt: 'Portada de la landing page de Adminiad'
   comp:
-    src: '/projects/adminiad/comp.webp'
+    src: 'https://cdn.moura.ar/projects/adminiad/comp.webp'
     alt: 'Composición de imagenes de la landing page de Adminiad'
 tags:
   - 'UI/UX Design'
