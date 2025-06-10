@@ -1,4 +1,4 @@
-<div class="orbit-container" data-animate="fade" data-delay="100">
+<div class="orbit-container">
   <svg class="orbit-svg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
     <defs>
       <mask id="center-mask">
@@ -40,6 +40,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: orbit-fade-in 1s ease-out 0.2s forwards;
   }
 
   @media (min-width: 1024px) {
@@ -125,6 +127,15 @@
     }
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @keyframes orbit-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
     }
   }
 </style>
