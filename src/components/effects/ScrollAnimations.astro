@@ -1,0 +1,40 @@
+---
+// Componente para inicializar las animaciones de scroll
+---
+
+<script>
+  import AOS from 'aos';
+  import 'aos/dist/aos.css';
+
+  // Configuración optimizada para performance
+  const initAOS = () => {
+    AOS.init({
+      duration: window.innerWidth < 768 ? 600 : 800, // Animaciones más rápidas en móvil
+      easing: 'ease-out-cubic',
+      once: true, // Solo animar una vez para mejor performance
+      offset: window.innerWidth < 768 ? 50 : 120, // Trigger más temprano en móvil
+      delay: 0,
+      anchorPlacement: 'top-bottom',
+      disable: false, // Mantener animaciones en móviles pero optimizadas
+      startEvent: 'DOMContentLoaded',
+      useClassNames: false,
+      disableMutationObserver: false,
+      debounceDelay: 50,
+      throttleDelay: 99,
+    });
+  };
+
+  // Inicializar AOS
+  document.addEventListener('DOMContentLoaded', initAOS);
+
+  // Re-inicializar en navegación de Astro
+  document.addEventListener('astro:page-load', () => {
+    // Pequeño delay para asegurar que el DOM esté listo
+    setTimeout(initAOS, 100);
+  });
+
+  // Actualizar animaciones cuando se modifica el DOM
+  document.addEventListener('astro:after-swap', () => {
+    AOS.refresh();
+  });
+</script>

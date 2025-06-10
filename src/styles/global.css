@@ -45,9 +45,23 @@
 
 /* Estilos base adicionales */
 @layer base {
-  /* Smooth scrolling */
+  /* Smooth scrolling con respeto a preferencias */
   html {
     scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   /* Mejora la legibilidad del texto */
@@ -56,6 +70,10 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings:
+      'liga' 1,
+      'kern' 1;
+    overflow-x: hidden;
   }
 
   /* Focus visible para accesibilidad */
@@ -68,6 +86,20 @@
   ::selection {
     background-color: var(--color-accent);
     color: var(--color-primary);
+  }
+
+  /* Optimización de imágenes por defecto */
+  img {
+    height: auto;
+    max-width: 100%;
+    object-fit: cover;
+    loading: lazy;
+  }
+
+  /* Optimización de videos */
+  video {
+    height: auto;
+    max-width: 100%;
   }
 }
 
