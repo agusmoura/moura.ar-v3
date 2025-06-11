@@ -11,7 +11,6 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'auto',
     assets: '_assets',
-    splitting: true,
   },
   prefetch: {
     defaultStrategy: 'viewport',
@@ -32,6 +31,7 @@ export default defineConfig({
             animations: ['swiper'],
           },
           assetFileNames: (assetInfo) => {
+            if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
             const info = assetInfo.name.split('.');
             const extType = info[info.length - 1];
             if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
