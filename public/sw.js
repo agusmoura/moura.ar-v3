@@ -1,3 +1,4 @@
+// @ts-nocheck
 const STATIC_CACHE = 'moura-static-v1';
 const DYNAMIC_CACHE = 'moura-dynamic-v1';
 
