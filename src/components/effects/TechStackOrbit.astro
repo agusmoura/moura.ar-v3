@@ -188,7 +188,6 @@ const uniqueId = 'tech-orbit-' + Math.random().toString(36).substring(2, 9);
         return groupIcons.map((icon, iconIndex) => {
           const offset = iconIndex / 9; // 10 icons per group
           const animationDuration = 120; // 2 minutes for mobile rotation
-          const groupDelay = groupIndex * 24; // 24 seconds between groups
 
           return (
             <g
