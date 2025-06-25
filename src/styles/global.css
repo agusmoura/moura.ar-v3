@@ -76,6 +76,13 @@
     overflow-x: hidden;
   }
 
+  /* Espacio para el menú móvil */
+  @media (max-width: 768px) {
+    body {
+      padding-bottom: 5rem; /* Nueva altura del menú móvil optimizado */
+    }
+  }
+
   /* Focus visible para accesibilidad */
   :focus-visible {
     outline: 2px solid var(--color-accent);
