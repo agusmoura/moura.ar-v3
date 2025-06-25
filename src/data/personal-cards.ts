@@ -23,13 +23,13 @@ export const personalCardsData: PersonalCard[] = [
   },
   {
     id: 2,
-    title: 'Música Actual',
+    title: 'Mi música favorita',
     subtitle: 'Frecuencia Adaptativa',
     description: 'El ritmo como herramienta de enfoque',
     image: 'https://cdn.moura.ar/music.webp',
     rarity: 'epic',
     specialTag: 'Música',
-    tags: ['Lo-Fi', 'Techno', 'Dubstep', 'Drumstep'],
+    tags: ['Lo-Fi', 'Techno', 'Dubstep', 'Hip-Hop'],
     colors: {
       background: 'bg-[#04170f]',
       border: 'from-[#436f2d] via-[#447234] to-[#2d4a1c]',
@@ -52,7 +52,7 @@ export const personalCardsData: PersonalCard[] = [
   {
     id: 3,
     title: 'Experiencia',
-    subtitle: 'Veterano Digital',
+    subtitle: 'Experto Digital',
     description: '6+ años forjando el futuro',
     image: 'https://cdn.moura.ar/cv.webp',
     rarity: 'rare',
@@ -134,13 +134,13 @@ export const personalCardsData: PersonalCard[] = [
   },
   {
     id: 6,
-    title: 'Juego Actual',
+    title: 'Mi zona de confort',
     subtitle: 'Factorio',
     description: 'Cuando necesito descansar del código... automatizo más cosas.',
     image: 'https://cdn.moura.ar/factorio.webp',
     rarity: 'epic',
     specialTag: 'Gaming',
-    tags: ['Estrategia', 'Automatización', 'Horas perdidas'],
+    tags: ['Automatización', 'Horas perdidas'],
     colors: {
       background: 'bg-[#090a05]',
       border: 'from-[#a35220] via-[#c47034] to-[#a35220]',
