@@ -8,6 +8,9 @@ export default defineConfig({
   integrations: [icon()],
   site: 'https://moura.ar', // Cambia esto a tu dominio real
   compressHTML: true,
+  devToolbar: {
+    enabled: false,
+  },
   build: {
     inlineStylesheets: 'auto',
     assets: '_assets',
