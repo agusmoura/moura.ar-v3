@@ -8,6 +8,8 @@ import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import '@styles/global.css';
 import { ClientRouter } from 'astro:transitions';
+import DesktopSideNav from '@components/ui/DesktopSideNav.astro';
+import MobileNav from '@components/ui/MobileNav.astro';
 
 export interface Props {
   title: string;
@@ -61,6 +63,8 @@ const backgroundConfig = {
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
     <SpaceBackground {...backgroundConfig} />
     <ScrollAnimations />
+    <DesktopSideNav />
+    <MobileNav />
     <slot />
 
     <!-- Simplified Performance Monitoring -->

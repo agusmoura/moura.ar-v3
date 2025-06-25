@@ -1,0 +1,601 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface NavItem {
+  href: string;
+  icon: string;
+  label: string;
+  section?: string;
+  offsetY?: number;
+}
+
+const navItems: readonly NavItem[] = [
+  {
+    href: '#about',
+    icon: 'heroicons:beaker',
+    label: 'Principios',
+    section: 'about',
+    offsetY: 0,
+  },
+  {
+    href: '#projects',
+    icon: 'heroicons:adjustments-horizontal',
+    label: 'Proyectos',
+    section: 'projects',
+    offsetY: 20,
+  },
+  {
+    href: '#',
+    icon: 'heroicons:sun',
+    label: 'Inicio',
+    section: 'home',
+    offsetY: 35,
+  },
+  {
+    href: 'mailto:agustin@moura.ar',
+    icon: 'heroicons:envelope',
+    label: 'Contacto',
+    offsetY: 20,
+  },
+  {
+    href: '/cv.pdf',
+    icon: 'heroicons:document-arrow-down',
+    label: 'CV',
+    offsetY: 0,
+  },
+] as const;
+---
+
+<nav class="mobile-nav" aria-label="Navegación principal móvil" data-mobile-nav="active-detector">
+  <div class="mobile-nav__animated-container">
+    <div class="mobile-nav-orbit-container">
+      <div class="mobile-orbit-ring"></div>
+    </div>
+
+    <ul class="mobile-nav__list" role="menubar">
+      {
+        navItems.map(({ href, icon, label, section, offsetY }, index) => {
+          const isExternal =
+            href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('/');
+
+          return (
+            <li
+              class="mobile-nav__item"
+              role="none"
+              style={`--item-index: ${index}; --offset-y: -${offsetY}px; --animation-delay: ${index * 0.1}s`}
+            >
+              <a
+                href={href}
+                class="mobile-nav__link"
+                aria-label={label}
+                role="menuitem"
+                data-section={section}
+                {...(isExternal && {
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                })}
+              >
+                <div class="mobile-nav__icon-wrapper">
+                  <Icon name={icon} class="mobile-nav__icon" size={24} aria-hidden="true" />
+                </div>
+                <span class="mobile-nav__label">{label}</span>
+                <div class="mobile-nav__ripple" />
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</nav>
+
+<script is:inline>
+  class MobileNavController {
+    constructor() {
+      this.nav = document.querySelector('[data-mobile-nav="active-detector"]');
+      if (!this.nav) return;
+
+      this.links = this.nav.querySelectorAll('[data-section]');
+      this.sections = new Map();
+      this.isCollapsed = false;
+
+      this.init();
+    }
+
+    init() {
+      this.setupSections();
+      this.setupObservers();
+      this.setupNavigation();
+      this.setupTouchFeedback();
+    }
+
+    setupSections() {
+      this.links?.forEach((link) => {
+        const sectionId = link.getAttribute('data-section');
+        if (sectionId) {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            this.sections?.set(sectionId, section);
+          }
+        }
+      });
+    }
+
+    setupObservers() {
+      // Observer para secciones activas
+      this.sectionObserver = new IntersectionObserver(
+        (entries) => {
+          const mostVisible = entries.reduce((prev, current) => {
+            return current.intersectionRatio > prev.intersectionRatio ? current : prev;
+          }, entries[0]);
+
+          if (mostVisible && mostVisible.isIntersecting) {
+            this.setActiveLink(mostVisible.target.id);
+          }
+        },
+        {
+          root: null,
+          rootMargin: '-20% 0px -60% 0px',
+          threshold: 0.1,
+        }
+      );
+
+      // Observer para colapsar en scroll
+      const heroSection = document.getElementById('home');
+      if (heroSection) {
+        this.heroObserver = new IntersectionObserver(
+          (entries) => {
+            const shouldCollapse = !entries[0].isIntersecting;
+            if (shouldCollapse !== this.isCollapsed) {
+              this.isCollapsed = shouldCollapse;
+              this.nav?.classList.toggle('mobile-nav--collapsed', shouldCollapse);
+            }
+          },
+          {
+            root: null,
+            rootMargin: '-20% 0px -20% 0px',
+            threshold: 0.2,
+          }
+        );
+
+        this.heroObserver.observe(heroSection);
+      }
+
+      // Observar todas las secciones
+      this.sections?.forEach((section) => {
+        this.sectionObserver?.observe(section);
+      });
+    }
+
+    setupNavigation() {
+      this.links?.forEach((link) => {
+        link.addEventListener('click', (e) => {
+          const sectionId = link.getAttribute('data-section');
+          const href = link.getAttribute('href');
+
+          if (sectionId && href && href.startsWith('#')) {
+            e.preventDefault();
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+              targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+              const newUrl = href === '#' ? window.location.pathname : href;
+              history.pushState(null, '', newUrl);
+              this.setActiveLink(sectionId);
+            }
+          }
+        });
+      });
+    }
+
+    setupTouchFeedback() {
+      this.links?.forEach((link) => {
+        link.addEventListener(
+          'touchstart',
+          () => {
+            if ('vibrate' in navigator) {
+              navigator.vibrate(10);
+            }
+          },
+          { passive: true }
+        );
+      });
+    }
+
+    /**
+     * @param {string} activeSectionId
+     */
+    setActiveLink(activeSectionId) {
+      this.links?.forEach((link) => {
+        const sectionId = link.getAttribute('data-section');
+        if (sectionId === activeSectionId) {
+          link.classList.add('mobile-nav__link--active');
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.classList.remove('mobile-nav__link--active');
+          link.removeAttribute('aria-current');
+        }
+      });
+    }
+  }
+
+  // Inicializar solo en móvil
+  function isMobile() {
+    return window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (isMobile()) {
+      new MobileNavController();
+    }
+  });
+</script>
+
+<style>
+  /* Variables CSS */
+  .mobile-nav {
+    --nav-height: 4.5rem;
+    --nav-height-collapsed: 3.5rem;
+    --nav-bg: rgba(16, 16, 15, 0.95);
+    --nav-bg-hover: rgba(32, 32, 30, 0.98);
+    --nav-border: rgba(255, 255, 255, 0.12);
+    --nav-border-hover: rgba(255, 255, 255, 0.2);
+    --nav-text: rgba(255, 255, 255, 0.7);
+    --nav-text-hover: rgba(255, 255, 255, 0.9);
+    --nav-text-active: #10100e;
+    --nav-accent: #ecad22;
+    --nav-accent-hover: #ffc107;
+    --nav-transition: 250ms cubic-bezier(0.23, 1, 0.32, 1);
+
+    position: fixed;
+    bottom: 0.3rem;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: var(--nav-height);
+    display: none;
+
+    /* Animación de entrada */
+    animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform: translateY(100%);
+  }
+
+  /* Solo visible en móvil */
+  @media (max-width: 768px) {
+    .mobile-nav {
+      display: block;
+    }
+  }
+
+  /* Contenedor animado */
+  .mobile-nav__animated-container {
+    width: 100%;
+    height: 100%;
+    animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform: translateY(100%);
+  }
+
+  /* Estado colapsado */
+  .mobile-nav--collapsed {
+    height: var(--nav-height-collapsed);
+  }
+
+  .mobile-nav--collapsed .mobile-nav__label {
+    opacity: 0;
+  }
+
+  .mobile-nav--collapsed .mobile-nav__link {
+    padding: 0.25rem 0.125rem;
+    gap: 0.2rem;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  .mobile-nav--collapsed .mobile-nav__icon {
+    transform: scale(1.35);
+  }
+
+  /* Estado activo cuando está colapsado */
+  .mobile-nav--collapsed .mobile-nav__link--active {
+    transform: translateY(-2px) scale(1.05) !important;
+  }
+
+  .mobile-nav--collapsed .mobile-nav__link--active .mobile-nav__icon {
+    transform: scale(1.4) !important;
+  }
+
+  /* Decoración orbital */
+  .mobile-nav-orbit-container {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    transition:
+      transform var(--nav-transition),
+      opacity var(--nav-transition);
+  }
+
+  .mobile-orbit-ring {
+    position: absolute;
+    width: 90%;
+    height: 310px;
+    border-radius: 50%;
+    opacity: 0.4;
+    left: 50%;
+    bottom: -60px;
+    transform: translate(-50%, 55%);
+    background: radial-gradient(
+      circle at center,
+      rgba(16, 16, 15, 0.8) 0%,
+      rgba(16, 16, 15, 0.6) 50%,
+      rgba(16, 16, 15, 0.2) 80%,
+      transparent 100%
+    );
+    border: 1.5px solid var(--nav-accent);
+  }
+
+  .mobile-nav--collapsed .mobile-orbit-ring {
+    width: 90%;
+    bottom: -80px;
+  }
+
+  /* Lista de navegación */
+  .mobile-nav__list {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 0;
+    padding: 0 0.5rem;
+    list-style: none;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    gap: 0.25rem;
+  }
+
+  /* Items de navegación */
+  .mobile-nav__item {
+    flex: 1;
+    max-width: 70px;
+    transform: translateY(var(--offset-y, 0px));
+    animation: itemSlideUp 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-delay: calc(0.1s + var(--animation-delay, 0s));
+    opacity: 0;
+    transition: transform var(--nav-transition);
+  }
+
+  /* Enlaces */
+  .mobile-nav__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    padding: 0.5rem 0.25rem;
+    min-width: 48px;
+    min-height: 48px;
+    color: var(--nav-text);
+    text-decoration: none;
+    font-size: 0.5rem;
+    font-weight: 600;
+    line-height: 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: var(--nav-bg);
+    border: 1px solid var(--nav-border);
+    transition: all var(--nav-transition);
+    transform-origin: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Estados hover/focus */
+  .mobile-nav__link:hover:not(.mobile-nav__link--active),
+  .mobile-nav__link:focus-visible:not(.mobile-nav__link--active) {
+    color: var(--nav-text-hover);
+    transform: translateY(-2px) scale(1.02);
+    background: var(--nav-bg-hover);
+    border-color: var(--nav-border-hover);
+  }
+
+  /* Estado activo */
+  .mobile-nav__link--active {
+    color: var(--nav-text-active) !important;
+    background: linear-gradient(
+      135deg,
+      var(--nav-accent) 0%,
+      var(--nav-accent-hover) 100%
+    ) !important;
+    border-color: var(--nav-accent) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.15),
+      0 2px 8px rgba(236, 173, 34, 0.25) !important;
+  }
+
+  /* Iconos */
+  .mobile-nav__icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    transition: all var(--nav-transition);
+  }
+
+  .mobile-nav__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    transition: all var(--nav-transition);
+    opacity: 0.8;
+  }
+
+  .mobile-nav__link:hover:not(.mobile-nav__link--active) .mobile-nav__icon,
+  .mobile-nav__link:focus-visible:not(.mobile-nav__link--active) .mobile-nav__icon {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .mobile-nav__link--active .mobile-nav__icon {
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
+  }
+
+  /* Labels */
+  .mobile-nav__label {
+    font-size: 0.5rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all var(--nav-transition);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  .mobile-nav__link--active .mobile-nav__label {
+    opacity: 1 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Efecto ripple */
+  .mobile-nav__ripple {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle,
+      var(--nav-accent) 0%,
+      rgba(236, 173, 34, 0.2) 60%,
+      transparent 80%
+    );
+    opacity: 0;
+    transform: scale(0);
+    border-radius: inherit;
+    pointer-events: none;
+    transition: all 0.3s ease-out;
+  }
+
+  .mobile-nav__link:active:not(.mobile-nav__link--active) {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  .mobile-nav__link:active .mobile-nav__ripple {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  /* Focus accesible */
+  .mobile-nav__link:focus-visible {
+    outline: 1px solid var(--nav-accent);
+    outline-offset: 2px;
+  }
+
+  /* Estado colapsado - resetear offsets */
+  .mobile-nav--collapsed .mobile-nav__icon-wrapper {
+    margin-top: 0.4rem;
+  }
+
+  .mobile-nav--collapsed .mobile-nav__item {
+    transform: translateY(0px);
+    max-width: 60px;
+  }
+
+  .mobile-nav--collapsed .mobile-nav__list {
+    gap: 0.125rem;
+    padding: 0 0.25rem;
+  }
+
+  /* Animaciones */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes itemSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(calc(var(--offset-y, 0px) + 20px));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(var(--offset-y, 0px));
+    }
+  }
+
+  @keyframes orbitGlow {
+    from {
+      opacity: 0.3;
+      box-shadow: 0 0 10px rgba(236, 173, 34, 0.05);
+    }
+    to {
+      opacity: 0.5;
+      box-shadow: 0 0 20px rgba(236, 173, 34, 0.1);
+    }
+  }
+
+  /* Orientación landscape */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .mobile-nav {
+      --nav-height: 3.5rem;
+      --nav-height-collapsed: 2.5rem;
+    }
+
+    .mobile-nav__link {
+      min-height: 40px;
+      padding: 0.375rem 0.25rem;
+    }
+  }
+
+  /* Alto contraste */
+  @media (prefers-contrast: high) {
+    .mobile-nav {
+      --nav-border: rgba(255, 255, 255, 0.3);
+      --nav-bg: rgba(0, 0, 0, 0.95);
+    }
+  }
+
+  /* Movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav,
+    .mobile-nav__animated-container,
+    .mobile-nav__item,
+    .mobile-nav__link,
+    .mobile-nav__icon,
+    .mobile-nav__label,
+    .mobile-nav__ripple,
+    .mobile-nav-orbit-container,
+    .mobile-orbit-ring {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .mobile-nav,
+    .mobile-nav__animated-container {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mobile-nav__item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Ocultar en desktop */
+  @media (min-width: 769px) {
+    .mobile-nav {
+      display: none !important;
+    }
+  }
+</style>

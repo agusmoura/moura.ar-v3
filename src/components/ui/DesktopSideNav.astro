@@ -1,0 +1,743 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface NavItem {
+  href: string;
+  icon: string;
+  label: string;
+  section?: string;
+  offsetX?: number;
+}
+
+const navItems: readonly NavItem[] = [
+  {
+    href: '#',
+    icon: 'heroicons:sun',
+    label: 'Inicio',
+    section: 'home',
+    offsetX: 0,
+  },
+  {
+    href: '#about',
+    icon: 'heroicons:beaker',
+    label: 'Principios',
+    section: 'about',
+    offsetX: 35,
+  },
+  {
+    href: '#projects',
+    icon: 'heroicons:adjustments-horizontal',
+    label: 'Proyectos',
+    section: 'projects',
+    offsetX: 50,
+  },
+  {
+    href: 'mailto:agustin@moura.ar',
+    icon: 'heroicons:envelope',
+    label: 'Contacto',
+    offsetX: 35,
+  },
+  {
+    href: '/cv.pdf',
+    icon: 'heroicons:document-arrow-down',
+    label: 'CV',
+    offsetX: 0,
+  },
+] as const;
+---
+
+<nav class="side-nav" aria-label="Navegación principal" data-nav="active-detector">
+  <!-- Orbit decoration with particles -->
+  <div class="nav-orbit-container">
+    <div class="orbit-ring"></div>
+    <div class="orbit-particles">
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+    </div>
+  </div>
+
+  <!-- Navigation buttons -->
+  <ul class="side-nav__list" role="menubar">
+    {
+      navItems.map(({ href, icon, label, section, offsetX }, index) => {
+        const isExternal =
+          href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('/');
+
+        return (
+          <li
+            class="side-nav__item"
+            role="none"
+            style={`--offset-x: -${offsetX}px; --animation-delay: ${index * 0.1}s`}
+          >
+            <a
+              href={href}
+              class="side-nav__link"
+              aria-label={label}
+              role="menuitem"
+              data-section={section}
+              {...(isExternal && {
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              })}
+            >
+              <div class="side-nav__icon-wrapper">
+                <Icon name={icon} class="side-nav__icon" size={20} aria-hidden="true" />
+                <div class="side-nav__icon-bg" />
+              </div>
+              <span class="side-nav__text">{label}</span>
+              <div class="side-nav__ripple" />
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<script>
+  class ActiveNavDetector {
+    private nav: HTMLElement;
+    private links!: NodeListOf<HTMLAnchorElement>;
+    private observer!: IntersectionObserver;
+    private heroObserver!: IntersectionObserver;
+    private sections: Map<string, HTMLElement> = new Map();
+    private isCollapsed: boolean = false;
+
+    constructor() {
+      this.nav = document.querySelector('[data-nav="active-detector"]') as HTMLElement;
+      if (!this.nav) return;
+
+      this.links = this.nav.querySelectorAll('[data-section]') as NodeListOf<HTMLAnchorElement>;
+
+      // Initialize observers with proper options
+      this.observer = new IntersectionObserver(() => {}, { threshold: 0.1 });
+      this.heroObserver = new IntersectionObserver(() => {}, { threshold: 0.1 });
+
+      this.initializeSections();
+      this.setupIntersectionObserver();
+      this.setupHeroObserver();
+      this.observeSections();
+      this.handleNavClicks();
+    }
+
+    private initializeSections(): void {
+      // Collect all sections that have corresponding nav items
+      this.links.forEach((link) => {
+        const sectionId = link.getAttribute('data-section');
+        if (sectionId) {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            this.sections.set(sectionId, section);
+          }
+        }
+      });
+    }
+
+    private setupIntersectionObserver(): void {
+      const options: IntersectionObserverInit = {
+        root: null,
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0.1,
+      };
+
+      this.observer = new IntersectionObserver((entries) => {
+        let mostVisible = entries.reduce((prev, current) => {
+          return current.intersectionRatio > prev.intersectionRatio ? current : prev;
+        }, entries[0]);
+
+        if (mostVisible && mostVisible.isIntersecting) {
+          const sectionId = mostVisible.target.id;
+          this.setActiveLink(sectionId);
+        }
+      }, options);
+    }
+
+    private setupHeroObserver(): void {
+      const heroSection = document.getElementById('home');
+      if (!heroSection) return;
+
+      const options: IntersectionObserverInit = {
+        root: null,
+        rootMargin: '-10% 0px -10% 0px',
+        threshold: 0.3,
+      };
+
+      this.heroObserver = new IntersectionObserver((entries) => {
+        const heroEntry = entries[0];
+        const shouldCollapse = !heroEntry.isIntersecting;
+
+        if (shouldCollapse !== this.isCollapsed) {
+          this.isCollapsed = shouldCollapse;
+          this.toggleCollapsedState(shouldCollapse);
+        }
+      }, options);
+
+      this.heroObserver.observe(heroSection);
+    }
+
+    private toggleCollapsedState(collapsed: boolean): void {
+      const navElement = this.nav;
+
+      if (collapsed) {
+        navElement.classList.add('side-nav--collapsed');
+        navElement.setAttribute('data-collapsed', 'true');
+      } else {
+        navElement.classList.remove('side-nav--collapsed');
+        navElement.removeAttribute('data-collapsed');
+      }
+    }
+
+    private observeSections(): void {
+      this.sections.forEach((section) => {
+        this.observer.observe(section);
+      });
+    }
+
+    private setActiveLink(activeSectionId: string): void {
+      this.links.forEach((link) => {
+        link.classList.remove('side-nav__link--active');
+        link.removeAttribute('aria-current');
+      });
+
+      const activeLink = this.nav.querySelector(
+        `[data-section="${activeSectionId}"]`
+      ) as HTMLAnchorElement;
+      if (activeLink) {
+        activeLink.classList.add('side-nav__link--active');
+        activeLink.setAttribute('aria-current', 'page');
+      }
+    }
+
+    private handleNavClicks(): void {
+      this.links.forEach((link) => {
+        link.addEventListener('click', (e) => {
+          const sectionId = link.getAttribute('data-section');
+          const href = link.getAttribute('href');
+
+          if (sectionId && href?.startsWith('#')) {
+            e.preventDefault();
+
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+              targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+
+              const newUrl = href === '#' ? window.location.pathname : href;
+              history.pushState(null, '', newUrl);
+              this.setActiveLink(sectionId);
+            }
+          }
+        });
+      });
+    }
+
+    public destroy(): void {
+      if (this.observer) {
+        this.sections.forEach((section) => {
+          this.observer.unobserve(section);
+        });
+        this.observer.disconnect();
+      }
+
+      if (this.heroObserver) {
+        this.heroObserver.disconnect();
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    new ActiveNavDetector();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      const currentHash = window.location.hash;
+      if (currentHash) {
+        const sectionId = currentHash.substring(1);
+        const activeLink = document.querySelector(
+          `[data-section="${sectionId}"]`
+        ) as HTMLAnchorElement;
+        if (activeLink) {
+          activeLink.classList.add('side-nav__link--active');
+          activeLink.setAttribute('aria-current', 'page');
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+  .side-nav {
+    --nav-bg: hsl(0 0% 6% / 0.9);
+    --nav-bg-hover: hsl(0 0% 8% / 0.95);
+    --nav-border: hsl(0 0% 100% / 0.08);
+    --nav-border-hover: var(--color-accent);
+    --nav-text: hsl(0 0% 100% / 0.9);
+    --nav-text-hover: var(--color-accent);
+    --nav-shadow: 0 8px 32px hsl(0 0% 0% / 0.12);
+    --nav-radius: 1.25rem;
+    --nav-gap: 0.75rem;
+    --nav-padding-block: 0.625rem;
+    --nav-padding-inline: 0.75rem;
+
+    /* Enhanced transition timing for ultra-smooth animations */
+    --nav-transition-timing: cubic-bezier(0.23, 1, 0.32, 1);
+    --nav-transition-duration: 600ms;
+    --nav-transition-stagger: 100ms;
+    --nav-backdrop-blur: 12px;
+
+    position: fixed;
+    inset-block-start: 50%;
+    inset-inline-end: 1rem;
+    transform: translateY(-50%);
+    z-index: 100;
+
+    /* Entrance animation */
+    animation: slideInFromRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+
+    /* Ocultar en móvil */
+    display: block;
+  }
+
+  /* Ocultar en móvil */
+  @media (max-width: 768px) {
+    .side-nav {
+      display: none !important;
+    }
+  }
+
+  /* Collapsed state with smooth variable transitions */
+  .side-nav--collapsed {
+    --nav-gap: 0.5rem;
+    --nav-padding-block: 0.5rem;
+    --nav-padding-inline: 0.75rem;
+  }
+
+  .side-nav--collapsed .nav-orbit-container {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  /* Orbit decoration with enhanced transitions */
+  .nav-orbit-container {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition:
+      transform var(--nav-transition-duration) var(--nav-transition-timing),
+      opacity var(--nav-transition-duration) var(--nav-transition-timing);
+    will-change: transform, opacity;
+  }
+
+  .orbit-ring {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border: 2px solid var(--color-gold);
+    border-radius: 50%;
+    opacity: 0.6;
+    inset: 50%;
+    transform: translate(-15%, -50%);
+
+    animation:
+      orbitRotate 20s linear infinite,
+      orbitPulse 4s ease-in-out infinite alternate,
+      orbitFadeIn 1s ease-out 0.3s forwards;
+
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--color-gold) 90deg,
+      transparent 180deg,
+      var(--color-gold) 270deg,
+      transparent 360deg
+    );
+    border: none;
+    mask: radial-gradient(circle, transparent 158px, black 160px);
+    -webkit-mask: radial-gradient(circle, transparent 158px, black 160px);
+  }
+
+  .orbit-particles {
+    position: absolute;
+    inset: 0;
+    animation: orbitFadeIn 1.2s ease-out 0.6s forwards;
+    opacity: 0;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--color-gold);
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: particleFloat 3s ease-in-out infinite;
+  }
+
+  .particle-1 {
+    top: 20%;
+    right: 25%;
+    animation-delay: 0s;
+  }
+
+  .particle-2 {
+    top: 60%;
+    right: 15%;
+    animation-delay: 1s;
+    animation-duration: 4s;
+  }
+
+  .particle-3 {
+    top: 80%;
+    right: 30%;
+    animation-delay: 2s;
+    animation-duration: 3.5s;
+  }
+
+  .side-nav__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--nav-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transition: gap var(--nav-transition-duration) var(--nav-transition-timing);
+  }
+
+  .side-nav__item {
+    transform: translateX(var(--offset-x));
+    animation: buttonSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(0.8s + var(--animation-delay));
+    opacity: 0;
+    transform: translateX(calc(var(--offset-x) + 60px));
+
+    /* Smooth transition for item positioning */
+    transition: transform var(--nav-transition-duration) var(--nav-transition-timing);
+    will-change: transform;
+  }
+
+  /* Smooth collapsed positioning */
+  .side-nav--collapsed .side-nav__item {
+    transform: translateX(0);
+  }
+
+  .side-nav__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: var(--nav-padding-block) var(--nav-padding-inline);
+    min-inline-size: 8rem;
+    position: relative;
+
+    background: var(--nav-bg);
+    border: 1px solid var(--nav-border);
+    border-radius: var(--nav-radius);
+
+    color: var(--nav-text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.2;
+
+    backdrop-filter: blur(var(--nav-backdrop-blur));
+    box-shadow: var(--nav-shadow);
+    overflow: hidden;
+    cursor: pointer;
+
+    /* Ultra-smooth coordinated transitions */
+    transition:
+      min-inline-size var(--nav-transition-duration) var(--nav-transition-timing),
+      inline-size var(--nav-transition-duration) var(--nav-transition-timing),
+      block-size var(--nav-transition-duration) var(--nav-transition-timing),
+      border-radius var(--nav-transition-duration) var(--nav-transition-timing),
+      gap calc(var(--nav-transition-duration) * 0.8) var(--nav-transition-timing),
+      padding var(--nav-transition-duration) var(--nav-transition-timing),
+      background-color calc(var(--nav-transition-duration) * 0.6) var(--nav-transition-timing),
+      border-color calc(var(--nav-transition-duration) * 0.6) var(--nav-transition-timing),
+      color calc(var(--nav-transition-duration) * 0.6) var(--nav-transition-timing),
+      transform calc(var(--nav-transition-duration) * 0.8) var(--nav-transition-timing),
+      box-shadow calc(var(--nav-transition-duration) * 0.6) var(--nav-transition-timing);
+
+    will-change:
+      min-inline-size, inline-size, block-size, border-radius, gap, padding, background-color,
+      border-color, color, transform, box-shadow;
+  }
+
+  /* Ultra-smooth collapsed state */
+  .side-nav--collapsed .side-nav__link {
+    min-inline-size: 0;
+    inline-size: 3rem;
+    block-size: 3rem;
+    border-radius: 50%;
+    gap: 0;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .side-nav__icon-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .side-nav--collapsed .side-nav__icon-wrapper {
+    position: absolute;
+  }
+
+  .side-nav__icon-bg {
+    position: absolute;
+    inset: -4px;
+    background: var(--color-gold);
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0.8);
+    z-index: -1;
+    transition:
+      opacity calc(var(--nav-transition-duration) * 0.7) var(--nav-transition-timing),
+      transform calc(var(--nav-transition-duration) * 0.7) var(--nav-transition-timing);
+    will-change: opacity, transform;
+  }
+
+  .side-nav__icon {
+    flex-shrink: 0;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    position: relative;
+    z-index: 1;
+    transition: transform calc(var(--nav-transition-duration) * 0.7) var(--nav-transition-timing);
+    will-change: transform;
+  }
+
+  .side-nav__text {
+    font-weight: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    z-index: 1;
+
+    /* Staggered text transition for ultra-smooth collapse */
+    transition:
+      opacity calc(var(--nav-transition-duration) * 0.5) var(--nav-transition-timing),
+      width calc(var(--nav-transition-duration) * 0.8) var(--nav-transition-timing)
+        var(--nav-transition-stagger),
+      margin-left calc(var(--nav-transition-duration) * 0.8) var(--nav-transition-timing)
+        var(--nav-transition-stagger);
+    will-change: opacity, width, margin-left;
+  }
+
+  /* Smooth text hiding with staggered timing */
+  .side-nav--collapsed .side-nav__text {
+    opacity: 0;
+    width: 0;
+    pointer-events: none;
+  }
+
+  .side-nav__ripple {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle, var(--color-gold) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+    transition:
+      all 0.6s var(--nav-transition-timing),
+      border-radius var(--nav-transition-duration) var(--nav-transition-timing);
+    will-change: opacity, transform, border-radius;
+  }
+
+  /* Enhanced hover states with smooth transitions */
+  .side-nav__link:hover,
+  .side-nav__link:focus-visible {
+    background: var(--nav-bg-hover);
+    border-color: var(--nav-border-hover);
+    color: var(--nav-text-hover);
+    transform: translateX(-0.5rem) scale(1.02);
+    box-shadow:
+      var(--nav-shadow),
+      0 0 20px hsl(var(--color-accent-hsl) / 0.2);
+  }
+
+  .side-nav--collapsed .side-nav__link:hover,
+  .side-nav--collapsed .side-nav__link:focus-visible {
+    transform: translateX(-0.25rem) scale(1.05);
+  }
+
+  .side-nav__link:hover::before,
+  .side-nav__link:focus-visible::before {
+    opacity: 0.15;
+  }
+
+  .side-nav__link:hover .side-nav__icon-bg,
+  .side-nav__link:focus-visible .side-nav__icon-bg {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+
+  .side-nav__link:hover .side-nav__icon,
+  .side-nav__link:focus-visible .side-nav__icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .side-nav__link:active .side-nav__ripple {
+    opacity: 0.3;
+    transform: scale(1);
+    transition: all 0.2s var(--nav-transition-timing);
+  }
+
+  /* Enhanced active state */
+  .side-nav__link--active {
+    background: var(--color-gold);
+    border-color: var(--nav-border-hover);
+    color: var(--color-background);
+    box-shadow:
+      0 0 24px rgba(236, 173, 34, 0.4),
+      var(--nav-shadow);
+    transform: translateX(-0.25rem);
+  }
+
+  .side-nav--collapsed .side-nav__link--active {
+    transform: translateX(-0.125rem);
+  }
+
+  .side-nav__link--active::before {
+    opacity: 0.2;
+  }
+
+  .side-nav__link--active .side-nav__icon-bg {
+    opacity: 0.3;
+    transform: scale(1.1);
+  }
+
+  .side-nav__link--active .side-nav__icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+  }
+
+  /* Focus management */
+  .side-nav__link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Animations */
+  @keyframes slideInFromRight {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+
+  @keyframes buttonSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(calc(var(--offset-x) + 60px));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(var(--offset-x));
+    }
+  }
+
+  @keyframes orbitRotate {
+    from {
+      transform: translate(-15%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-15%, -50%) rotate(360deg);
+    }
+  }
+
+  @keyframes orbitPulse {
+    from {
+      opacity: 0.4;
+      transform: translate(-15%, -50%) scale(1);
+    }
+    to {
+      opacity: 0.8;
+      transform: translate(-15%, -50%) scale(1.05);
+    }
+  }
+
+  @keyframes orbitFadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-15%, -50%) scale(0.8);
+    }
+    to {
+      opacity: 0.6;
+      transform: translate(-15%, -50%) scale(1);
+    }
+  }
+
+  @keyframes particleFloat {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-10px) scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .side-nav,
+    .side-nav__item,
+    .side-nav__list,
+    .side-nav__link,
+    .side-nav__link::before,
+    .side-nav__icon,
+    .side-nav__icon-bg,
+    .side-nav__text,
+    .side-nav__ripple,
+    .nav-orbit-container,
+    .orbit-ring,
+    .orbit-particles,
+    .particle {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .side-nav {
+      opacity: 1;
+    }
+
+    .side-nav__item {
+      opacity: 1;
+      transform: translateX(var(--offset-x));
+    }
+
+    .side-nav--collapsed .side-nav__item {
+      transform: translateX(0);
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .side-nav {
+      --nav-border: hsl(0 0% 100% / 0.3);
+      --nav-bg: hsl(0 0% 0% / 0.95);
+    }
+
+    .orbit-ring,
+    .particle {
+      opacity: 1;
+    }
+  }
+</style>
