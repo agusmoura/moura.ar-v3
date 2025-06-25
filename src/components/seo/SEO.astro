@@ -33,7 +33,7 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 
 <!-- Resource Hints -->
 <link rel="preconnect" href="https://cdn.moura.ar" />
-<link rel="dns-prefetch" href="https://www.google-analytics.com" />
+<link rel="dns-prefetch" href="https://analytics.moura.ar" />
 <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
 <!-- HTTP/2 Server Push equivalent -->
@@ -55,7 +55,7 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 
 <meta
   name="keywords"
-  content="moura, agustin, mourino,mouriño, developer, designer, full-stack, ux, ui, argentina, buenos aires"
+  content="moura, agustin, mourino,mouriño, developer, designer, full-stack, ux, ui, argentina, buenos aires, data science, design systems, leadership"
 />
 
 <!-- Enhanced Social Media Meta -->
@@ -91,6 +91,19 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 />
 <meta name="googlebot" content="index, follow" />
 <meta name="bingbot" content="index, follow" />
+
+{
+  import.meta.env.PROD &&
+    import.meta.env.PUBLIC_ENABLE_ANALYTICS === 'true' &&
+    import.meta.env.PUBLIC_ANALYTICS_SCRIPT_URL &&
+    import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID && (
+      <script
+        defer
+        src={import.meta.env.PUBLIC_ANALYTICS_SCRIPT_URL}
+        data-website-id={import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID}
+      />
+    )
+}
 
 <!-- Favicon optimized -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
