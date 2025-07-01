@@ -35,6 +35,7 @@
   --color-background-alt: var(--color-surface);
   --color-text: var(--color-foreground);
   --color-accent-hover: var(--color-accent-emphasis);
+  --color-text-2: color-mix(in srgb, var(--color-foreground) 50%, transparent);
 
   /* Espaciado personalizado */
   --spacing-18: 4.5rem;
@@ -126,5 +127,312 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Animaciones creativas para botones */
+  .animate-gradient-x {
+    animation: gradientX 4s ease infinite;
+    background-size: 400% 400%;
+  }
+
+  @keyframes gradientX {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Animaciones de partículas flotantes */
+  .animate-float-1 {
+    animation: float1 3s ease-in-out infinite;
+  }
+
+  .animate-float-2 {
+    animation: float2 4s ease-in-out infinite reverse;
+  }
+
+  .animate-float-3 {
+    animation: float3 5s ease-in-out infinite;
+  }
+
+  @keyframes float1 {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+      opacity: 0.2;
+    }
+    33% {
+      transform: translateY(-10px) translateX(5px) rotate(120deg);
+      opacity: 0.4;
+    }
+    66% {
+      transform: translateY(-5px) translateX(-5px) rotate(240deg);
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes float2 {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-15px) translateX(10px) scale(1.2);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes float3 {
+    0%,
+    100% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+      opacity: 0.25;
+    }
+    25% {
+      transform: translateY(-8px) translateX(-8px) rotate(90deg);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translateY(-12px) translateX(8px) rotate(180deg);
+      opacity: 0.35;
+    }
+    75% {
+      transform: translateY(-5px) translateX(-3px) rotate(270deg);
+      opacity: 0.3;
+    }
+  }
+
+  /* Animación de glow pulsante */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      filter: drop-shadow(0 0 5px var(--color-accent));
+    }
+    to {
+      filter: drop-shadow(0 0 20px var(--color-accent-light));
+    }
+  }
+
+  /* Animación de morphing para formas */
+  .animate-morph {
+    animation: morph 8s ease-in-out infinite;
+  }
+
+  @keyframes morph {
+    0%,
+    100% {
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    50% {
+      border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+  }
+
+  /* Animación de ondas */
+  .animate-wave {
+    animation: wave 3s ease-in-out infinite;
+  }
+
+  @keyframes wave {
+    0%,
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 0.1;
+    }
+    50% {
+      transform: scale(1.1) rotate(180deg);
+      opacity: 0.3;
+    }
+  }
+
+  /* Animación de brillo que atraviesa el botón */
+  .animate-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animate-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .animate-shine:hover::before {
+    left: 100%;
+  }
+
+  /* ===== SISTEMA DE PARTÍCULAS GRAVITACIONALES ===== */
+
+  /* Partículas gravitacionales principales - órbitas circulares */
+  .gravity-particle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--size);
+    height: var(--size);
+    background: var(--color-accent);
+    border-radius: 50%;
+    opacity: 0.6;
+    transform-origin: 0 0;
+    animation: gravityOrbit var(--speed) linear infinite;
+    animation-delay: var(--delay);
+    box-shadow: 0 0 4px var(--color-accent-light);
+  }
+
+  @keyframes gravityOrbit {
+    0% {
+      transform: rotate(var(--angle)) translateX(var(--distance)) scale(0.8);
+      opacity: 0.3;
+    }
+    25% {
+      opacity: 0.6;
+      transform: rotate(calc(var(--angle) + 90deg)) translateX(calc(var(--distance) * 0.9)) scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: rotate(calc(var(--angle) + 180deg)) translateX(calc(var(--distance) * 0.7))
+        scale(1.2);
+    }
+    75% {
+      opacity: 0.9;
+      transform: rotate(calc(var(--angle) + 270deg)) translateX(calc(var(--distance) * 0.5))
+        scale(1.4);
+    }
+    100% {
+      transform: rotate(calc(var(--angle) + 360deg)) translateX(calc(var(--distance) * 0.3))
+        scale(1.6);
+      opacity: 0.95;
+    }
+  }
+
+  /* Partículas gravitacionales lejanas - órbitas amplias y lentas */
+  .gravity-particle-far {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--size);
+    height: var(--size);
+    background: var(--color-accent-light);
+    border-radius: 50%;
+    opacity: 0.4;
+    transform-origin: 0 0;
+    animation: gravityOrbitFar var(--speed) ease-in-out infinite;
+    animation-delay: var(--delay);
+    box-shadow: 0 0 6px var(--color-accent);
+  }
+
+  @keyframes gravityOrbitFar {
+    0% {
+      transform: rotate(var(--angle)) translateX(var(--distance)) scale(0.5);
+      opacity: 0.2;
+    }
+    33% {
+      transform: rotate(calc(var(--angle) + 120deg)) translateX(calc(var(--distance) * 0.85))
+        scale(0.8);
+      opacity: 0.4;
+    }
+    66% {
+      transform: rotate(calc(var(--angle) + 240deg)) translateX(calc(var(--distance) * 0.6))
+        scale(1.1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: rotate(calc(var(--angle) + 360deg)) translateX(calc(var(--distance) * 0.4))
+        scale(1.3);
+      opacity: 0.8;
+    }
+  }
+
+  /* Partículas micro - movimiento caótico atraído hacia el centro */
+  .gravity-particle-micro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--size);
+    height: var(--size);
+    background: var(--color-accent-emphasis);
+    border-radius: 50%;
+    opacity: 0.7;
+    transform: translate(var(--x), var(--y));
+    animation: gravityMicro var(--speed) ease-in-out infinite alternate;
+    box-shadow: 0 0 2px var(--color-accent);
+  }
+
+  @keyframes gravityMicro {
+    0% {
+      transform: translate(var(--x), var(--y)) scale(0.3);
+      opacity: 0.4;
+    }
+    25% {
+      transform: translate(calc(var(--x) * 0.7), calc(var(--y) * 0.8)) scale(0.6) rotate(45deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translate(calc(var(--x) * 0.4), calc(var(--y) * 0.5)) scale(0.9) rotate(90deg);
+      opacity: 0.8;
+    }
+    75% {
+      transform: translate(calc(var(--x) * 0.2), calc(var(--y) * 0.3)) scale(1.2) rotate(135deg);
+      opacity: 0.9;
+    }
+    100% {
+      transform: translate(calc(var(--x) * 0.1), calc(var(--y) * 0.1)) scale(1.5) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  /* Efectos de campo gravitacional en hover */
+  .group:hover .gravity-particle {
+    animation-duration: calc(var(--speed) * 0.5);
+    opacity: 0.9;
+    box-shadow: 0 0 8px var(--color-accent-light);
+  }
+
+  .group:hover .gravity-particle-far {
+    animation-duration: calc(var(--speed) * 0.3);
+    opacity: 0.7;
+    box-shadow: 0 0 10px var(--color-accent);
+  }
+
+  .group:hover .gravity-particle-micro {
+    animation-duration: calc(var(--speed) * 0.2);
+    opacity: 1;
+    box-shadow: 0 0 6px var(--color-accent-emphasis);
+  }
+
+  /* Variaciones de color para las partículas */
+  .gravity-particle:nth-child(2n) {
+    background: var(--color-accent-light);
+    box-shadow: 0 0 4px var(--color-accent);
+  }
+
+  .gravity-particle:nth-child(3n) {
+    background: var(--color-accent-emphasis);
+    box-shadow: 0 0 4px var(--color-accent-light);
+  }
+
+  .gravity-particle-far:nth-child(2n) {
+    background: var(--color-accent);
+    box-shadow: 0 0 6px var(--color-accent-emphasis);
+  }
+
+  .gravity-particle-micro:nth-child(2n) {
+    background: var(--color-accent-light);
+  }
+
+  .gravity-particle-micro:nth-child(3n) {
+    background: var(--color-accent);
   }
 }
