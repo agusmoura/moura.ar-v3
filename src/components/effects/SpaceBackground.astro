@@ -188,6 +188,8 @@ const {
     private lastHeight: number = 0;
     private isMobile: boolean = false;
     private stableHeight: number = 0;
+    // Performance optimization - limit active shooting stars
+    private readonly maxActiveShootingStars: number = 3;
 
     constructor() {
       super();
@@ -256,6 +258,10 @@ const {
 
     private setupBackground(): void {
       if (!this.canvas || !this.ctx) return;
+
+      // Reset orbit references to ensure clean state
+      this.orbitContainer = null;
+      this.orbitRect = null;
 
       // Detect mobile device
       this.isMobile =
@@ -461,15 +467,26 @@ const {
     }
 
     private findOrbitContainer(): void {
-      // Try different possible selectors for orbit container
+      // Try specific selectors for actual orbit container elements
+      // Be more specific to avoid false positives
       this.orbitContainer =
         document.querySelector('.orbit-container') ||
         document.querySelector('#orbit-container') ||
-        document.querySelector('[class*="orbit"]') ||
-        document.querySelector('[id*="orbit"]');
+        document.querySelector('[data-orbit-container]') ||
+        document.querySelector('.hero-orbit-container');
 
+      // Reset orbitRect if no container found
       if (this.orbitContainer) {
         this.updateOrbitRect();
+        // Debug: Check if we actually found a valid orbit element
+        const rect = this.orbitContainer.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+          console.warn('Found orbit container but it has no dimensions, disabling gravity');
+          this.orbitContainer = null;
+          this.orbitRect = null;
+        }
+      } else {
+        this.orbitRect = null;
       }
     }
 
@@ -493,17 +510,19 @@ const {
         };
       }
 
-      // Fallback to configured coordinates or screen center
+      // If no orbit element, return center of screen (but this should not be used)
+      // The calling methods should check for orbitContainer existence first
       return {
-        x: this.config.gravity.x ?? this.width / 2,
-        y: this.config.gravity.y ?? this.height / 2,
-        width: Math.min(this.width, this.height) * 0.3, // 30% of smaller dimension
-        height: Math.min(this.width, this.height) * 0.3,
+        x: this.width / 2,
+        y: this.height / 2,
+        width: 0,
+        height: 0,
       };
     }
 
     private applyGravity(star: ShootingStar, deltaTime: number): void {
-      if (!this.config.gravity.enabled) return;
+      // Only apply gravity if enabled AND orbit element exists
+      if (!this.config.gravity.enabled || !this.orbitContainer) return;
 
       const gravity = this.getGravityCoordinates();
 
@@ -539,19 +558,25 @@ const {
     }
 
     private applyMultipleGravitationalLensing(star: Star): { x: number; y: number } {
-      // Get orbit gravity center
-      const gravityCoords = this.getGravityCoordinates();
+      let currentPosition = { x: star.x, y: star.y };
 
-      // Apply orbit center gravity
-      const orbitLensed = this.applySingleGravitationalLensing(
-        star,
-        {
-          x: gravityCoords.x,
-          y: gravityCoords.y,
-        },
-        2.0,
-        0.3
-      );
+      // Only apply orbit gravity lensing if orbit element exists and has valid dimensions
+      if (this.orbitContainer && this.orbitRect && this.config.gravity.enabled) {
+        // Double check that the orbit is actually visible
+        const rect = this.orbitContainer.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          const gravityCoords = this.getGravityCoordinates();
+          currentPosition = this.applySingleGravitationalLensing(
+            star,
+            {
+              x: gravityCoords.x,
+              y: gravityCoords.y,
+            },
+            2.0,
+            0.3
+          );
+        }
+      }
 
       // Apply mouse gravity if enabled and mouse is on screen
       if (
@@ -563,8 +588,8 @@ const {
       ) {
         const mouseLensed = this.applySingleGravitationalLensing(
           {
-            x: orbitLensed.x,
-            y: orbitLensed.y,
+            x: currentPosition.x,
+            y: currentPosition.y,
             radius: star.radius,
             opacity: star.opacity,
             twinkleSpeed: star.twinkleSpeed,
@@ -581,7 +606,7 @@ const {
         return mouseLensed;
       }
 
-      return orbitLensed;
+      return currentPosition;
     }
 
     private applySingleGravitationalLensing(
@@ -660,9 +685,13 @@ const {
         }
       }
 
-      // Create new shooting star if it's time
+      // Create new shooting star if it's time and we haven't reached the limit
       if (this.config.shootingStars.enabled && performance.now() >= this.nextShootingStarTime) {
-        this.createShootingStar();
+        if (this.shootingStars.length < this.maxActiveShootingStars) {
+          this.createShootingStar();
+        }
+        // Always reschedule the next shooting star regardless of whether we created one
+        // This prevents getting stuck when at the limit
         this.scheduleNextShootingStar();
       }
     }
@@ -833,13 +862,6 @@ const {
       } else {
         this.ctx.clearRect(0, 0, this.width, this.height);
       }
-
-      // Get gravity center for lensing effect
-      const gravityCoords = this.getGravityCoordinates();
-
-      // Debug: log gravity coordinates for static render
-      console.log('Static render - Gravity center:', gravityCoords.x, gravityCoords.y);
-      console.log('Static render - Canvas size:', this.width, this.height);
 
       this.ctx.fillStyle = '#fff';
 
