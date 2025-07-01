@@ -25,16 +25,17 @@ const navItems: readonly NavItem[] = [
     offsetY: 20,
   },
   {
-    href: '#',
+    href: '#home',
     icon: 'heroicons:sun',
     label: 'Inicio',
     section: 'home',
     offsetY: 35,
   },
   {
-    href: 'mailto:agustin@moura.ar',
+    href: '#contact',
     icon: 'heroicons:envelope',
     label: 'Contacto',
+    section: 'contact',
     offsetY: 20,
   },
   {
@@ -107,6 +108,7 @@ const navItems: readonly NavItem[] = [
       this.setupObservers();
       this.setupNavigation();
       this.setupTouchFeedback();
+      this.initializeActiveState();
     }
 
     setupSections() {
@@ -125,18 +127,25 @@ const navItems: readonly NavItem[] = [
       // Observer para secciones activas
       this.sectionObserver = new IntersectionObserver(
         (entries) => {
-          const mostVisible = entries.reduce((prev, current) => {
-            return current.intersectionRatio > prev.intersectionRatio ? current : prev;
-          }, entries[0]);
+          // Encontrar la sección más visible
+          let mostVisible = entries[0];
+          let maxRatio = 0;
 
-          if (mostVisible && mostVisible.isIntersecting) {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+              maxRatio = entry.intersectionRatio;
+              mostVisible = entry;
+            }
+          });
+
+          if (mostVisible && mostVisible.isIntersecting && maxRatio > 0) {
             this.setActiveLink(mostVisible.target.id);
           }
         },
         {
           root: null,
-          rootMargin: '-20% 0px -60% 0px',
-          threshold: 0.1,
+          rootMargin: '-10% 0px -70% 0px',
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
         }
       );
 
@@ -175,15 +184,18 @@ const navItems: readonly NavItem[] = [
 
           if (sectionId && href && href.startsWith('#')) {
             e.preventDefault();
+
+            // Marcar como activo inmediatamente
+            this.setActiveLink(sectionId);
+
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
               targetSection.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start',
               });
-              const newUrl = href === '#' ? window.location.pathname : href;
+              const newUrl = href === '#home' ? window.location.pathname : href;
               history.pushState(null, '', newUrl);
-              this.setActiveLink(sectionId);
             }
           }
         });
@@ -202,6 +214,21 @@ const navItems: readonly NavItem[] = [
           { passive: true }
         );
       });
+    }
+
+    initializeActiveState() {
+      // Detectar sección inicial basada en la URL
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#')) {
+        const sectionId = hash.substring(1);
+        if (this.sections?.has(sectionId)) {
+          this.setActiveLink(sectionId);
+          return;
+        }
+      }
+
+      // Si no hay hash o no es válido, marcar home como activo por defecto
+      this.setActiveLink('home');
     }
 
     /**
