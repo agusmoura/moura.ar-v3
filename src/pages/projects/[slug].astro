@@ -1,0 +1,757 @@
+---
+import { parseText } from '@/utils/textParser';
+import ProjectLayout from '@layouts/ProjectLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import { getCollection, getEntry, render } from 'astro:content';
+
+const pt = (text: string) => parseText(text);
+
+// Obtener el slug de la URL
+const { slug } = Astro.params;
+
+// Encontrar el proyecto por slug
+const project = await getEntry('projects', slug as string);
+
+// Si no existe el proyecto, mostrar 404
+if (!project) {
+  return Astro.redirect('/404');
+}
+
+// Get all projects and filter manually
+const allProjects = await getCollection('projects');
+const relatedProjects = allProjects
+  .filter((p) => p.data.category === project.data.category && p.data.slug !== project.data.slug)
+  .slice(0, 3);
+
+// Renderizar el contenido solo si el proyecto existe
+const { Content } = await render(project);
+
+// Helper para obtener ícono de categoría
+function getCategoryIcon(category: string): string {
+  const icons: Record<string, string> = {
+    'E-commerce': 'heroicons:shopping-cart',
+    'Web Design': 'heroicons:paint-brush',
+    'Web App': 'heroicons:device-phone-mobile',
+    Branding: 'heroicons:sparkles',
+    'Augmented Reality Game': 'heroicons:cube-transparent',
+  };
+  return icons[category] || 'heroicons:squares-2x2';
+}
+
+// Helper para obtener ícono de tecnología
+function getTechIcon(tech: string): string {
+  const techIcons: Record<string, string> = {
+    TypeScript: 'simple-icons:typescript',
+    JavaScript: 'simple-icons:javascript',
+    React: 'simple-icons:react',
+    'Vue.js': 'simple-icons:vuedotjs',
+    Vue: 'simple-icons:vuedotjs',
+    Astro: 'simple-icons:astro',
+    WordPress: 'simple-icons:wordpress',
+    'Node.js': 'simple-icons:nodedotjs',
+    PHP: 'simple-icons:php',
+    Laravel: 'simple-icons:laravel',
+    Python: 'simple-icons:python',
+    Docker: 'simple-icons:docker',
+    MongoDB: 'simple-icons:mongodb',
+    PostgreSQL: 'simple-icons:postgresql',
+    MySQL: 'simple-icons:mysql',
+    Git: 'simple-icons:git',
+    GitHub: 'simple-icons:github',
+    GitLab: 'simple-icons:gitlab',
+    'Tailwind CSS': 'simple-icons:tailwindcss',
+    Tailwind: 'simple-icons:tailwindcss',
+    Figma: 'simple-icons:figma',
+    Adobe: 'simple-icons:adobe',
+    Photoshop: 'simple-icons:adobephotoshop',
+    Illustrator: 'simple-icons:adobeillustrator',
+    Unity: 'simple-icons:unity',
+    Flutter: 'simple-icons:flutter',
+    Swift: 'simple-icons:swift',
+    Kotlin: 'simple-icons:kotlin',
+    AWS: 'simple-icons:amazonwebservices',
+    Vercel: 'simple-icons:vercel',
+    Netlify: 'simple-icons:netlify',
+  };
+  return techIcons[tech] || 'heroicons:code-bracket';
+}
+
+// Helper para obtener color de tecnología
+function getTechColor(tech: string): string {
+  const techColors: Record<string, string> = {
+    TypeScript: '#3178C6',
+    JavaScript: '#F7DF1E',
+    React: '#61DAFB',
+    'Vue.js': '#4FC08D',
+    Vue: '#4FC08D',
+    Astro: '#FF5D01',
+    WordPress: '#21759B',
+    'Node.js': '#539E43',
+    PHP: '#777BB4',
+    Laravel: '#FF2D20',
+    Python: '#3776AB',
+    Docker: '#2496ED',
+    MongoDB: '#47A248',
+    PostgreSQL: '#336791',
+    MySQL: '#4479A1',
+    Git: '#F05032',
+    GitHub: '#181717',
+    GitLab: '#FCA326',
+    'Tailwind CSS': '#38BDF8',
+    Tailwind: '#38BDF8',
+    Figma: '#F24E1E',
+    Adobe: '#FF0000',
+    Photoshop: '#31A8FF',
+    Illustrator: '#FF9A00',
+    Unity: '#000000',
+    Flutter: '#02569B',
+    Swift: '#FA7343',
+    Kotlin: '#7F52FF',
+    AWS: '#FF9900',
+    Vercel: '#000000',
+    Netlify: '#00C7B7',
+  };
+  return techColors[tech] || '#EFBB47';
+}
+---
+
+<ProjectLayout
+  title={`${project.data.title} | Agustín Mouriño`}
+  description={project.data.description}
+  canonical={`https://www.moura.ar/projects/${project.data.slug}`}
+>
+  <main class="min-h-screen">
+    <!-- Navegación superior fija -->
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30"
+    >
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo/Home -->
+          <a href="/" class="flex items-center gap-2 group">
+            <div
+              class="w-8 h-8 bg-accent rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <Icon name="heroicons:home" class="h-4 w-4 text-background" />
+            </div>
+            <span class="font-semibold text-foreground">Agustín Mouriño</span>
+          </a>
+
+          <!-- Navegación central -->
+          <div class="hidden md:flex items-center gap-8">
+            <a href="/projects" class="text-muted hover:text-accent transition-colors">
+              ← Todos los Proyectos
+            </a>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex items-center gap-4">
+            {
+              project.data.links?.live && (
+                <a
+                  href={project.data.links.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg text-sm font-semibold hover:bg-accent-emphasis transition-all duration-300 hover:scale-105"
+                >
+                  <Icon name="heroicons:arrow-top-right-on-square" class="h-4 w-4" />
+                  Ver Live
+                </a>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section Optimizado -->
+    <section class="relative overflow-hidden pt-24 pb-16">
+      <!-- Efectos de fondo -->
+      <div class="absolute inset-0 -z-10">
+        <div
+          class="absolute top-1/4 right-1/3 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse"
+        >
+        </div>
+        <div
+          class="absolute bottom-1/4 left-1/3 w-80 h-80 bg-accent/3 rounded-full blur-2xl animate-pulse delay-1000"
+        >
+        </div>
+      </div>
+
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl">
+        <!-- Breadcrumb -->
+        <nav class="mb-8" aria-label="Navegación" data-aos="fade-up" data-aos-duration="600">
+          <div class="flex items-center gap-2 text-sm text-muted">
+            <a href="/" class="hover:text-accent transition-colors">Inicio</a>
+            <Icon name="heroicons:chevron-right" class="h-4 w-4" />
+            <a href="/projects" class="hover:text-accent transition-colors">Proyectos</a>
+            <Icon name="heroicons:chevron-right" class="h-4 w-4" />
+            <span class="text-foreground">{project.data.title}</span>
+          </div>
+        </nav>
+
+        <!-- Hero principal centrado -->
+        <div class="max-w-5xl mx-auto text-center space-y-8">
+          <!-- Metadata superior con año y duración visual -->
+          <div
+            class="flex flex-wrap items-center justify-center gap-6"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="200"
+          >
+            <!-- Categoría -->
+            <div
+              class="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/20 rounded-full text-sm font-medium text-accent"
+            >
+              <Icon name={getCategoryIcon(project.data.category)} class="h-4 w-4" />
+              {project.data.category}
+            </div>
+
+            <!-- Separador visual -->
+            <div class="h-6 w-px bg-border"></div>
+
+            <!-- Año con ícono -->
+            <div class="inline-flex items-center gap-2 text-sm text-foreground">
+              <Icon name="heroicons:calendar-days" class="h-4 w-4 text-accent" />
+              <span class="font-medium">{project.data.date}</span>
+            </div>
+
+            <!-- Duración con ícono -->
+            <div class="inline-flex items-center gap-2 text-sm text-foreground">
+              <Icon name="heroicons:clock" class="h-4 w-4 text-accent" />
+              <span class="font-medium">{project.data.duration}</span>
+            </div>
+          </div>
+
+          <!-- Título principal impactante -->
+          <div class="space-y-6">
+            <h1
+              class="font-serif text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-balance"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="400"
+              set:html={pt(project.data.title)}
+            />
+
+            <!-- Descripción destacada -->
+            <p
+              class="text-xl md:text-2xl lg:text-3xl leading-relaxed text-foreground/80 max-w-4xl mx-auto"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="600"
+            >
+              {project.data.description}
+            </p>
+          </div>
+
+          <!-- Información clave del proyecto -->
+          <div
+            class="max-w-2xl mx-auto"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="800"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Cliente -->
+              <div
+                class="flex items-center justify-center gap-3 px-4 py-3 bg-surface/30 rounded-xl border border-border/50"
+              >
+                <Icon name="heroicons:building-office" class="h-5 w-5 text-accent" />
+                <div class="text-center">
+                  <div class="text-xs text-muted mb-1">Cliente</div>
+                  <div class="font-semibold text-foreground">{project.data.client}</div>
+                </div>
+              </div>
+
+              <!-- Mi Rol -->
+              <div
+                class="flex items-center justify-center gap-3 px-4 py-3 bg-surface/30 rounded-xl border border-border/50"
+              >
+                <Icon name="heroicons:user-circle" class="h-5 w-5 text-accent" />
+                <div class="text-center">
+                  <div class="text-xs text-muted mb-1">Mi Rol</div>
+                  <div class="font-semibold text-foreground">{project.data.role}</div>
+                </div>
+              </div>
+
+              {
+                project.data.partner && (
+                  <div class="md:col-span-2">
+                    <div class="flex items-center justify-center gap-3 px-4 py-3 bg-accent/10 rounded-xl border border-accent/20">
+                      <div class="text-center">
+                        <div class="text-xs text-accent/80 mb-1">En Colaboración con</div>
+                        <div class="font-semibold text-accent flex items-center justify-center gap-2">
+                          {/* Preparado para logo del partner en el futuro */}
+                          <span>{project.data.partner}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+            </div>
+          </div>
+
+          <!-- Tecnologías destacadas con iconos prominentes -->
+          {
+            project.data.technologies && project.data.technologies.length > 0 && (
+              <div
+                class="space-y-4"
+                data-aos="fade-up"
+                data-aos-duration="600"
+                data-aos-delay="1000"
+              >
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                  {project.data.technologies.slice(0, 8).map((tech: string) => (
+                    <div class="group relative">
+                      <div class="inline-flex items-center gap-3 px-4 py-3 bg-background/80 border border-border rounded-xl hover:bg-surface/50 hover:border-accent/30 transition-all duration-300">
+                        <Icon
+                          name={getTechIcon(tech)}
+                          class="h-6 w-6 group-hover:scale-110 transition-transform"
+                          style={`color: ${getTechColor(tech)}`}
+                        />
+                        <span class="text-foreground font-medium">{tech}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Tags discretos debajo de tecnologías -->
+          {
+            project.data.tags && project.data.tags.length > 0 && (
+              <div
+                class="space-y-3"
+                data-aos="fade-up"
+                data-aos-duration="600"
+                data-aos-delay="1100"
+              >
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                  {project.data.tags.slice(0, 6).map((tag: string) => (
+                    <span class="px-3 py-1 bg-surface/20 text-muted text-xs rounded-full border border-border/30 hover:bg-surface/40 transition-colors">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <!-- CTAs principales -->
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="1200"
+          >
+            {
+              project.data.links?.live && (
+                <a
+                  href={project.data.links.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group inline-flex items-center justify-center gap-3 bg-accent text-background px-8 py-4 rounded-xl font-semibold text-lg hover:bg-accent-emphasis transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  <Icon name="heroicons:globe-alt" class="h-6 w-6" />
+                  <span>Ver Proyecto Live</span>
+                  <Icon
+                    name="heroicons:arrow-top-right-on-square"
+                    class="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                  />
+                </a>
+              )
+            }
+
+            {
+              project.data.links?.github && (
+                <a
+                  href={project.data.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group inline-flex items-center justify-center gap-3 border-2 border-accent text-foreground px-8 py-4 rounded-xl font-semibold text-lg hover:bg-accent hover:text-background transition-all duration-300"
+                >
+                  <Icon name="heroicons:code-bracket" class="h-6 w-6" />
+                  <span>Ver Código</span>
+                  <Icon
+                    name="heroicons:arrow-top-right-on-square"
+                    class="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                  />
+                </a>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contenido principal centrado -->
+    <section class="py-20">
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-5xl">
+        <!-- Contenido del caso de estudio -->
+        <div
+          class="project-content"
+          data-aos="fade-up"
+          data-aos-duration="800"
+          data-aos-delay="400"
+        >
+          <Content />
+        </div>
+      </div>
+    </section>
+
+    <!-- Proyectos Relacionados -->
+    {
+      relatedProjects.length > 0 && (
+        <section class="border-t border-border/30 py-20 bg-surface/5">
+          <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl">
+            <div class="text-center mb-16" data-aos="fade-up" data-aos-duration="800">
+              <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">Proyectos Relacionados</h2>
+              <p class="text-lg text-muted max-w-2xl mx-auto">
+                Otros trabajos en la categoría {project.data.category}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {relatedProjects.map((relatedProject, index) => (
+                <a
+                  href={`/projects/${relatedProject.data.slug}`}
+                  class="group relative bg-charcoal rounded-2xl overflow-hidden border border-border hover:border-accent/50 transition-all duration-500 hover:scale-105 shadow-lg hover:shadow-2xl"
+                  data-aos="fade-up"
+                  data-aos-duration="800"
+                  data-aos-delay={index * 200}
+                >
+                  {relatedProject.data.images?.cover && (
+                    <div class="aspect-[16/9] overflow-hidden">
+                      <Image
+                        src={relatedProject.data.images.cover.src}
+                        alt={relatedProject.data.images.cover.alt}
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        width={400}
+                        height={225}
+                        loading="lazy"
+                        quality={80}
+                      />
+                    </div>
+                  )}
+
+                  <div class="p-6">
+                    <h3 class="font-serif font-bold text-xl mb-3 group-hover:text-accent transition-colors">
+                      {relatedProject.data.title}
+                    </h3>
+                    <p class="text-muted text-sm line-clamp-2 mb-4">
+                      {relatedProject.data.description}
+                    </p>
+
+                    {relatedProject.data.technologies &&
+                      relatedProject.data.technologies.length > 0 && (
+                        <div class="flex flex-wrap gap-2">
+                          {relatedProject.data.technologies.slice(0, 3).map((tech: string) => (
+                            <div class="inline-flex items-center gap-1 px-2 py-1 bg-surface/50 border border-border rounded text-xs">
+                              <Icon
+                                name={getTechIcon(tech)}
+                                class="h-3 w-3"
+                                style={`color: ${getTechColor(tech)}`}
+                              />
+                              <span>{tech}</span>
+                            </div>
+                          ))}
+                          {relatedProject.data.technologies.length > 3 && (
+                            <div class="inline-flex items-center px-2 py-1 bg-surface/30 border border-border rounded text-xs text-muted">
+                              +{relatedProject.data.technologies.length - 3}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Call to Action Final -->
+    <section class="border-t border-border/30 bg-gradient-to-b from-background to-surface/20 py-20">
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-5xl text-center">
+        <div class="max-w-3xl mx-auto space-y-8">
+          <h2
+            class="font-serif text-3xl md:text-5xl font-bold text-balance"
+            data-aos="fade-up"
+            data-aos-duration="800"
+          >
+            ¿Te inspiró este proyecto?
+          </h2>
+
+          <p
+            class="text-xl md:text-2xl text-muted leading-relaxed"
+            data-aos="fade-up"
+            data-aos-duration="800"
+            data-aos-delay="200"
+          >
+            Hablemos sobre cómo puedo ayudarte a crear algo excepcional para tu próximo desafío.
+          </p>
+
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="400"
+          >
+            <a
+              href="/#contact"
+              class="group inline-flex items-center justify-center gap-3 bg-accent text-background px-8 py-4 rounded-xl font-semibold text-lg hover:bg-accent-emphasis transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              <span>Iniciar Conversación</span>
+              <Icon
+                name="heroicons:chat-bubble-left-right"
+                class="h-6 w-6 group-hover:scale-110 transition-transform"
+              />
+            </a>
+            <a
+              href="/projects"
+              class="group inline-flex items-center justify-center gap-3 border-2 border-accent text-foreground px-8 py-4 rounded-xl font-semibold text-lg hover:bg-accent hover:text-background transition-all duration-300"
+            >
+              <span>Ver Más Proyectos</span>
+              <Icon
+                name="heroicons:arrow-right"
+                class="h-6 w-6 group-hover:translate-x-1 transition-transform"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</ProjectLayout>
+
+<style is:global>
+  /* Estilos personalizados para el contenido del proyecto */
+  .project-content {
+    color: rgba(225, 219, 205, 0.9);
+  }
+
+  .project-content .project-section {
+    position: relative;
+    margin-bottom: 5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .project-content .project-section {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  .project-content .project-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, #efbb47, transparent);
+    border-radius: 0 2px 2px 0;
+    opacity: 0.3;
+  }
+
+  .project-content .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #efbb47;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .project-content .section-title {
+      font-size: 2.25rem;
+    }
+  }
+
+  .project-content .section-title .emoji {
+    font-size: 2.25rem;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  }
+
+  @media (min-width: 1024px) {
+    .project-content .section-title .emoji {
+      font-size: 3rem;
+    }
+  }
+
+  .project-content .project-text {
+    line-height: 1.625;
+    font-size: 1.2rem;
+    color: rgba(225, 219, 205, 0.9);
+    margin-bottom: 1.5rem;
+    text-wrap: balance;
+  }
+
+  .project-content .project-text strong {
+    font-weight: 600;
+    color: #efbb47;
+    font-family: var(--font-mono);
+  }
+
+  .project-content .project-text em {
+    font-style: italic;
+    color: rgba(225, 219, 205, 0.7);
+  }
+
+  .project-content .project-quote {
+    border-left: 4px solid rgba(239, 187, 71, 0.5);
+    padding-left: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    background-color: rgba(60, 60, 60, 0.2);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .project-content .project-quote p {
+    font-size: 1.25rem;
+    font-style: italic;
+    color: rgba(239, 187, 71, 0.9);
+    font-family: var(--font-serif);
+    line-height: 1.625;
+    margin-bottom: 0;
+  }
+
+  .project-content .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #3c3c3c, transparent);
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+  }
+
+  .project-content .image-showcase {
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(60, 60, 60, 0.5);
+    background-color: rgba(60, 60, 60, 0.3);
+    padding: 1.5rem;
+  }
+
+  .project-content .image-showcase img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    transition: transform 0.5s ease;
+  }
+
+  .project-content .image-showcase img:hover {
+    transform: scale(1.05);
+  }
+
+  .project-content .image-caption {
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .project-content .image-caption strong {
+    display: block;
+    color: #efbb47;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .project-content .image-caption p {
+    color: rgba(225, 219, 205, 0.7);
+    font-size: 0.875rem;
+    line-height: 1.625;
+  }
+
+  .project-content .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .project-content .compare-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .project-content .featured-single {
+    max-width: 64rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .project-content .tech-stack-section {
+    background-color: rgba(60, 60, 60, 0.1);
+    border-radius: 1rem;
+    padding: 2rem;
+    border: 1px solid rgba(60, 60, 60, 0.3);
+  }
+
+  .project-content .tech-category {
+    margin-bottom: 2rem;
+  }
+
+  .project-content .tech-category h4 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #efbb47;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .project-content .tech-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .project-content .tech-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: rgba(225, 219, 205, 0.9);
+    padding: 0.5rem 1rem;
+    background-color: rgba(16, 16, 14, 0.3);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(60, 60, 60, 0.2);
+    margin-bottom: 0.5rem;
+  }
+
+  .project-content .tech-list li::before {
+    content: '▸';
+    color: #efbb47;
+    font-family: var(--font-mono);
+    font-size: 1.125rem;
+  }
+
+  .project-content .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(60, 60, 60, 0.5);
+    border: 1px solid #3c3c3c;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+  }
+
+  .project-content .highlight-text {
+    color: #efbb47;
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+</style>

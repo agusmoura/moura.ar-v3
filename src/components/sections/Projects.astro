@@ -7,11 +7,14 @@ import { Icon } from 'astro-icon/components';
 
 const pt = (text: string) => parseText(text);
 
-// Cargar todos los proyectos
-const projectFiles = await Astro.glob<Project>('/src/data/projects/*.md');
-const projects = projectFiles
-  .map((file) => file.frontmatter)
-  .filter((project): project is Project => project !== undefined);
+// Cargar todos los proyectos usando import.meta.glob (recomendado en Astro v5+)
+const projectFiles = import.meta.glob<{ frontmatter: Project }>('/src/content/projects/*.{md,mdx}');
+const projects = await Promise.all(
+  Object.values(projectFiles).map(async (loader) => {
+    const file = await loader();
+    return file.frontmatter;
+  })
+).then((projects) => projects.filter((project): project is Project => project !== undefined));
 
 // Filtrar y ordenar proyectos
 const filteredProjects = projects
@@ -22,7 +25,7 @@ const filteredProjects = projects
 <div>
   <section
     id="projects"
-    class="relative container mx-auto px-4 md:pt-10 pb-2 md:pb-10 lg:px-8 xl:max-w-7xl"
+    class="relative container mx-auto px-4pt-40 md:pt-20 pb-2 lg:px-8 xl:max-w-7xl"
   >
     <!-- TechStackOrbit con mejor posicionamiento responsive -->
     <div
@@ -87,18 +90,211 @@ const filteredProjects = projects
       }
     </div>
 
-    <!-- Opcional: Link para ver todos los proyectos -->
-    <div class="mt-16 text-center" data-aos="fade-up" data-aos-duration="600" data-aos-delay="800">
-      <a
-        href="/projects"
-        class="inline-flex items-center gap-2 px-6 py-3 text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-300 group"
-      >
-        <span>Ver todos los proyectos</span>
-        <Icon
-          name="heroicons:arrow-right"
-          class="h-4 w-4 transform group-hover:translate-x-1 transition-transform"
-        />
-      </a>
+    <!-- Botón creativo para ver todos los proyectos -->
+    <div
+      class="mt-20 flex justify-center"
+      data-aos="fade-up"
+      data-aos-duration="600"
+      data-aos-delay="800"
+    >
+      <div class="relative group">
+        <!-- Efecto de fondo sutil con colores del sitio -->
+        <div
+          class="absolute -inset-0.5 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-700 group-hover:duration-300 bg-gradient-to-r from-accent/30 via-accent-light/20 to-accent-emphasis/30"
+        >
+        </div>
+        <div
+          class="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300 animate-gradient-x bg-gradient-to-r from-accent via-accent-light to-accent-emphasis"
+        >
+        </div>
+
+        <!-- Campo gravitacional extendido para las partículas - solo desktop -->
+        <div class="absolute -inset-32 pointer-events-none hidden md:block">
+          <!-- Micropartículas gravitacionales -->
+          <div
+            class="gravity-particle"
+            style="--angle: 0deg; --distance: 120px; --size: 2px; --speed: 8s; --delay: 0s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 60deg; --distance: 110px; --size: 3px; --speed: 10s; --delay: -2s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 120deg; --distance: 150px; --size: 2.5px; --speed: 9s; --delay: -4s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 180deg; --distance: 135px; --size: 2px; --speed: 8.5s; --delay: -6s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 240deg; --distance: 145px; --size: 1.5px; --speed: 9.5s; --delay: -8s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 300deg; --distance: 160px; --size: 1px; --speed: 6s; --delay: -10s;"
+          >
+          </div>
+
+          <!-- Partículas adicionales con órbitas más lejanas -->
+          <div
+            class="gravity-particle-far"
+            style="--angle: 45deg; --distance: 200px; --size: 1px; --speed: 15s; --delay: 0s;"
+          >
+          </div>
+          <div
+            class="gravity-particle-far"
+            style="--angle: 135deg; --distance: 220px; --size: 1.5px; --speed: 18s; --delay: -5s;"
+          >
+          </div>
+          <div
+            class="gravity-particle-far"
+            style="--angle: 225deg; --distance: 180px; --size: 1px; --speed: 12s; --delay: -10s;"
+          >
+          </div>
+          <div
+            class="gravity-particle-far"
+            style="--angle: 315deg; --distance: 240px; --size: 2px; --speed: 20s; --delay: -15s;"
+          >
+          </div>
+
+          <!-- Partículas micro con movimiento caótico -->
+          <div
+            class="gravity-particle-micro"
+            style="--x: 80px; --y: -60px; --size: 0.5px; --speed: 4s;"
+          >
+          </div>
+          <div
+            class="gravity-particle-micro"
+            style="--x: -90px; --y: 70px; --size: 0.8px; --speed: 5s;"
+          >
+          </div>
+          <div
+            class="gravity-particle-micro"
+            style="--x: 100px; --y: 40px; --size: 0.3px; --speed: 3.5s;"
+          >
+          </div>
+        </div>
+
+        <!-- Campo gravitacional simplificado para móviles -->
+        <div class="absolute -inset-16 pointer-events-none block md:hidden">
+          <!-- Solo algunas partículas básicas para móviles -->
+          <div
+            class="gravity-particle"
+            style="--angle: 0deg; --distance: 80px; --size: 2px; --speed: 8s; --delay: 0s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 120deg; --distance: 90px; --size: 1.5px; --speed: 9s; --delay: -4s;"
+          >
+          </div>
+          <div
+            class="gravity-particle"
+            style="--angle: 240deg; --distance: 85px; --size: 2px; --speed: 7s; --delay: -8s;"
+          >
+          </div>
+        </div>
+
+        <!-- Botón principal con estilo del sitio -->
+        <a
+          href="/projects"
+          class="relative flex items-center justify-center px-6 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 bg-gradient-to-r from-background via-charcoal to-background text-foreground text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 group overflow-hidden w-full max-w-[280px] sm:max-w-none sm:min-w-[320px] border border-border hover:border-accent z-10"
+        >
+          <!-- Efecto de ondas con colores dorados -->
+          <div
+            class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-all duration-500 animate-gradient-x bg-gradient-to-r from-accent via-accent-light to-accent-emphasis"
+          >
+          </div>
+
+          <!-- Partículas flotantes con colores del tema - solo en desktop -->
+          <div class="absolute inset-0 overflow-hidden hidden sm:block">
+            <div
+              class="absolute w-2 h-2 bg-accent rounded-full opacity-20 animate-float-1"
+              style="top: 20%; left: 15%;"
+            >
+            </div>
+            <div
+              class="absolute w-1 h-1 bg-accent-light rounded-full opacity-30 animate-float-2"
+              style="top: 60%; left: 80%;"
+            >
+            </div>
+            <div
+              class="absolute w-1.5 h-1.5 bg-accent-light rounded-full opacity-25 animate-float-3"
+              style="top: 40%; left: 60%;"
+            >
+            </div>
+          </div>
+
+          <!-- Contenido del botón -->
+          <div class="relative flex items-center gap-2 sm:gap-3 z-10">
+            <!-- Icono con animación -->
+            <div class="relative">
+              <Icon
+                name="heroicons:rocket-launch"
+                class="h-5 w-5 sm:h-6 sm:w-6 text-accent transform transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-accent-light"
+              />
+              <!-- Efecto de glow en el icono con color dorado -->
+              <div
+                class="absolute inset-0 bg-accent rounded-full opacity-0 group-hover:opacity-30 blur-sm scale-150 transition-all duration-300"
+              >
+              </div>
+            </div>
+
+            <!-- Texto principal responsive -->
+            <span class="relative group-hover:text-cream transition-colors duration-300">
+              <span class="block sm:hidden">Ver Todos</span>
+              <span class="hidden sm:block">Explorar Todos los Proyectos</span>
+              <!-- Efecto de underline animado con color dorado -->
+              <span
+                class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-accent to-accent-light transition-all duration-300 group-hover:w-full"
+              ></span>
+            </span>
+
+            <!-- Contador de proyectos -->
+            <div
+              class="relative flex items-center gap-1 sm:gap-2 ml-1 sm:ml-2 pl-2 sm:pl-3 border-l border-border group-hover:border-accent transition-colors duration-300"
+            >
+              <span
+                class="text-xs sm:text-sm text-muted group-hover:text-accent-light transition-colors duration-300"
+                >+{filteredProjects.length}</span
+              >
+              <Icon
+                name="heroicons:arrow-right"
+                class="h-4 w-4 sm:h-5 sm:w-5 text-accent transform transition-all duration-300 group-hover:translate-x-2 group-hover:scale-110 group-hover:text-accent-light"
+              />
+            </div>
+          </div>
+
+          <!-- Efecto de ripple con color dorado -->
+          <div
+            class="absolute inset-0 opacity-0 group-active:opacity-100 transition-opacity duration-200"
+          >
+            <div
+              class="absolute inset-0 bg-accent opacity-20 rounded-xl sm:rounded-2xl transform scale-0 group-active:scale-100 transition-transform duration-200"
+            >
+            </div>
+          </div>
+        </a>
+
+        <!-- Texto indicativo debajo del botón -->
+        <div class="mt-4 text-center px-4">
+          <p
+            class="text-xs sm:text-sm text-muted group-hover:text-background transition-colors duration-300 z-10 max-w-xs sm:max-w-none mx-auto"
+          >
+            <span class="block sm:hidden">Historia completa de cada proyecto</span>
+            <span class="hidden sm:block"
+              >Descubre la historia completa detrás de cada proyecto</span
+            >
+          </p>
+        </div>
+      </div>
     </div>
   </section>
 </div>

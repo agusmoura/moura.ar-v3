@@ -1,0 +1,427 @@
+---
+import { parseText } from '@/utils/textParser';
+import TechStackOrbit from '@components/effects/TechStackOrbit.astro';
+import BentoProjectCard from '@components/ui/BentoProjectCard.astro';
+import Layout from '@layouts/Layout.astro';
+import { Icon } from 'astro-icon/components';
+import { getCollection } from 'astro:content';
+
+const pt = (text: string) => parseText(text);
+
+// Cargar todos los proyectos usando Astro Content Collections
+
+const allProjects = await getCollection('projects');
+
+// Ordenar proyectos por orden
+const projects = allProjects.map((project) => project.data).sort((a, b) => a.order - b.order);
+
+// Extraer categorías únicas
+const categories = [...new Set(projects.map((p) => p.category))];
+
+// Helper para convertir date a número
+const getDateAsNumber = (date: string | number): number => {
+  return typeof date === 'string' ? parseInt(date) : date;
+};
+
+// Stats para la página
+const stats = {
+  totalProjects: projects.length,
+  categories: categories.length,
+  technologies: [...new Set(projects.flatMap((p) => p.technologies || []))].length,
+  yearsActive:
+    new Date().getFullYear() - Math.min(...projects.map((p) => getDateAsNumber(p.date))) + 1,
+};
+
+// Timeline de años
+const years = [...new Set(projects.map((p) => getDateAsNumber(p.date)))].sort((a, b) => b - a);
+---
+
+<Layout
+  title="Proyectos | Agustín Mouriño - Casos de Estudio Completos"
+  description="Explora mi portfolio completo: casos de estudio detallados, procesos creativos y soluciones técnicas. Desde e-commerce hasta realidad aumentada, cada proyecto cuenta una historia única."
+  canonical="https://www.moura.ar/projects"
+>
+  <main class="min-h-screen">
+    <!-- Hero Section con diseño espacial -->
+    <section class="relative overflow-hidden">
+      <!-- Efecto de fondo orbital -->
+      <div class="absolute inset-0 -z-10">
+        <div
+          class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse"
+        >
+        </div>
+        <div
+          class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-light/3 rounded-full blur-2xl animate-pulse delay-700"
+        >
+        </div>
+      </div>
+
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl pt-24 pb-16">
+        <!-- Breadcrumb Navigation -->
+        <nav class="mb-8" aria-label="Navegación" data-aos="fade-up" data-aos-duration="600">
+          <div class="flex items-center gap-2 text-sm text-muted">
+            <a href="/" class="hover:text-accent transition-colors">Inicio</a>
+            <Icon name="heroicons:chevron-right" class="h-4 w-4" />
+            <span class="text-foreground">Proyectos</span>
+          </div>
+        </nav>
+
+        <!-- Hero Content -->
+        <div class="grid lg:grid-cols-12 gap-12 items-center">
+          <!-- Contenido principal -->
+          <div class="lg:col-span-8 space-y-8">
+            <!-- Subtitle con efecto -->
+            <div
+              class="flex items-center gap-3"
+              data-aos="fade-up"
+              data-aos-duration="600"
+              data-aos-delay="200"
+            >
+              <div class="h-px bg-gradient-to-r from-accent via-accent-light to-transparent w-16">
+              </div>
+              <p class="text-sm font-medium uppercase tracking-widest text-accent-light opacity-90">
+                Portfolio Completo
+              </p>
+              <div class="h-px bg-gradient-to-l from-accent via-accent-light to-transparent w-16">
+              </div>
+            </div>
+
+            <!-- Título principal -->
+            <h1
+              class="font-serif text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-balance"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="400"
+            >
+              <span class="relative">
+                Proyectos que
+                <div class="absolute -inset-2 bg-accent/10 rounded-lg blur-xl animate-pulse -z-10">
+                </div>
+              </span>
+              <br />
+              <span class="text-accent">resuelven problemas</span>
+              <br />
+              <span class="text-muted">reales</span>
+            </h1>
+
+            <!-- Descripción -->
+            <p
+              class="text-foreground text-lg md:text-xl leading-relaxed max-w-2xl"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="600"
+            >
+              Cada proyecto es una historia de desafíos técnicos, decisiones creativas y soluciones
+              innovadoras. Desde conceptos iniciales hasta implementaciones finales, explora el
+              proceso completo detrás de cada trabajo.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div
+              class="flex flex-wrap gap-4"
+              data-aos="fade-up"
+              data-aos-duration="600"
+              data-aos-delay="800"
+            >
+              <a
+                href="#projects-grid"
+                class="group inline-flex items-center gap-2 bg-accent text-background px-6 py-3 rounded-xl font-semibold hover:bg-accent-emphasis transition-all duration-300 hover:scale-105 active:scale-95"
+              >
+                <span>Explorar Proyectos</span>
+                <Icon
+                  name="heroicons:arrow-down"
+                  class="h-4 w-4 group-hover:translate-y-1 transition-transform"
+                />
+              </a>
+              <a
+                href="#contact"
+                class="group inline-flex items-center gap-2 border-2 border-accent text-foreground px-6 py-3 rounded-xl font-semibold hover:bg-accent hover:text-background transition-all duration-300"
+              >
+                <span>Trabajemos Juntos</span>
+                <Icon
+                  name="heroicons:arrow-right"
+                  class="h-4 w-4 group-hover:translate-x-1 transition-transform"
+                />
+              </a>
+            </div>
+          </div>
+
+          <!-- Stats Panel -->
+          <div class="lg:col-span-4">
+            <div
+              class="relative bg-background/40 backdrop-blur-sm border border-border rounded-2xl p-6 space-y-6"
+              data-aos="fade-left"
+              data-aos-duration="800"
+              data-aos-delay="400"
+            >
+              <!-- Efecto orbital en el panel -->
+              <div class="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full animate-pulse">
+              </div>
+              <div
+                class="absolute -bottom-1 -left-1 w-2 h-2 bg-accent-light rounded-full animate-pulse delay-500"
+              >
+              </div>
+
+              <h3 class="font-serif text-xl font-bold text-center mb-6">Métricas del Portfolio</h3>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-4 bg-surface/50 rounded-xl">
+                  <div class="text-2xl font-bold text-accent">{stats.totalProjects}</div>
+                  <div class="text-sm text-muted mt-1">Proyectos</div>
+                </div>
+                <div class="text-center p-4 bg-surface/50 rounded-xl">
+                  <div class="text-2xl font-bold text-accent">{stats.categories}</div>
+                  <div class="text-sm text-muted mt-1">Categorías</div>
+                </div>
+                <div class="text-center p-4 bg-surface/50 rounded-xl">
+                  <div class="text-2xl font-bold text-accent">{stats.technologies}</div>
+                  <div class="text-sm text-muted mt-1">Tecnologías</div>
+                </div>
+                <div class="text-center p-4 bg-surface/50 rounded-xl">
+                  <div class="text-2xl font-bold text-accent">{stats.yearsActive}</div>
+                  <div class="text-sm text-muted mt-1">Años Activo</div>
+                </div>
+              </div>
+
+              <!-- Timeline rápida -->
+              <div class="border-t border-border pt-4">
+                <h4 class="text-sm font-semibold text-accent mb-3">Timeline Reciente</h4>
+                <div class="space-y-2">
+                  {
+                    years.slice(0, 3).map((year) => (
+                      <div class="flex items-center justify-between text-sm">
+                        <span class="text-muted">{year}</span>
+                        <span class="text-foreground">
+                          {projects.filter((p) => p.date === year).length} proyectos
+                        </span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtros y Controles -->
+    <section class="border-t border-border/30 bg-surface/20 backdrop-blur-sm sticky top-0 z-30">
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl py-6">
+        <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+          <!-- Filtros principales -->
+          <div class="flex flex-wrap gap-3 items-center">
+            <!-- Filtro por categoría -->
+            <div class="flex items-center gap-2">
+              <Icon name="heroicons:funnel" class="h-4 w-4 text-muted" />
+              <select
+                id="category-filter"
+                class="bg-background/80 border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                aria-label="Filtrar por categoría"
+              >
+                <option value="">Todas las categorías</option>
+                {categories.map((cat) => <option value={cat}>{cat}</option>)}
+              </select>
+            </div>
+
+            <!-- Filtro por año -->
+            <div class="flex items-center gap-2">
+              <Icon name="heroicons:calendar" class="h-4 w-4 text-muted" />
+              <select
+                id="year-filter"
+                class="bg-background/80 border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                aria-label="Filtrar por año"
+              >
+                <option value="">Todos los años</option>
+                {years.map((year) => <option value={year}>{year}</option>)}
+              </select>
+            </div>
+
+            <!-- Toggle para proyectos destacados -->
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="featured-toggle" class="sr-only peer" />
+              <div
+                class="relative w-10 h-5 bg-charcoal peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"
+              >
+              </div>
+              <span class="text-sm text-muted">Solo destacados</span>
+            </label>
+          </div>
+
+          <!-- Controles de vista y ordenamiento -->
+          <div class="flex items-center gap-4">
+            <!-- Buscador -->
+            <div class="relative">
+              <Icon
+                name="heroicons:magnifying-glass"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted"
+              />
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Buscar proyectos..."
+                class="bg-background/80 border border-border rounded-lg pl-10 pr-16 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent transition-all w-64"
+                aria-label="Buscar proyectos"
+              />
+              <div
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1"
+              >
+                <kbd
+                  class="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-surface/50 border-border px-1.5 font-mono text-[10px] font-medium text-muted opacity-100"
+                >
+                  <span class="text-xs">⌘</span>K
+                </kbd>
+              </div>
+            </div>
+
+            <!-- Ordenamiento -->
+            <div class="flex items-center gap-2">
+              <Icon name="heroicons:arrows-up-down" class="h-4 w-4 text-muted" />
+              <select
+                id="sort-select"
+                class="bg-background/80 border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                aria-label="Ordenar proyectos"
+              >
+                <option value="order">Por orden</option>
+                <option value="date-desc">Más recientes</option>
+                <option value="date-asc">Más antiguos</option>
+                <option value="title">Por título</option>
+              </select>
+            </div>
+
+            <!-- Contador de resultados con estado -->
+            <div class="text-sm text-muted flex items-center gap-2">
+              <span id="results-count">{projects.length}</span> proyectos
+              <div
+                id="filter-indicator"
+                class="hidden items-center gap-1 px-2 py-1 bg-accent/10 rounded-full"
+              >
+                <div class="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                <span class="text-xs text-accent font-medium">Filtrado</span>
+              </div>
+            </div>
+
+            <!-- Toggle de vista de grid -->
+            <div
+              class="flex items-center gap-1 bg-background/60 rounded-lg p-1 border border-border"
+            >
+              <button
+                id="grid-view-btn"
+                class="p-2 rounded-md transition-all bg-accent text-background"
+                aria-label="Vista de grilla"
+                title="Vista de grilla"
+              >
+                <Icon name="heroicons:squares-2x2" class="h-4 w-4" />
+              </button>
+              <button
+                id="list-view-btn"
+                class="p-2 rounded-md transition-all hover:bg-surface/50"
+                aria-label="Vista de lista"
+                title="Vista de lista"
+              >
+                <Icon name="heroicons:list-bullet" class="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid de Proyectos -->
+    <section id="projects-grid" class="py-16">
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl">
+        <!-- Mensaje de estado -->
+        <div id="no-results" class="hidden text-center py-20">
+          <div class="space-y-4">
+            <Icon name="heroicons:face-frown" class="h-16 w-16 text-muted mx-auto" />
+            <h3 class="text-xl font-semibold text-foreground">No se encontraron proyectos</h3>
+            <p class="text-muted">Intenta ajustar los filtros o términos de búsqueda</p>
+            <button
+              id="clear-filters"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent-light transition-colors"
+            >
+              <Icon name="heroicons:x-mark" class="h-4 w-4" />
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid principal -->
+        <div
+          id="projects-container"
+          class="grid grid-cols-12 xl:grid-cols-16 auto-rows-[120px] sm:auto-rows-[190px] md:auto-rows-[190px] lg:auto-rows-[140px] gap-3 sm:gap-2 md:gap-3 lg:gap-4"
+        >
+          {
+            projects.map((project, index) => (
+              <BentoProjectCard project={project as any} index={index} />
+            ))
+          }
+        </div>
+
+        <!-- Loading state -->
+        <div id="loading" class="hidden text-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
+          <p class="text-muted mt-4">Cargando proyectos...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="border-t border-border/30 bg-gradient-to-b from-background to-surface/20 py-20">
+      <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl text-center">
+        <div class="max-w-3xl mx-auto space-y-8">
+          <h2
+            class="font-serif text-3xl md:text-5xl font-bold text-balance"
+            data-aos="fade-up"
+            data-aos-duration="800"
+          >
+            ¿Tienes un proyecto en mente?
+          </h2>
+
+          <p
+            class="text-lg md:text-xl text-muted leading-relaxed"
+            data-aos="fade-up"
+            data-aos-duration="800"
+            data-aos-delay="200"
+          >
+            Cada proyecto es una oportunidad para crear algo único. Hablemos sobre cómo puedo
+            ayudarte a materializar tu visión.
+          </p>
+
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="400"
+          >
+            <a
+              href="/contact"
+              class="group inline-flex items-center justify-center gap-2 bg-accent text-background px-8 py-4 rounded-xl font-semibold hover:bg-accent-emphasis transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              <span>Iniciar Conversación</span>
+              <Icon
+                name="heroicons:chat-bubble-left-right"
+                class="h-5 w-5 group-hover:scale-110 transition-transform"
+              />
+            </a>
+            <a
+              href="/cv"
+              class="group inline-flex items-center justify-center gap-2 border-2 border-accent text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-accent hover:text-background transition-all duration-300"
+            >
+              <span>Ver CV Completo</span>
+              <Icon
+                name="heroicons:document-arrow-down"
+                class="h-5 w-5 group-hover:translate-y-1 transition-transform"
+              />
+            </a>
+          </div>
+        </div>
+
+        <!-- Efecto de partículas -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+          <TechStackOrbit />
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

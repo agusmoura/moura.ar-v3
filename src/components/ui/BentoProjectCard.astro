@@ -91,7 +91,7 @@ const gridStyles = getGridStyles(project);
   <!-- Link para navegación (toda la tarjeta es clickeable) -->
   <a
     href={`/projects/${project.slug}`}
-    class="absolute inset-0 z-10"
+    class="absolute inset-0 z-40"
     aria-label={`Ver proyecto ${project.title}`}></a>
 
   <!-- Contenedor de imágenes -->
@@ -140,7 +140,9 @@ const gridStyles = getGridStyles(project);
     </div>
 
     <!-- Contenido de la tarjeta con padding optimizado -->
-    <div class="absolute inset-0 flex flex-col justify-end p-3 sm:p-4 md:p-6 lg:p-8 z-30">
+    <div
+      class="absolute inset-0 flex flex-col justify-end p-3 sm:p-4 md:p-6 lg:p-8 z-30 pointer-events-none"
+    >
       <!-- Badge de categoría - siempre visible en mobile, hover en desktop -->
       <div class="mb-auto flex justify-end sm:justify-start">
         <span
