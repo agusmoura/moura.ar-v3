@@ -93,7 +93,7 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 <meta name="bingbot" content="index, follow" />
 
 {
-  import.meta.env.PROD &&
+  import.meta.env.NODE_ENV === 'production' &&
     import.meta.env.PUBLIC_ENABLE_ANALYTICS === 'true' &&
     import.meta.env.PUBLIC_ANALYTICS_SCRIPT_URL &&
     import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID && (
