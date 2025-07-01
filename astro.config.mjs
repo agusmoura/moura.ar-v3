@@ -1,12 +1,25 @@
 // @ts-check
+import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 import icon from 'astro-icon';
 import { defineConfig } from 'astro/config';
+import rehypeRaw from 'rehype-raw';
+
+import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [icon()],
+  output: 'server',
+  adapter: node({
+    mode: 'standalone',
+  }),
+  integrations: [icon(), mdx()],
   site: 'https://moura.ar', // Cambia esto a tu dominio real
+  markdown: {
+    syntaxHighlight: false,
+    remarkPlugins: [],
+    rehypePlugins: [rehypeRaw],
+  },
   compressHTML: true,
   devToolbar: {
     enabled: false,
