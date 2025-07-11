@@ -303,7 +303,7 @@ const {
       if (this.isMobile) {
         // Use visual viewport API if available for better mobile handling
         if ('visualViewport' in window && window.visualViewport) {
-          (window.visualViewport as any).addEventListener(
+          (window.visualViewport as VisualViewport).addEventListener(
             'resize',
             this.handleMobileViewportChange.bind(this)
           );
@@ -901,7 +901,7 @@ const {
 
       // Throttle based on battery status
       if ('getBattery' in navigator) {
-        (navigator as any).getBattery().then((battery: any) => {
+        (navigator as Navigator & { getBattery(): Promise<{ level: number }> }).getBattery().then((battery: { level: number }) => {
           if (battery.level < 0.2) return true; // Low battery
         });
       }
@@ -916,7 +916,7 @@ const {
 
       // Use longer debounce for mobile to avoid UI bar changes
       this.resizeTimeout = window.setTimeout(() => {
-        const visualViewport = (window as any).visualViewport;
+        const visualViewport = (window as Window & { visualViewport: VisualViewport }).visualViewport;
         if (!visualViewport) return;
 
         const newWidth = visualViewport.width;
@@ -1031,7 +1031,7 @@ const {
       // Clean up event listeners
       if (this.isMobile) {
         if ('visualViewport' in window && window.visualViewport) {
-          (window.visualViewport as any).removeEventListener(
+          (window.visualViewport as VisualViewport).removeEventListener(
             'resize',
             this.handleMobileViewportChange.bind(this)
           );

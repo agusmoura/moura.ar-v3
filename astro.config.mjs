@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import icon from 'astro-icon';
 import { defineConfig } from 'astro/config';
 import rehypeRaw from 'rehype-raw';
+import sitemap from '@astrojs/sitemap';
 
 import mdx from '@astrojs/mdx';
 
@@ -13,7 +14,15 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
-  integrations: [icon(), mdx()],
+  integrations: [
+    icon(), 
+    mdx(),
+    sitemap({
+      changefreq: 'weekly',
+      priority: 0.7,
+      lastmod: new Date(),
+    })
+  ],
   site: 'https://moura.ar', // Cambia esto a tu dominio real
   markdown: {
     syntaxHighlight: false,
