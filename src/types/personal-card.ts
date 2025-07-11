@@ -8,6 +8,7 @@ export interface PersonalCard {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   tags?: string[];
   specialTag?: string;
+  category?: string;
   cta?: {
     text: string;
     action: string;

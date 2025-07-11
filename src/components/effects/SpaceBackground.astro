@@ -32,7 +32,7 @@ const {
   }
 </style>
 
-<script define:vars={{ starDensity, starColor, backgroundColor, gravityEnabled, mouseGravityEnabled }}>
+<script define:vars={{ starDensity, starColor, backgroundColor, gravityEnabled, mouseGravityEnabled }} is:inline>
   class OptimizedSpaceBackground {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
@@ -230,7 +230,7 @@ const {
       
       // Draw stars
       for (const star of this.stars) {
-        this.ctx.fillStyle = `rgba(${this.hexToRgb(starColor)}, ${star.opacity})`;
+        this.ctx.fillStyle = `rgba(${this.hexToRgb(starColor || '#ffffff')}, ${star.opacity})`;
         this.ctx.fillRect(star.x, star.y, 1, 1);
       }
     }

@@ -30,3 +30,6 @@ pnpm-debug.log*
 
 # Git hooks
 .husky/_/
+
+# Claude settings
+.claude/

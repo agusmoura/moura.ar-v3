@@ -1,0 +1,243 @@
+---
+// Performance monitoring component
+---
+
+<div id="performance-monitor" class="hidden"></div>
+
+<script>
+  interface PerformanceMetrics {
+    lcp: number | null;
+    fid: number | null;
+    cls: number | null;
+    fcp: number | null;
+    ttfb: number | null;
+    navigationTiming: PerformanceTiming | null;
+    memoryUsage: any;
+    timestamp: string;
+  }
+
+  class PerformanceMonitor {
+    private metrics: PerformanceMetrics = {
+      lcp: null,
+      fid: null,
+      cls: null,
+      fcp: null,
+      ttfb: null,
+      navigationTiming: null,
+      memoryUsage: null,
+      timestamp: new Date().toISOString(),
+    };
+
+    private observers: PerformanceObserver[] = [];
+
+    constructor() {
+      this.init();
+    }
+
+    private init(): void {
+      // Only run in production or when explicitly enabled
+      if (import.meta.env.DEV && !import.meta.env.PUBLIC_ENABLE_PERFORMANCE_MONITORING) {
+        return;
+      }
+
+      this.observeWebVitals();
+      this.collectNavigationTiming();
+      this.collectMemoryUsage();
+      this.setupReporting();
+    }
+
+    private observeWebVitals(): void {
+      // Largest Contentful Paint (LCP)
+      this.observePerformance('largest-contentful-paint', (entries) => {
+        const lastEntry = entries[entries.length - 1];
+        this.metrics.lcp = lastEntry.startTime;
+        console.log('LCP:', this.metrics.lcp);
+      });
+
+      // First Input Delay (FID)
+      this.observePerformance('first-input', (entries) => {
+        const firstEntry = entries[0];
+        this.metrics.fid = firstEntry.processingStart - firstEntry.startTime;
+        console.log('FID:', this.metrics.fid);
+      });
+
+      // Cumulative Layout Shift (CLS)
+      this.observePerformance('layout-shift', (entries) => {
+        let cls = 0;
+        for (const entry of entries) {
+          if (!(entry as any).hadRecentInput) {
+            cls += (entry as any).value;
+          }
+        }
+        this.metrics.cls = cls;
+        console.log('CLS:', this.metrics.cls);
+      });
+
+      // First Contentful Paint (FCP)
+      this.observePerformance('paint', (entries) => {
+        const fcpEntry = entries.find(entry => entry.name === 'first-contentful-paint');
+        if (fcpEntry) {
+          this.metrics.fcp = fcpEntry.startTime;
+          console.log('FCP:', this.metrics.fcp);
+        }
+      });
+
+      // Navigation timing
+      this.observePerformance('navigation', (entries) => {
+        const navigationEntry = entries[0] as PerformanceNavigationTiming;
+        this.metrics.ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
+        console.log('TTFB:', this.metrics.ttfb);
+      });
+    }
+
+    private observePerformance(type: string, callback: (entries: PerformanceEntry[]) => void): void {
+      try {
+        const observer = new PerformanceObserver((list) => {
+          callback(list.getEntries());
+        });
+
+        observer.observe({ entryTypes: [type] });
+        this.observers.push(observer);
+      } catch (error) {
+        console.warn(`Performance observer for ${type} not supported:`, error);
+      }
+    }
+
+    private collectNavigationTiming(): void {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          this.metrics.navigationTiming = performance.timing;
+          this.reportMetrics();
+        }, 0);
+      });
+    }
+
+    private collectMemoryUsage(): void {
+      // Check if memory API is available
+      if ('memory' in performance) {
+        this.metrics.memoryUsage = {
+          usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
+          totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
+          jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
+        };
+      }
+    }
+
+    private setupReporting(): void {
+      // Report metrics after page load
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          this.reportMetrics();
+        }, 2000);
+      });
+
+      // Report on page visibility change (when user leaves)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          this.reportMetrics();
+        }
+      });
+
+      // Report on beforeunload
+      window.addEventListener('beforeunload', () => {
+        this.reportMetrics();
+      });
+    }
+
+    private reportMetrics(): void {
+      const report = {
+        ...this.metrics,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Log to console in development
+      if (import.meta.env.DEV) {
+        console.log('Performance Report:', report);
+      }
+
+      // Send to analytics
+      this.sendToAnalytics(report);
+
+      // Store locally for debugging
+      this.storeLocally(report);
+    }
+
+    private sendToAnalytics(report: any): void {
+      // Google Analytics 4
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_performance', {
+          lcp: report.lcp,
+          fid: report.fid,
+          cls: report.cls,
+          fcp: report.fcp,
+          ttfb: report.ttfb,
+          custom_map: {
+            custom_parameter_1: 'performance_metrics',
+          },
+        });
+      }
+
+      // Custom analytics endpoint
+      if (import.meta.env.PUBLIC_ANALYTICS_ENDPOINT) {
+        fetch(import.meta.env.PUBLIC_ANALYTICS_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'performance',
+            data: report,
+          }),
+        }).catch(() => {
+          // Silently fail
+        });
+      }
+    }
+
+    private storeLocally(report: any): void {
+      try {
+        const perfLog = JSON.parse(localStorage.getItem('performance_log') || '[]');
+        perfLog.push(report);
+        
+        // Keep only last 10 reports
+        if (perfLog.length > 10) {
+          perfLog.splice(0, perfLog.length - 10);
+        }
+        
+        localStorage.setItem('performance_log', JSON.stringify(perfLog));
+      } catch (error) {
+        console.warn('Could not store performance data locally:', error);
+      }
+    }
+
+    public getMetrics(): PerformanceMetrics {
+      return { ...this.metrics };
+    }
+
+    public destroy(): void {
+      this.observers.forEach(observer => observer.disconnect());
+      this.observers = [];
+    }
+  }
+
+  // Initialize performance monitoring
+  const monitor = new PerformanceMonitor();
+
+  // Expose to global scope for debugging
+  if (import.meta.env.DEV) {
+    (window as any).performanceMonitor = monitor;
+  }
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    monitor.destroy();
+  });
+</script>
+
+<style>
+  #performance-monitor {
+    display: none;
+  }
+</style>

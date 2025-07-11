@@ -88,8 +88,8 @@
 
 <script>
   class ScrollAnimations {
-    private observer: IntersectionObserver;
-    private elements: NodeListOf<Element>;
+    private observer!: IntersectionObserver;
+    private elements!: NodeListOf<Element>;
     private initialized = false;
 
     constructor() {

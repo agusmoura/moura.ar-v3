@@ -1,0 +1,182 @@
+---
+export interface Props {
+  fallback?: string;
+  componentName?: string;
+}
+
+const { fallback = 'Something went wrong', componentName = 'Component' } = Astro.props;
+---
+
+<div class="error-boundary" data-component={componentName}>
+  <slot />
+  <div class="error-fallback hidden" role="alert" aria-live="polite">
+    <div class="error-content">
+      <div class="error-icon">⚠️</div>
+      <h3 class="error-title">Oops! Something went wrong</h3>
+      <p class="error-message">{fallback}</p>
+      <button class="error-retry" onclick="location.reload()">
+        Try again
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-boundary {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .error-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 16, 14, 0.95);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+  }
+
+  .error-fallback.show {
+    display: flex;
+  }
+
+  .error-content {
+    text-align: center;
+    padding: 2rem;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+  }
+
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+  }
+
+  .error-message {
+    color: #cccccc;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .error-retry {
+    background: #ecad22;
+    color: #10100e;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .error-retry:hover {
+    background: #e0c587;
+    transform: translateY(-2px);
+  }
+
+  .error-retry:active {
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  class ErrorBoundary {
+    private container: HTMLElement;
+    private fallback: HTMLElement;
+    private componentName: string;
+
+    constructor(container: HTMLElement) {
+      this.container = container;
+      this.fallback = container.querySelector('.error-fallback') as HTMLElement;
+      this.componentName = container.dataset.component || 'Component';
+      this.init();
+    }
+
+    private init() {
+      // Global error handler
+      window.addEventListener('error', (event) => {
+        if (this.isErrorFromThisComponent(event)) {
+          this.handleError(event.error);
+        }
+      });
+
+      // Unhandled promise rejections
+      window.addEventListener('unhandledrejection', (event) => {
+        if (this.isErrorFromThisComponent(event)) {
+          this.handleError(event.reason);
+        }
+      });
+
+      // Monitor for component failures
+      this.monitorComponentHealth();
+    }
+
+    private isErrorFromThisComponent(event: ErrorEvent | PromiseRejectionEvent): boolean {
+      // Simple heuristic: check if error relates to this component
+      const errorMessage = event instanceof ErrorEvent ? event.message : String(event.reason);
+      return errorMessage.toLowerCase().includes(this.componentName.toLowerCase());
+    }
+
+    private handleError(error: Error) {
+      console.error(`Error in ${this.componentName}:`, error);
+      
+      // Log error for monitoring
+      if (window.gtag) {
+        window.gtag('event', 'exception', {
+          description: `${this.componentName}: ${error.message}`,
+          fatal: false
+        });
+      }
+
+      this.showFallback();
+    }
+
+    private showFallback() {
+      // Hide main content
+      const mainContent = this.container.querySelector(':not(.error-fallback)');
+      if (mainContent) {
+        (mainContent as HTMLElement).style.display = 'none';
+      }
+
+      // Show fallback UI
+      this.fallback.classList.remove('hidden');
+      this.fallback.classList.add('show');
+    }
+
+    private monitorComponentHealth() {
+      // Check for missing critical elements
+      setTimeout(() => {
+        const criticalElements = this.container.querySelectorAll('[data-critical]');
+        criticalElements.forEach(element => {
+          if (!element.offsetParent && !element.checkVisibility?.()) {
+            this.handleError(new Error(`Critical element missing: ${element.tagName}`));
+          }
+        });
+      }, 2000);
+    }
+  }
+
+  // Initialize error boundaries
+  document.addEventListener('DOMContentLoaded', () => {
+    const errorBoundaries = document.querySelectorAll('.error-boundary');
+    errorBoundaries.forEach(boundary => {
+      new ErrorBoundary(boundary as HTMLElement);
+    });
+  });
+</script>
