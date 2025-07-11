@@ -1,7 +1,7 @@
 ---
 import type { Preload } from '@/types/Preload';
 import SpaceBackground from '@components/effects/SpaceBackground.astro';
-import ScrollAnimations from '@components/effects/ScrollAnimations.astro';
+import ScrollAnimationsOptimized from '@components/effects/ScrollAnimationsOptimized.astro';
 import SEO from '@components/seo/SEO.astro';
 import '@fontsource-variable/noto-serif-jp';
 import '@fontsource/space-mono/400.css';
@@ -62,7 +62,7 @@ const backgroundConfig = {
   </head>
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
     <SpaceBackground {...backgroundConfig} />
-    <ScrollAnimations />
+    <ScrollAnimationsOptimized />
     <DesktopSideNav />
     <MobileNav />
     <slot />

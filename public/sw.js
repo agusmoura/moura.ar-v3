@@ -1,9 +1,16 @@
 // @ts-nocheck
-const STATIC_CACHE = 'moura-static-v1';
-const DYNAMIC_CACHE = 'moura-dynamic-v1';
+const STATIC_CACHE = 'moura-static-v3-optimized';
+const DYNAMIC_CACHE = 'moura-dynamic-v3-optimized';
 
 // Assets críticos para cachear inmediatamente (solo los que sabemos que existen)
-const CORE_ASSETS = ['/', '/favicon.svg'];
+const CORE_ASSETS = [
+  '/',
+  '/favicon.svg',
+  '/og-image.webp',
+  '/apple-touch-icon.png',
+  '/favicon-32x32.png',
+  '/favicon-16x16.png'
+];
 
 // Install event - cachear assets críticos
 self.addEventListener('install', (event) => {

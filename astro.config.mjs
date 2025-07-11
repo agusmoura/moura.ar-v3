@@ -5,6 +5,7 @@ import icon from 'astro-icon';
 import { defineConfig } from 'astro/config';
 import rehypeRaw from 'rehype-raw';
 import sitemap from '@astrojs/sitemap';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 import mdx from '@astrojs/mdx';
 
@@ -42,7 +43,16 @@ export default defineConfig({
     prefetchAll: true,
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      // Bundle analyzer - only in build mode
+      process.env.NODE_ENV === 'production' && visualizer({
+        filename: 'dist/stats.html',
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    ].filter(Boolean),
     ssr: {
       noExternal: ['@tailwindcss/vite'],
     },
@@ -51,9 +61,27 @@ export default defineConfig({
       minify: 'esbuild',
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ['astro'],
-            animations: ['swiper'],
+          manualChunks: (id) => {
+            // Vendor chunk for core libraries
+            if (id.includes('node_modules')) {
+              // Swiper gets its own chunk (lazy loaded)
+              if (id.includes('swiper')) {
+                return 'swiper';
+              }
+              // AOS gets its own chunk (lazy loaded)
+              if (id.includes('aos')) {
+                return 'aos';
+              }
+              // Other vendor libraries
+              return 'vendor';
+            }
+            // Component-specific chunks
+            if (id.includes('PersonalCarousel')) {
+              return 'carousel';
+            }
+            if (id.includes('ScrollAnimations')) {
+              return 'scroll-animations';
+            }
           },
           assetFileNames: (assetInfo) => {
             if (!assetInfo.name) return 'assets/[name]-[hash][extname]';

@@ -1,0 +1,250 @@
+---
+interface Props {
+  // Simplified props for performance
+  starDensity?: number;
+  starColor?: string;
+  backgroundColor?: string;
+  gravityEnabled?: boolean;
+  mouseGravityEnabled?: boolean;
+}
+
+const {
+  starDensity = 0.001,
+  starColor = '#ecad22',
+  backgroundColor = '#10100E',
+  gravityEnabled = true,
+  mouseGravityEnabled = true,
+} = Astro.props;
+---
+
+<canvas id="space-background" class="space-background"></canvas>
+
+<style>
+  .space-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--bg-color, #10100E);
+  }
+</style>
+
+<script define:vars={{ starDensity, starColor, backgroundColor, gravityEnabled, mouseGravityEnabled }}>
+  class OptimizedSpaceBackground {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private stars: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      opacity: number;
+    }> = [];
+    private mouseX = 0;
+    private mouseY = 0;
+    private animationId: number | null = null;
+    private isVisible = true;
+    private lastFrameTime = 0;
+    private targetFPS = 60;
+    private frameInterval = 1000 / this.targetFPS;
+    
+    constructor() {
+      this.canvas = document.getElementById('space-background') as HTMLCanvasElement;
+      if (!this.canvas) return;
+      
+      this.ctx = this.canvas.getContext('2d')!;
+      if (!this.ctx) return;
+      
+      this.init();
+    }
+    
+    private init() {
+      this.setupCanvas();
+      this.createStars();
+      this.setupEventListeners();
+      this.startAnimation();
+    }
+    
+    private setupCanvas() {
+      const setCanvasSize = () => {
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        const rect = this.canvas.getBoundingClientRect();
+        
+        this.canvas.width = rect.width * devicePixelRatio;
+        this.canvas.height = rect.height * devicePixelRatio;
+        
+        this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        this.canvas.style.width = rect.width + 'px';
+        this.canvas.style.height = rect.height + 'px';
+      };
+      
+      setCanvasSize();
+      
+      // Throttled resize handler
+      let resizeTimeout: number;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(() => {
+          setCanvasSize();
+          this.createStars();
+        }, 250);
+      });
+    }
+    
+    private createStars() {
+      const width = this.canvas.width;
+      const height = this.canvas.height;
+      const numStars = Math.floor(width * height * starDensity);
+      
+      this.stars = [];
+      
+      for (let i = 0; i < numStars; i++) {
+        this.stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.1,
+          vy: (Math.random() - 0.5) * 0.1,
+          opacity: Math.random() * 0.8 + 0.2,
+        });
+      }
+    }
+    
+    private setupEventListeners() {
+      // Mouse tracking with throttling
+      let mouseTimeout: number;
+      
+      if (mouseGravityEnabled) {
+        document.addEventListener('mousemove', (e) => {
+          clearTimeout(mouseTimeout);
+          mouseTimeout = window.setTimeout(() => {
+            this.mouseX = e.clientX;
+            this.mouseY = e.clientY;
+          }, 16); // ~60fps
+        });
+      }
+      
+      // Visibility API for performance
+      document.addEventListener('visibilitychange', () => {
+        this.isVisible = !document.hidden;
+        if (this.isVisible) {
+          this.startAnimation();
+        } else {
+          this.stopAnimation();
+        }
+      });
+      
+      // Intersection Observer for better performance
+      const observer = new IntersectionObserver((entries) => {
+        this.isVisible = entries[0].isIntersecting;
+        if (this.isVisible) {
+          this.startAnimation();
+        } else {
+          this.stopAnimation();
+        }
+      });
+      
+      observer.observe(this.canvas);
+    }
+    
+    private startAnimation() {
+      if (this.animationId) return;
+      
+      const animate = (currentTime: number) => {
+        if (!this.isVisible) return;
+        
+        if (currentTime - this.lastFrameTime >= this.frameInterval) {
+          this.update();
+          this.render();
+          this.lastFrameTime = currentTime;
+        }
+        
+        this.animationId = requestAnimationFrame(animate);
+      };
+      
+      this.animationId = requestAnimationFrame(animate);
+    }
+    
+    private stopAnimation() {
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+    }
+    
+    private update() {
+      const width = this.canvas.width;
+      const height = this.canvas.height;
+      
+      for (const star of this.stars) {
+        // Simple physics
+        star.x += star.vx;
+        star.y += star.vy;
+        
+        // Gravity effect (simplified)
+        if (gravityEnabled) {
+          const centerX = width / 2;
+          const centerY = height / 2;
+          const dx = centerX - star.x;
+          const dy = centerY - star.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance > 0) {
+            const force = 0.00001;
+            star.vx += (dx / distance) * force;
+            star.vy += (dy / distance) * force;
+          }
+        }
+        
+        // Mouse gravity (simplified)
+        if (mouseGravityEnabled && this.mouseX && this.mouseY) {
+          const dx = this.mouseX - star.x;
+          const dy = this.mouseY - star.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 200 && distance > 0) {
+            const force = 0.0001;
+            star.vx += (dx / distance) * force;
+            star.vy += (dy / distance) * force;
+          }
+        }
+        
+        // Boundary wrapping
+        if (star.x < 0) star.x = width;
+        if (star.x > width) star.x = 0;
+        if (star.y < 0) star.y = height;
+        if (star.y > height) star.y = 0;
+        
+        // Velocity damping
+        star.vx *= 0.999;
+        star.vy *= 0.999;
+      }
+    }
+    
+    private render() {
+      // Clear canvas
+      this.ctx.fillStyle = backgroundColor;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
+      // Draw stars
+      for (const star of this.stars) {
+        this.ctx.fillStyle = `rgba(${this.hexToRgb(starColor)}, ${star.opacity})`;
+        this.ctx.fillRect(star.x, star.y, 1, 1);
+      }
+    }
+    
+    private hexToRgb(hex: string): string {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : '236, 173, 34';
+    }
+  }
+  
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    new OptimizedSpaceBackground();
+  });
+</script>

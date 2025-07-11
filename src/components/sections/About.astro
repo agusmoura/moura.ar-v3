@@ -1,6 +1,6 @@
 ---
 import { parseText } from '@/utils/textParser';
-import PersonalCarousel from '@components/ui/PersonalCarousel.astro';
+import PersonalCarouselLazy from '@components/ui/PersonalCarouselLazy.astro';
 const pt = (text: string) => parseText(text);
 ---
 
@@ -113,7 +113,7 @@ const pt = (text: string) => parseText(text);
           data-aos-duration="800"
           data-aos-delay="600"
         >
-          <PersonalCarousel />
+          <PersonalCarouselLazy />
         </div>
       </div>
     </div>
