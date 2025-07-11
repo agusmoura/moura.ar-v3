@@ -1,40 +1,184 @@
 ---
-// Componente para inicializar las animaciones de scroll
+// Componente optimizado para animaciones de scroll
 ---
 
+<!-- Critical CSS inlined -->
+<style>
+  /* Critical AOS styles - only what we actually use */
+  [data-aos] {
+    pointer-events: none;
+  }
+  
+  [data-aos].aos-animate {
+    pointer-events: auto;
+  }
+  
+  [data-aos="fade-up"] {
+    transform: translate3d(0, 40px, 0);
+    opacity: 0;
+    transition-property: transform, opacity;
+  }
+  
+  [data-aos="fade-up"].aos-animate {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  
+  [data-aos="fade-in"] {
+    opacity: 0;
+    transition-property: opacity;
+  }
+  
+  [data-aos="fade-in"].aos-animate {
+    opacity: 1;
+  }
+  
+  [data-aos="fade-left"] {
+    transform: translate3d(-40px, 0, 0);
+    opacity: 0;
+    transition-property: transform, opacity;
+  }
+  
+  [data-aos="fade-left"].aos-animate {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  
+  [data-aos="fade-right"] {
+    transform: translate3d(40px, 0, 0);
+    opacity: 0;
+    transition-property: transform, opacity;
+  }
+  
+  [data-aos="fade-right"].aos-animate {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  
+  [data-aos="zoom-in"] {
+    transform: scale(0.9);
+    opacity: 0;
+    transition-property: transform, opacity;
+  }
+  
+  [data-aos="zoom-in"].aos-animate {
+    transform: scale(1);
+    opacity: 1;
+  }
+  
+  /* Transition timings */
+  [data-aos] {
+    transition-duration: 0.6s;
+    transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  
+  @media (max-width: 768px) {
+    [data-aos] {
+      transition-duration: 0.4s;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    [data-aos] {
+      transition-duration: 0.1s !important;
+    }
+  }
+</style>
+
 <script>
-  import AOS from 'aos';
-  import 'aos/dist/aos.css';
+  class ScrollAnimations {
+    private observer: IntersectionObserver;
+    private elements: NodeListOf<Element>;
+    private initialized = false;
 
-  // Configuración optimizada para performance
-  const initAOS = () => {
-    AOS.init({
-      duration: window.innerWidth < 768 ? 600 : 800, // Animaciones más rápidas en móvil
-      easing: 'ease-out-cubic',
-      once: true, // Solo animar una vez para mejor performance
-      offset: window.innerWidth < 768 ? 50 : 120, // Trigger más temprano en móvil
-      delay: 0,
-      anchorPlacement: 'top-bottom',
-      disable: false, // Mantener animaciones en móviles pero optimizadas
-      startEvent: 'DOMContentLoaded',
-      useClassNames: false,
-      disableMutationObserver: false,
-      debounceDelay: 50,
-      throttleDelay: 99,
-    });
-  };
+    constructor() {
+      this.init();
+    }
 
-  // Inicializar AOS
-  document.addEventListener('DOMContentLoaded', initAOS);
+    private init() {
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setup());
+      } else {
+        this.setup();
+      }
+    }
 
-  // Re-inicializar en navegación de Astro
+    private setup() {
+      if (this.initialized) return;
+      
+      this.initialized = true;
+      this.elements = document.querySelectorAll('[data-aos]');
+      
+      if (this.elements.length === 0) return;
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      if (prefersReducedMotion) {
+        // Immediately show all elements if reduced motion is preferred
+        this.elements.forEach(el => el.classList.add('aos-animate'));
+        return;
+      }
+
+      this.createObserver();
+      this.observeElements();
+    }
+
+    private createObserver() {
+      const isMobile = window.innerWidth < 768;
+      
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('aos-animate');
+              // Unobserve after animation to improve performance
+              this.observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          root: null,
+          rootMargin: isMobile ? '0px 0px -20px 0px' : '0px 0px -50px 0px',
+          threshold: 0.1,
+        }
+      );
+    }
+
+    private observeElements() {
+      this.elements.forEach((element) => {
+        this.observer.observe(element);
+      });
+    }
+
+    private refresh() {
+      // Re-initialize if new elements are added
+      const newElements = document.querySelectorAll('[data-aos]:not(.aos-animate)');
+      newElements.forEach((element) => {
+        this.observer.observe(element);
+      });
+    }
+
+    // Public method to refresh animations
+    public refreshAnimations() {
+      this.refresh();
+    }
+  }
+
+  // Initialize scroll animations
+  const scrollAnimations = new ScrollAnimations();
+
+  // Handle Astro page transitions
   document.addEventListener('astro:page-load', () => {
-    // Pequeño delay para asegurar que el DOM esté listo
-    setTimeout(initAOS, 100);
+    setTimeout(() => {
+      scrollAnimations.refreshAnimations();
+    }, 100);
   });
 
-  // Actualizar animaciones cuando se modifica el DOM
+  // Handle Astro after swap
   document.addEventListener('astro:after-swap', () => {
-    AOS.refresh();
+    scrollAnimations.refreshAnimations();
   });
 </script>

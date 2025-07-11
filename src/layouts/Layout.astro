@@ -1,7 +1,7 @@
 ---
 import type { Preload } from '@/types/Preload';
 import SpaceBackground from '@components/effects/SpaceBackground.astro';
-import ScrollAnimationsOptimized from '@components/effects/ScrollAnimationsOptimized.astro';
+import ScrollAnimations from '@components/effects/ScrollAnimations.astro';
 import SEO from '@components/seo/SEO.astro';
 import SkipLink from '@components/accessibility/SkipLink.astro';
 import FocusManager from '@components/accessibility/FocusManager.astro';
@@ -65,7 +65,7 @@ const backgroundConfig = {
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
     <SkipLink />
     <SpaceBackground {...backgroundConfig} />
-    <ScrollAnimationsOptimized />
+    <ScrollAnimations />
     <FocusManager />
     <DesktopSideNav />
     <MobileNav />
