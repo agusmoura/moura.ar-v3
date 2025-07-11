@@ -16,6 +16,15 @@ technologies:
   - 'figma'
   - 'photoshop'
   - 'illustrator'
+theme:
+  colors:
+    primary: '#f59e0b' # Ámbar para iconos y bordes
+    secondary: '#7c2d12' # Marrón chocolate
+    accent: '#fbbf24' # Dorado para destacados
+    surface: '#451a03' # Superficie marrón
+    foreground: '#fef3c7' # Texto principal
+  background: '#1c1917' # Marrón muy oscuro
+  mood: 'playful'
 images:
   cover:
     src: 'https://cdn.moura.ar/projects/cerveza-meet/cover.webp'

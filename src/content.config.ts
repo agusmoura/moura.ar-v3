@@ -22,11 +22,28 @@ const projectsCollection = defineCollection({
     category: z.string(),
     date: z.union([z.string(), z.number()]),
     client: z.string(),
+    client_logo: z.string().optional(),
     partner: z.string().optional(),
+    partner_logo: z.string().optional(),
     role: z.string(),
     duration: z.string(),
     aspectRatio: z.string().optional(),
     technologies: z.array(z.string()),
+    theme: z
+      .object({
+        title_gradient: z.string().optional(),
+        colors: z
+          .object({
+            primary: z.string().optional(),
+            secondary: z.string().optional(),
+            background: z.string().optional(),
+            foreground: z.string().optional(),
+            surface: z.string().optional(),
+            border: z.string().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
     images: z.any(), // Simplified
     tags: z.array(z.string()),
     grid: z.any(), // Simplified

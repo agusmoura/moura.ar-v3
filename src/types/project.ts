@@ -8,11 +8,24 @@ export interface Project {
   category: string;
   date: number;
   client: string;
+  client_logo?: string;
   partner?: string;
+  partner_logo?: string;
   role: string;
   duration: string;
   technologies: string[];
   highContrast?: boolean;
+  theme?: {
+    title_gradient: string;
+    colors?: {
+      primary?: string;
+      secondary?: string;
+      background?: string;
+      foreground?: string;
+      surface?: string;
+      border?: string;
+    };
+  };
   grid: {
     cols: {
       base?: number;

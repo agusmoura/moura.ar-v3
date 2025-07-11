@@ -17,6 +17,15 @@ technologies:
   - 'wordpress'
   - 'php'
   - 'javascript'
+theme:
+  colors:
+    primary: '#0ea5e9' # Azul vibrante para iconos y bordes
+    secondary: '#1e293b' # Gris azulado oscuro
+    accent: '#38bdf8' # Azul claro para destacados
+    surface: '#374151' # Superficie gris
+    foreground: '#f1f5f9' # Texto principal
+  background: '#0f172a' # Azul muy oscuro
+  mood: 'tech'
 links:
   live: 'https://inscribite.atlantida.edu.ar/'
 images:
