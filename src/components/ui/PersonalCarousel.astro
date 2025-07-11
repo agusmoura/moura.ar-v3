@@ -327,7 +327,6 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
         cards.forEach((card) => {
           const cardElement = card as HTMLElement;
           let rafId: number;
-          let isFlipped = false;
 
           // Click handler
           cardElement.addEventListener('click', (e: Event) => {
