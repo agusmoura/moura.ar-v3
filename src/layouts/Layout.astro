@@ -3,6 +3,8 @@ import type { Preload } from '@/types/Preload';
 import SpaceBackground from '@components/effects/SpaceBackground.astro';
 import ScrollAnimationsOptimized from '@components/effects/ScrollAnimationsOptimized.astro';
 import SEO from '@components/seo/SEO.astro';
+import SkipLink from '@components/accessibility/SkipLink.astro';
+import FocusManager from '@components/accessibility/FocusManager.astro';
 import '@fontsource-variable/noto-serif-jp';
 import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
@@ -61,11 +63,15 @@ const backgroundConfig = {
     <ClientRouter />
   </head>
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
+    <SkipLink />
     <SpaceBackground {...backgroundConfig} />
     <ScrollAnimationsOptimized />
+    <FocusManager />
     <DesktopSideNav />
     <MobileNav />
-    <slot />
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
 
     <!-- Simplified Performance Monitoring -->
     <script>

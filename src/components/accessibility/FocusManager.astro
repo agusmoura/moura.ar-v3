@@ -1,0 +1,161 @@
+---
+// Focus management component for better keyboard navigation
+---
+
+<script>
+  class FocusManager {
+    private focusableElements: string = 'a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
+    private trapStack: HTMLElement[] = [];
+    
+    constructor() {
+      this.init();
+    }
+    
+    private init() {
+      // Enhanced focus indicators
+      this.enhanceFocusIndicators();
+      
+      // Skip link functionality
+      this.setupSkipLinks();
+      
+      // Keyboard navigation enhancements
+      this.setupKeyboardNavigation();
+    }
+    
+    private enhanceFocusIndicators() {
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Enhanced focus indicators */
+        *:focus {
+          outline: 2px solid #ecad22;
+          outline-offset: 2px;
+        }
+        
+        /* Custom focus for interactive elements */
+        button:focus,
+        a:focus,
+        input:focus,
+        textarea:focus,
+        select:focus {
+          outline: 2px solid #ecad22;
+          outline-offset: 2px;
+          box-shadow: 0 0 0 4px rgba(236, 173, 34, 0.2);
+        }
+        
+        /* Focus within containers */
+        .card-flip:focus-within {
+          outline: 2px solid #ecad22;
+          outline-offset: 2px;
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    private setupSkipLinks() {
+      document.addEventListener('keydown', (e) => {
+        // Alt + S to skip to main content
+        if (e.altKey && e.key === 's') {
+          e.preventDefault();
+          const mainContent = document.getElementById('main-content');
+          if (mainContent) {
+            mainContent.focus();
+            mainContent.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+        
+        // Alt + N to skip to navigation
+        if (e.altKey && e.key === 'n') {
+          e.preventDefault();
+          const nav = document.querySelector('nav') || document.querySelector('[role="navigation"]');
+          if (nav) {
+            const firstLink = nav.querySelector('a, button');
+            if (firstLink) {
+              (firstLink as HTMLElement).focus();
+            }
+          }
+        }
+      });
+    }
+    
+    private setupKeyboardNavigation() {
+      // Escape key to close modals/dropdowns
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          // Close any open modals
+          const modals = document.querySelectorAll('[aria-modal="true"]');
+          modals.forEach(modal => {
+            if (modal instanceof HTMLElement) {
+              modal.style.display = 'none';
+              modal.setAttribute('aria-hidden', 'true');
+            }
+          });
+          
+          // Close any open dropdowns
+          const dropdowns = document.querySelectorAll('[aria-expanded="true"]');
+          dropdowns.forEach(dropdown => {
+            dropdown.setAttribute('aria-expanded', 'false');
+          });
+          
+          // Restore focus to last focused element
+          if (this.trapStack.length > 0) {
+            const lastFocused = this.trapStack.pop();
+            if (lastFocused) {
+              lastFocused.focus();
+            }
+          }
+        }
+      });
+    }
+    
+    // Focus trap for modals
+    public trapFocus(element: HTMLElement) {
+      const focusableElements = element.querySelectorAll(this.focusableElements);
+      const firstFocusable = focusableElements[0] as HTMLElement;
+      const lastFocusable = focusableElements[focusableElements.length - 1] as HTMLElement;
+      
+      // Store current focus
+      this.trapStack.push(document.activeElement as HTMLElement);
+      
+      element.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+              e.preventDefault();
+              lastFocusable.focus();
+            }
+          } else {
+            if (document.activeElement === lastFocusable) {
+              e.preventDefault();
+              firstFocusable.focus();
+            }
+          }
+        }
+      });
+      
+      // Focus first element
+      firstFocusable?.focus();
+    }
+    
+    // Release focus trap
+    public releaseFocus() {
+      const lastFocused = this.trapStack.pop();
+      if (lastFocused) {
+        lastFocused.focus();
+      }
+    }
+  }
+  
+  // Initialize focus management
+  document.addEventListener('DOMContentLoaded', () => {
+    new FocusManager();
+  });
+</script>
