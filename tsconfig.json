@@ -23,6 +23,8 @@
     "moduleDetection": "force",
     "noEmit": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "jsx": "preserve",
+    "jsxImportSource": "astro"
   }
 }
