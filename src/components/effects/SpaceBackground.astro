@@ -502,14 +502,7 @@ const {
 
     private findOrbitContainer(): void {
       // Try specific selectors in order of preference
-      const selectors = [
-        '.orbit-container',
-        '.orbit-hero',
-        '#orbit-container',
-        '#orbit-hero',
-        '[class*="orbit-container"]',
-        '[class*="orbit"]',
-      ];
+      const selectors = ['.orbit-container'];
 
       for (const selector of selectors) {
         const element = document.querySelector(selector);
