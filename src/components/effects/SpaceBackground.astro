@@ -6,6 +6,7 @@ interface Props {
   twinkleProbability?: number;
   minTwinkleSpeed?: number;
   maxTwinkleSpeed?: number;
+  starsColor?: string;
 
   // Shooting Stars props
   shootingStarsEnabled?: boolean;
@@ -40,6 +41,7 @@ const {
   twinkleProbability = 0.7,
   minTwinkleSpeed = 0.5,
   maxTwinkleSpeed = 1,
+  starsColor = '#ffffff',
 
   // Shooting Stars defaults
   shootingStarsEnabled = true,
@@ -77,6 +79,7 @@ const {
       twinkleProbability,
       minTwinkleSpeed,
       maxTwinkleSpeed,
+      starsColor,
     },
     shootingStars: {
       enabled: shootingStarsEnabled,
@@ -135,6 +138,7 @@ const {
       twinkleProbability: number;
       minTwinkleSpeed: number;
       maxTwinkleSpeed: number;
+      starsColor: string;
     };
     shootingStars: {
       enabled: boolean;
@@ -179,10 +183,24 @@ const {
     private trailColors: { r: number; g: number; b: number };
     private orbitContainer: Element | null = null;
     private orbitRect: DOMRect | null = null;
-    private mouseX: number = -1000; // Start off-screen
+    private mouseX: number = -1000;
     private mouseY: number = -1000;
     private mouseGravityStrength: number;
     private mouseGravityRadius: number;
+    private MAX_SHOOTING_STARS = 2;
+    private frameCount = 0;
+    private gravityCache: {
+      coords: { x: number; y: number; width: number; height: number };
+      lastUpdate: number;
+    } | null = null;
+    private lastMouseMove = 0;
+    private MOUSE_THROTTLE = 16.67;
+    private isLoading = true;
+    private loadingProgress = 0;
+    private fadeInProgress = 0;
+    private totalStars = 0;
+    private STARS_PER_BATCH = 200;
+    private loadingStartTime = 0;
 
     constructor() {
       super();
@@ -200,6 +218,7 @@ const {
             twinkleProbability: 0.7,
             minTwinkleSpeed: 0.5,
             maxTwinkleSpeed: 1,
+            starsColor: '#ffffff',
           },
           shootingStars: {
             enabled: true,
@@ -252,40 +271,30 @@ const {
     private setupBackground(): void {
       if (!this.canvas || !this.ctx) return;
 
-      // Set canvas styles
       this.canvas.style.position = 'absolute';
       this.canvas.style.inset = '0';
       this.canvas.style.width = '100%';
       this.canvas.style.height = '100%';
+      this.canvas.style.opacity = '1';
+      this.canvas.style.transition = 'opacity 1s ease-in-out';
 
-      // Find orbit container for gravity
       this.findOrbitContainer();
-
-      // Add mouse tracking
       this.setupMouseTracking();
+      this.setupCanvas();
 
-      // Skip animations if user prefers reduced motion
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        this.setupCanvas();
         this.initializeStars();
         this.renderStatic();
+        this.finishLoading();
         return;
       }
 
-      // Setup and start
-      this.setupCanvas();
-      this.initializeStars();
+      this.loadingStartTime = performance.now();
       this.initializeShootingStarPool();
+      this.initializeStars();
+      this.startProgressiveLoading();
 
-      // Schedule first shooting star
-      if (this.config.shootingStars.enabled) {
-        this.scheduleNextShootingStar();
-      }
-
-      // Add resize listener with debouncing
       window.addEventListener('resize', this.handleResize.bind(this));
-
-      // Start animation
       this.lastTime = performance.now();
       this.animateFrame();
     }
@@ -311,21 +320,53 @@ const {
       if (this.ctx) {
         this.ctx.scale(this.dpr, this.dpr);
         // Set background once
-        this.ctx.fillStyle = '#000';
+        this.ctx.fillStyle = this.config.backgroundColor || '#000';
         this.ctx.fillRect(0, 0, this.width, this.height);
       }
     }
 
     private initializeStars(): void {
-      const { starDensity, allStarsTwinkle, twinkleProbability, minTwinkleSpeed, maxTwinkleSpeed } =
-        this.config.stars;
-
+      const { starDensity } = this.config.stars;
       const area = this.width * this.height;
-      const numStars = Math.floor(area * starDensity);
+      this.totalStars = Math.floor(area * starDensity);
+      this.stars = [];
+      this.loadingProgress = 0;
+    }
 
-      this.stars = Array.from({ length: numStars }, () => {
+    private startProgressiveLoading(): void {
+      this.isLoading = true;
+      // Add some initial stars immediately
+      this.addInitialStars();
+      this.loadNextStarBatch();
+    }
+
+    private addInitialStars(): void {
+      const { allStarsTwinkle, twinkleProbability, minTwinkleSpeed, maxTwinkleSpeed } =
+        this.config.stars;
+      // Add 20 initial stars immediately visible
+      for (let i = 0; i < 20; i++) {
         const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
-        return {
+        this.stars.push({
+          x: Math.random() * this.width,
+          y: Math.random() * this.height,
+          radius: Math.random() * 0.8 + 1,
+          opacity: Math.random() * 0.5 + 0.5,
+          twinkleSpeed: shouldTwinkle
+            ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
+            : null,
+          twinklePhase: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+
+    private loadNextStarBatch(): void {
+      const { allStarsTwinkle, twinkleProbability, minTwinkleSpeed, maxTwinkleSpeed } =
+        this.config.stars;
+      const starsToAdd = Math.min(this.STARS_PER_BATCH, this.totalStars - this.stars.length);
+
+      for (let i = 0; i < starsToAdd; i++) {
+        const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
+        this.stars.push({
           x: Math.random() * this.width,
           y: Math.random() * this.height,
           radius: Math.random() * 0.05 + 0.5,
@@ -334,8 +375,31 @@ const {
             ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
             : null,
           twinklePhase: Math.random() * Math.PI * 2,
-        };
-      });
+        });
+      }
+
+      this.loadingProgress = this.stars.length / this.totalStars;
+
+      if (this.stars.length < this.totalStars) {
+        requestAnimationFrame(() => this.loadNextStarBatch());
+      } else {
+        this.finishLoading();
+      }
+    }
+
+    private finishLoading(): void {
+      this.isLoading = false;
+      this.loadingProgress = 1;
+
+      if (this.config.shootingStars.enabled) {
+        this.scheduleNextShootingStar();
+      }
+
+      this.canvas.style.opacity = '1';
+
+      setTimeout(() => {
+        this.fadeInProgress = 1;
+      }, 100);
     }
 
     private initializeShootingStarPool(): void {
@@ -394,6 +458,8 @@ const {
     }
 
     private createShootingStar(): void {
+      if (this.shootingStars.length >= this.MAX_SHOOTING_STARS) return;
+
       const star = this.getShootingStar();
       if (!star) return;
 
@@ -435,15 +501,23 @@ const {
     }
 
     private findOrbitContainer(): void {
-      // Try different possible selectors for orbit container
-      this.orbitContainer =
-        document.querySelector('.orbit-container') ||
-        document.querySelector('#orbit-container') ||
-        document.querySelector('[class*="orbit"]') ||
-        document.querySelector('[id*="orbit"]');
+      // Try specific selectors in order of preference
+      const selectors = [
+        '.orbit-container',
+        '.orbit-hero',
+        '#orbit-container',
+        '#orbit-hero',
+        '[class*="orbit-container"]',
+        '[class*="orbit"]',
+      ];
 
-      if (this.orbitContainer) {
-        this.updateOrbitRect();
+      for (const selector of selectors) {
+        const element = document.querySelector(selector);
+        if (element && element.getBoundingClientRect().width > 0) {
+          this.orbitContainer = element;
+          this.updateOrbitRect();
+          break;
+        }
       }
     }
 
@@ -454,80 +528,91 @@ const {
     }
 
     private getGravityCoordinates(): { x: number; y: number; width: number; height: number } {
-      // Update orbit rect in case element moved
-      this.updateOrbitRect();
+      const now = performance.now();
 
-      if (this.orbitRect) {
-        // Use orbit container center and dimensions
-        return {
-          x: this.orbitRect.left + this.orbitRect.width / 2,
-          y: this.orbitRect.top + this.orbitRect.height / 2,
-          width: this.orbitRect.width,
-          height: this.orbitRect.height,
+      // Update cache less frequently but smoothly interpolate
+      if (this.gravityCache && now - this.gravityCache.lastUpdate < 50) {
+        return this.gravityCache.coords;
+      }
+
+      // Only update if orbit container exists
+      if (this.orbitContainer) {
+        this.updateOrbitRect();
+      }
+
+      let coords: { x: number; y: number; width: number; height: number };
+
+      if (this.orbitRect && this.orbitContainer) {
+        // Get coordinates relative to viewport
+        const rect = this.orbitContainer.getBoundingClientRect();
+        coords = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+          width: rect.width,
+          height: rect.height,
+        };
+      } else {
+        // Fallback to center if no orbit container
+        coords = {
+          x: this.width / 2,
+          y: this.height / 2,
+          width: Math.min(this.width, this.height) * 0.2,
+          height: Math.min(this.width, this.height) * 0.2,
         };
       }
 
-      // Fallback to configured coordinates or screen center
-      return {
-        x: this.config.gravity.x ?? this.width / 2,
-        y: this.config.gravity.y ?? this.height / 2,
-        width: Math.min(this.width, this.height) * 0.3, // 30% of smaller dimension
-        height: Math.min(this.width, this.height) * 0.3,
-      };
+      this.gravityCache = { coords, lastUpdate: now };
+      return coords;
     }
 
     private applyGravity(star: ShootingStar, deltaTime: number): void {
-      if (!this.config.gravity.enabled) return;
+      if (!this.config.gravity.enabled || !this.orbitContainer) return;
 
       const gravity = this.getGravityCoordinates();
-
-      // Calculate distance to gravity center
       const dx = gravity.x - star.x;
       const dy = gravity.y - star.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
+      const distance = Math.sqrt(distanceSquared);
 
-      // Avoid division by zero and too strong forces when very close
-      if (distance < Math.min(gravity.width, gravity.height) / 4) return;
+      const minDistance = Math.min(gravity.width, gravity.height) / 4;
+      if (distance < minDistance) return;
 
-      // Calculate gravitational force - stronger within orbit area
       const orbitRadius = Math.max(gravity.width, gravity.height) / 2;
       const strengthMultiplier = distance < orbitRadius ? 2 : 1;
-      const force = (this.config.gravity.strength * strengthMultiplier) / (distance * distance);
-      const normalizedDelta = deltaTime / 16.67; // Normalize to 60fps
+      const force = (this.config.gravity.strength * strengthMultiplier) / distanceSquared;
+      const normalizedDelta = deltaTime / 16.67;
 
-      // Apply force to velocity components
-      const forceX = (dx / distance) * force * normalizedDelta;
-      const forceY = (dy / distance) * force * normalizedDelta;
+      const invDistance = 1 / distance;
+      const forceX = dx * invDistance * force * normalizedDelta;
+      const forceY = dy * invDistance * force * normalizedDelta;
 
-      // Get current velocity components
-      const currentVelX = Math.cos(star.angle) * star.speed;
-      const currentVelY = Math.sin(star.angle) * star.speed;
+      const cosAngle = Math.cos(star.angle);
+      const sinAngle = Math.sin(star.angle);
+      const currentVelX = cosAngle * star.speed;
+      const currentVelY = sinAngle * star.speed;
 
-      // Update velocity
       const newVelX = currentVelX + forceX;
       const newVelY = currentVelY + forceY;
 
-      // Update star angle and speed
       star.angle = Math.atan2(newVelY, newVelX);
       star.speed = Math.sqrt(newVelX * newVelX + newVelY * newVelY);
     }
 
     private applyMultipleGravitationalLensing(star: Star): { x: number; y: number } {
-      // Get orbit gravity center
-      const gravityCoords = this.getGravityCoordinates();
+      let result = { x: star.x, y: star.y };
 
-      // Apply orbit center gravity
-      const orbitLensed = this.applySingleGravitationalLensing(
-        star,
-        {
-          x: gravityCoords.x,
-          y: gravityCoords.y,
-        },
-        2.0,
-        0.3
-      );
+      // Apply subtle orbit gravity if container exists
+      if (this.config.gravity.enabled && this.orbitContainer) {
+        const gravityCoords = this.getGravityCoordinates();
+        result = this.applyDramaticGravitationalWarp(
+          result,
+          { x: gravityCoords.x, y: gravityCoords.y },
+          2.8, // Balanced effect - noticeable but not excessive
+          0.4 // Moderate radius of influence
+        );
+      }
 
-      // Apply mouse gravity if enabled and mouse is on screen
+      // Apply mouse gravity with dramatic effect
       if (
         this.config.mouseGravity.enabled &&
         this.mouseX > 0 &&
@@ -535,59 +620,60 @@ const {
         this.mouseX < this.width &&
         this.mouseY < this.height
       ) {
-        const mouseLensed = this.applySingleGravitationalLensing(
-          {
-            x: orbitLensed.x,
-            y: orbitLensed.y,
-            radius: star.radius,
-            opacity: star.opacity,
-            twinkleSpeed: star.twinkleSpeed,
-            twinklePhase: star.twinklePhase,
-          },
-          {
-            x: this.mouseX,
-            y: this.mouseY,
-          },
-          this.mouseGravityStrength,
-          this.mouseGravityRadius
+        result = this.applyDramaticGravitationalWarp(
+          result,
+          { x: this.mouseX, y: this.mouseY },
+          this.mouseGravityStrength * 1.5, // Moderate mouse effect
+          this.mouseGravityRadius // Normal mouse radius
         );
-
-        return mouseLensed;
       }
 
-      return orbitLensed;
+      return result;
     }
 
-    private applySingleGravitationalLensing(
-      star: Star,
+    private applyDramaticGravitationalWarp(
+      position: { x: number; y: number },
       gravityCenter: { x: number; y: number },
       strength: number,
       maxRadiusRatio: number
     ): { x: number; y: number } {
-      const dx = star.x - gravityCenter.x;
-      const dy = star.y - gravityCenter.y;
+      const dx = position.x - gravityCenter.x;
+      const dy = position.y - gravityCenter.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      // Only apply lensing within a certain radius
-      const maxLensingRadius = Math.min(this.width, this.height) * maxRadiusRatio;
-      if (distance > maxLensingRadius) {
-        return { x: star.x, y: star.y };
+      const maxWarpRadius = Math.min(this.width, this.height) * maxRadiusRatio;
+      if (distance > maxWarpRadius || distance < 2) {
+        return position;
       }
 
-      // Calculate lensing strength
-      const lensingStrength = (1 - distance / maxLensingRadius) * strength;
+      // Create dramatic gravitational warping effect
+      const normalizedDistance = distance / maxWarpRadius;
 
-      // Apply distortion
+      // Exponential falloff for more dramatic effect near center
+      const falloff = Math.exp(-normalizedDistance * 2) * (1 - normalizedDistance);
+      const warpStrength = falloff * strength;
+
       const angle = Math.atan2(dy, dx);
-      const distortedDistance = distance * (1 + lensingStrength);
 
-      // Add tangential distortion to create swirl
-      const tangentialDistortion = lensingStrength * 0.5;
-      const newAngle = angle + tangentialDistortion;
+      // BLACK HOLE ORBITAL MECHANICS - expulsion and rotation
+      // Create outward displacement like matter being ejected from accretion disk
+      const radialExpulsion = 1 + warpStrength * 0.8; // Push stars outward
+      let warpedDistance = distance * radialExpulsion;
+
+      // Steady orbital rotation instead of pulsing
+      const time = performance.now() * 0.0002; // Much slower time progression
+      const orbitRotation = time * warpStrength * 0.2; // Reduced rotation speed
+
+      // Create stable orbital paths - closer stars orbit faster
+      const orbitalSpeed = warpStrength * (1 / Math.max(normalizedDistance, 0.1)) * 0.08; // Much slower orbital speed
+      const orbitalAngle = angle + orbitRotation * orbitalSpeed;
+
+      // Minimal distortion - just smooth orbital mechanics
+      const distortedAngle = orbitalAngle;
 
       return {
-        x: gravityCenter.x + Math.cos(newAngle) * distortedDistance,
-        y: gravityCenter.y + Math.sin(newAngle) * distortedDistance,
+        x: gravityCenter.x + Math.cos(distortedAngle) * warpedDistance,
+        y: gravityCenter.y + Math.sin(distortedAngle) * warpedDistance,
       };
     }
 
@@ -617,10 +703,9 @@ const {
         star.x += Math.cos(star.angle) * distance;
         star.y += Math.sin(star.angle) * distance;
 
-        // Update trail opacities (fade older points)
-        star.trail.forEach((point, index) => {
-          point.opacity = index / star.trail.length;
-        });
+        for (let i = 0; i < star.trail.length; i++) {
+          star.trail[i].opacity = i / star.trail.length;
+        }
 
         // Check if off screen
         if (
@@ -644,9 +729,8 @@ const {
     private render(): void {
       if (!this.ctx) return;
 
-      const ctx = this.ctx; // Store reference to avoid null checks
+      const ctx = this.ctx;
 
-      // Clear canvas - only if background color is set
       if (this.config.backgroundColor) {
         ctx.fillStyle = this.config.backgroundColor;
         ctx.fillRect(0, 0, this.width, this.height);
@@ -654,112 +738,149 @@ const {
         ctx.clearRect(0, 0, this.width, this.height);
       }
 
-      // Get gravity center for lensing effect
-      const gravityCoords = this.getGravityCoordinates();
-
-      // Debug: log gravity coordinates occasionally
-      if (Math.random() < 0.001) {
-        console.log('Gravity center:', gravityCoords.x, gravityCoords.y);
-        console.log('Canvas size:', this.width, this.height);
+      if (this.isLoading) {
+        this.renderLoadingState(ctx);
+        return;
       }
 
-      // Draw stars with gravitational lensing
-      ctx.fillStyle = '#fff';
+      const fadeAlpha =
+        this.fadeInProgress < 1
+          ? Math.min(1, (performance.now() - this.loadingStartTime - 500) / 1000)
+          : 1;
+
+      if (fadeAlpha <= 0) return;
+
       const time = performance.now() * 0.001;
+      const viewportPadding = 50;
+
+      // Optimize rendering with batching and improved culling
+      ctx.fillStyle = this.config.stars.starsColor;
 
       for (const star of this.stars) {
-        let opacity = star.opacity;
-
-        if (star.twinkleSpeed !== null) {
-          opacity = 0.5 + 0.5 * Math.sin(time / star.twinkleSpeed + star.twinklePhase);
+        // Improved viewport culling
+        if (
+          star.x < -viewportPadding ||
+          star.x > this.width + viewportPadding ||
+          star.y < -viewportPadding ||
+          star.y > this.height + viewportPadding
+        ) {
+          continue;
         }
 
-        // Apply gravitational lensing to star position
+        // Apply smooth gravitational lensing
         const lensedPosition = this.applyMultipleGravitationalLensing(star);
 
-        ctx.globalAlpha = opacity;
+        // Skip if lensed position is out of bounds
+        if (
+          lensedPosition.x < -viewportPadding ||
+          lensedPosition.x > this.width + viewportPadding ||
+          lensedPosition.y < -viewportPadding ||
+          lensedPosition.y > this.height + viewportPadding
+        ) {
+          continue;
+        }
+
+        // Calculate star opacity with stable twinkling
+        let opacity = star.opacity;
+        if (star.twinkleSpeed !== null) {
+          // Smoother, less flickery twinkling
+          opacity = 0.6 + 0.4 * Math.sin(time / star.twinkleSpeed + star.twinklePhase);
+        }
+
+        // Calculate subtle size variation based on gravitational distortion
+        const distanceFromOriginal = Math.sqrt(
+          (lensedPosition.x - star.x) ** 2 + (lensedPosition.y - star.y) ** 2
+        );
+
+        // Balanced gravitational lensing effect - moderate magnification
+        const gravitationalMagnification = 1 + distanceFromOriginal * 0.015; // Moderate effect
+        const finalRadius = star.radius * Math.min(gravitationalMagnification, 2.0); // Reasonable max magnification
+
+        // Moderate brightness variation
+        const lensingBrightness = 1 + distanceFromOriginal * 0.004; // Balanced brightness effect
+        const finalOpacity = Math.min(opacity * lensingBrightness, 1) * fadeAlpha;
+
+        // Render star with gravitational effects
+        ctx.globalAlpha = finalOpacity;
         ctx.beginPath();
-        ctx.arc(lensedPosition.x, lensedPosition.y, star.radius, 0, Math.PI * 2);
+        ctx.arc(lensedPosition.x, lensedPosition.y, finalRadius, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Draw shooting stars
-      ctx.globalAlpha = 1;
-      for (const star of this.shootingStars) {
-        if (!star.active || star.trail.length < 2) continue;
+      if (!this.isLoading) {
+        ctx.globalAlpha = fadeAlpha;
+        for (const star of this.shootingStars) {
+          if (!star.active || star.trail.length < 2) continue;
 
-        // Draw curved trail using path history
-        ctx.lineWidth = this.config.shootingStars.starHeight;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+          // Draw curved trail using path history
+          ctx.lineWidth = this.config.shootingStars.starHeight;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
 
-        // Draw trail segments with varying opacity
-        for (let i = 1; i < star.trail.length; i++) {
-          const currentPoint = star.trail[i];
-          const prevPoint = star.trail[i - 1];
+          ctx.beginPath();
+          ctx.moveTo(star.trail[0].x, star.trail[0].y);
 
-          // Calculate opacity based on position in trail and point opacity
-          const segmentOpacity = currentPoint.opacity * star.opacity;
+          for (let i = 1; i < star.trail.length; i++) {
+            ctx.lineTo(star.trail[i].x, star.trail[i].y);
+          }
 
-          // Create gradient for this segment
           const gradient = ctx.createLinearGradient(
-            prevPoint.x,
-            prevPoint.y,
-            currentPoint.x,
-            currentPoint.y
+            star.trail[0].x,
+            star.trail[0].y,
+            star.trail[star.trail.length - 1].x,
+            star.trail[star.trail.length - 1].y
           );
 
-          const startAlpha = i === 1 ? 0 : star.trail[i - 1].opacity * star.opacity;
           gradient.addColorStop(
             0,
-            `rgba(${this.trailColors.r}, ${this.trailColors.g}, ${this.trailColors.b}, ${startAlpha})`
+            `rgba(${this.trailColors.r}, ${this.trailColors.g}, ${this.trailColors.b}, 0)`
           );
           gradient.addColorStop(
             1,
-            `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${segmentOpacity})`
+            `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${star.opacity})`
           );
 
-          // Draw segment
           ctx.strokeStyle = gradient;
-          ctx.beginPath();
-          ctx.moveTo(prevPoint.x, prevPoint.y);
-          ctx.lineTo(currentPoint.x, currentPoint.y);
           ctx.stroke();
-        }
 
-        // Draw bright head with glow
-        const head = star.trail[star.trail.length - 1];
-        const headRadius = this.config.shootingStars.starHeight;
+          const head = star.trail[star.trail.length - 1];
+          const headRadius = this.config.shootingStars.starHeight;
 
-        // Save context for glow effect
-        ctx.save();
-
-        // Draw glow layers (outer to inner)
-        const glowLayers = [
-          { radius: headRadius * 4, opacity: 0.1 },
-          { radius: headRadius * 3, opacity: 0.2 },
-          { radius: headRadius * 2, opacity: 0.4 },
-          { radius: headRadius * 1.5, opacity: 0.6 },
-        ];
-
-        glowLayers.forEach((layer) => {
-          ctx.fillStyle = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${layer.opacity * star.opacity})`;
+          ctx.save();
+          ctx.shadowColor = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, 0.8)`;
+          ctx.shadowBlur = headRadius * 2;
+          ctx.fillStyle = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${star.opacity})`;
           ctx.beginPath();
-          ctx.arc(head.x, head.y, layer.radius, 0, Math.PI * 2);
+          ctx.arc(head.x, head.y, headRadius, 0, Math.PI * 2);
           ctx.fill();
-        });
-
-        // Draw core with shadow glow
-        ctx.shadowColor = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, 0.8)`;
-        ctx.shadowBlur = headRadius * 3;
-        ctx.fillStyle = `rgba(${this.shootingStarColors.r}, ${this.shootingStarColors.g}, ${this.shootingStarColors.b}, ${star.opacity})`;
-        ctx.beginPath();
-        ctx.arc(head.x, head.y, headRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Restore context
-        ctx.restore();
+          ctx.restore();
+        }
       }
+    }
+
+    private renderLoadingState(ctx: CanvasRenderingContext2D): void {
+      const progress = this.loadingProgress;
+      const centerX = this.width / 2;
+      const centerY = this.height / 2;
+      const radius = 3;
+
+      ctx.fillStyle = this.config.stars.starsColor;
+      ctx.globalAlpha = 0.6;
+
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const x = centerX + Math.cos(angle) * 20;
+        const y = centerY + Math.sin(angle) * 20;
+
+        const dotProgress = Math.max(0, Math.min(1, progress * 8 - i));
+        ctx.globalAlpha = 0.2 + dotProgress * 0.6;
+
+        ctx.beginPath();
+        ctx.arc(x, y, radius * dotProgress, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
     }
 
     private renderStatic(): void {
@@ -773,17 +894,9 @@ const {
         this.ctx.clearRect(0, 0, this.width, this.height);
       }
 
-      // Get gravity center for lensing effect
-      const gravityCoords = this.getGravityCoordinates();
-
-      // Debug: log gravity coordinates for static render
-      console.log('Static render - Gravity center:', gravityCoords.x, gravityCoords.y);
-      console.log('Static render - Canvas size:', this.width, this.height);
-
-      this.ctx.fillStyle = '#fff';
+      this.ctx.fillStyle = this.config.stars.starsColor;
 
       for (const star of this.stars) {
-        // Apply gravitational lensing to star position
         const lensedPosition = this.applyMultipleGravitationalLensing(star);
 
         this.ctx.globalAlpha = star.opacity;
@@ -795,8 +908,9 @@ const {
 
     private animateFrame(): void {
       const currentTime = performance.now();
-      const deltaTime = Math.min(currentTime - this.lastTime, 33.33); // Cap at 30fps minimum
+      const deltaTime = Math.min(currentTime - this.lastTime, 33.33);
       this.lastTime = currentTime;
+      this.frameCount++;
 
       this.updateShootingStars(deltaTime);
       this.render();
@@ -854,6 +968,10 @@ const {
     }
 
     private handleMouseMove = (event: MouseEvent) => {
+      const now = performance.now();
+      if (now - this.lastMouseMove < this.MOUSE_THROTTLE) return;
+
+      this.lastMouseMove = now;
       const rect = this.canvas.getBoundingClientRect();
       this.mouseX = event.clientX - rect.left;
       this.mouseY = event.clientY - rect.top;
