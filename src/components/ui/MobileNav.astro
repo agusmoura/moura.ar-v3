@@ -71,6 +71,10 @@ const navItems: readonly NavItem[] = [
                 aria-label={label}
                 role="menuitem"
                 data-section={section}
+                data-umami-event="Mobile Navigation Click"
+                data-umami-event-section={section || 'external'}
+                data-umami-event-label={label}
+                data-umami-event-position={index}
                 {...(isExternal && {
                   target: '_blank',
                   rel: 'noopener noreferrer',

@@ -5,6 +5,7 @@ import BentoProjectCard from '@components/ui/BentoProjectCard.astro';
 import Layout from '@layouts/Layout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
+import UmamiTracker from '@components/analytics/UmamiTracker.astro';
 
 const pt = (text: string) => parseText(text);
 
@@ -423,5 +424,22 @@ const years = [...new Set(projects.map((p) => getDateAsNumber(p.date)))].sort((a
         </div>
       </div>
     </section>
+    
+    <!-- Page-specific analytics tracking -->
+    {import.meta.env.NODE_ENV === 'production' && (
+      <UmamiTracker 
+        pageEvents={[
+          { 
+            event: 'Projects Page View', 
+            data: { 
+              totalProjects: stats.totalProjects, 
+              categories: stats.categories,
+              technologies: stats.technologies,
+              yearsActive: stats.yearsActive
+            } 
+          }
+        ]}
+      />
+    )}
   </main>
 </Layout>

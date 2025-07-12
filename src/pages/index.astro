@@ -4,6 +4,7 @@ import Contact from '@components/sections/Contact.astro';
 import Hero from '@components/sections/Hero.astro';
 import Projects from '@components/sections/Projects.astro';
 import Layout from '@layouts/Layout.astro';
+import UmamiTracker from '@components/analytics/UmamiTracker.astro';
 ---
 
 <Layout
@@ -19,5 +20,14 @@ import Layout from '@layouts/Layout.astro';
     <About />
     <Projects />
     <Contact />
+    
+    <!-- Page-specific analytics tracking -->
+    {import.meta.env.NODE_ENV === 'production' && (
+      <UmamiTracker 
+        pageEvents={[
+          { event: 'Homepage View', data: { version: '3.0', sections: 'hero,about,projects,contact' } }
+        ]}
+      />
+    )}
   </main>
 </Layout>

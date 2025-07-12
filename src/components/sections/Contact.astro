@@ -294,6 +294,7 @@ const projectTypes: ProjectType[] = [
                 id="contact-form"
                 role="form"
                 aria-label="Formulario de contacto"
+                data-umami-event="Contact Form Start"
               >
                 <!-- Name Field - enhanced accessibility -->
                 <div class="form-field group">
@@ -315,6 +316,8 @@ const projectTypes: ProjectType[] = [
                       aria-describedby="name-error"
                       maxlength="50"
                       minlength="2"
+                      data-umami-event="Form Field Focus"
+                      data-umami-event-field="name"
                     />
                     <div class="input-icon" aria-hidden="true">
                       <Icon name="heroicons:user" class="w-5 h-5" />
@@ -347,6 +350,8 @@ const projectTypes: ProjectType[] = [
                       class="form-input"
                       data-validate="email"
                       aria-describedby="email-error email-help"
+                      data-umami-event="Form Field Focus"
+                      data-umami-event-field="email"
                     />
                     <div class="input-icon" aria-hidden="true">
                       <Icon name="heroicons:envelope" class="w-5 h-5" />
@@ -383,6 +388,9 @@ const projectTypes: ProjectType[] = [
                             name="project-type"
                             value={projectType.value}
                             class="pill-input sr-only"
+                            data-umami-event="Project Type Select"
+                            data-umami-event-type={projectType.value}
+                            data-umami-event-category={projectType.category}
                           />
                           <div
                             class="pill-content"
@@ -437,7 +445,9 @@ const projectTypes: ProjectType[] = [
                       data-validate="message"
                       minlength="20"
                       maxlength="500"
-                      aria-describedby="message-counter message-error message-help"></textarea>
+                      aria-describedby="message-counter message-error message-help"
+                      data-umami-event="Form Field Focus"
+                      data-umami-event-field="message"></textarea>
                     <div class="textarea-counter" id="message-counter" aria-live="polite">
                       <span class="counter-text">0 / 500</span>
                     </div>
@@ -492,6 +502,7 @@ const projectTypes: ProjectType[] = [
                     disabled
                     id="submit-btn"
                     aria-describedby="submit-help"
+                    data-umami-event="Contact Form Submit"
                   >
                     <span class="button-content flex items-center justify-center gap-2">
                       <Icon
@@ -632,6 +643,8 @@ const projectTypes: ProjectType[] = [
               rel="noopener noreferrer"
               class="relative flex flex-col items-center justify-center p-6 md:p-8 bg-gradient-to-br from-charcoal/80 via-background/90 to-charcoal/80 border border-border hover:border-accent rounded-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent/10 active:scale-95 group overflow-hidden backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
               aria-label="Descargar Curriculum Vitae en formato PDF"
+              data-umami-event="CV Download"
+              data-umami-event-location="Contact Section"
             >
               <!-- Ripple effect -->
               <div
@@ -757,6 +770,9 @@ const projectTypes: ProjectType[] = [
                     rel={contact.id === 'email' ? undefined : 'noopener noreferrer'}
                     class="flex items-start gap-3 md:gap-4 p-3 rounded-lg border border-white/5 bg-background/5 hover:bg-accent/5 hover:border-accent/20 transition-all duration-200 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background max-w-full overflow-hidden"
                     aria-label={contact.ariaLabel}
+                    data-umami-event="Contact Method Click"
+                    data-umami-event-method={contact.id}
+                    data-umami-event-platform={contact.name}
                   >
                     <div class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-accent/10 group-hover:bg-accent/20 rounded-lg flex items-center justify-center transition-colors duration-200">
                       <Icon
@@ -858,7 +874,7 @@ const projectTypes: ProjectType[] = [
             <div class="space-y-4">
               {
                 faqData.map((faq) => (
-                  <details class="group" id={`faq-${faq.id}`}>
+                  <details class="group" id={`faq-${faq.id}`} data-umami-event="FAQ Expand" data-umami-event-question={faq.id} data-umami-event-category={faq.category}>
                     <summary class="font-mono text-sm text-foreground cursor-pointer hover:text-accent transition-colors duration-200 list-none flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background rounded">
                       {faq.question}
                       <Icon

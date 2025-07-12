@@ -1,0 +1,323 @@
+---
+interface Props {
+  /** Enable enhanced scroll tracking */
+  enableScrollTracking?: boolean;
+  /** Enable engagement time tracking */
+  enableEngagementTracking?: boolean;
+  /** Enable form interaction tracking */
+  enableFormTracking?: boolean;
+  /** Enable download tracking */
+  enableDownloadTracking?: boolean;
+  /** Custom events to track on page load */
+  pageEvents?: Array<{
+    event: string;
+    data?: Record<string, string | number | boolean>;
+  }>;
+}
+
+const {
+  enableScrollTracking = true,
+  enableEngagementTracking = true,
+  enableFormTracking = true,
+  enableDownloadTracking = true,
+  pageEvents = [],
+} = Astro.props;
+---
+
+<script define:vars={{ 
+  enableScrollTracking,
+  enableEngagementTracking, 
+  enableFormTracking,
+  enableDownloadTracking,
+  pageEvents 
+}}>
+  // TypeScript declarations for Umami
+  declare global {
+    interface Window {
+      umami?: {
+        track: (eventName: string, eventData?: Record<string, string | number | boolean>) => void;
+        identify: (userId: string, userData?: Record<string, string | number | boolean>) => void;
+      };
+    }
+  }
+
+  class UmamiAnalytics {
+    private scrollThresholds = [25, 50, 75, 90];
+    private scrollTracked = new Set<number>();
+    private engagementStart: number = 0;
+    private isEngaged = false;
+    private engagementTimeout: number | null = null;
+    private lastActiveTime: number = 0;
+
+    constructor() {
+      this.init();
+    }
+
+    private init(): void {
+      // Wait for Umami to be available
+      if (typeof window.umami === 'undefined') {
+        setTimeout(() => this.init(), 100);
+        return;
+      }
+
+      this.setupPageTracking();
+      
+      if (enableScrollTracking) this.setupScrollTracking();
+      if (enableEngagementTracking) this.setupEngagementTracking();
+      if (enableFormTracking) this.setupFormTracking();
+      if (enableDownloadTracking) this.setupDownloadTracking();
+      
+      this.setupNavigationTracking();
+      this.setupGenericElementTracking();
+    }
+
+    private track(event: string, data?: Record<string, string | number | boolean>): void {
+      if (typeof window.umami !== 'undefined') {
+        window.umami.track(event, data);
+      }
+    }
+
+    private setupPageTracking(): void {
+      // Track page-specific events
+      pageEvents.forEach(({ event, data }: { event: string; data?: Record<string, string | number | boolean> }) => {
+        this.track(event, {
+          ...data,
+          page: window.location.pathname,
+          timestamp: new Date().toISOString()
+        });
+      });
+
+      // Track page type
+      const pageType = this.getPageType();
+      this.track('Page Type View', {
+        type: pageType,
+        path: window.location.pathname,
+        referrer: document.referrer || 'Direct'
+      });
+    }
+
+    private getPageType(): string {
+      const path = window.location.pathname;
+      if (path === '/') return 'Home';
+      if (path === '/projects') return 'Projects List';
+      if (path.startsWith('/projects/')) return 'Project Detail';
+      if (path === '/404') return '404 Error';
+      return 'Other';
+    }
+
+    private setupScrollTracking(): void {
+      let ticking = false;
+
+      const trackScroll = () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = Math.round((scrollTop / docHeight) * 100);
+
+        this.scrollThresholds.forEach(threshold => {
+          if (scrollPercent >= threshold && !this.scrollTracked.has(threshold)) {
+            this.scrollTracked.add(threshold);
+            this.track('Scroll Depth', {
+              percentage: threshold,
+              page: window.location.pathname,
+              pixels: scrollTop
+            });
+          }
+        });
+
+        ticking = false;
+      };
+
+      const requestTick = () => {
+        if (!ticking) {
+          requestAnimationFrame(trackScroll);
+          ticking = true;
+        }
+      };
+
+      window.addEventListener('scroll', requestTick, { passive: true });
+    }
+
+    private setupEngagementTracking(): void {
+      this.engagementStart = Date.now();
+      this.lastActiveTime = Date.now();
+
+      const trackEngagement = () => {
+        if (!this.isEngaged) {
+          this.isEngaged = true;
+          this.track('Engagement Start', {
+            page: window.location.pathname,
+            timestamp: new Date().toISOString()
+          });
+        }
+        this.lastActiveTime = Date.now();
+      };
+
+      const endEngagement = () => {
+        if (this.isEngaged) {
+          const engagementTime = Math.round((Date.now() - this.engagementStart) / 1000);
+          this.track('Engagement End', {
+            duration: engagementTime,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString()
+          });
+          this.isEngaged = false;
+        }
+      };
+
+      // Track active engagement
+      ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+        document.addEventListener(event, trackEngagement, { passive: true });
+      });
+
+      // Track when user becomes inactive
+      const checkInactivity = () => {
+        if (Date.now() - this.lastActiveTime > 30000) { // 30 seconds
+          endEngagement();
+        }
+      };
+
+      setInterval(checkInactivity, 5000);
+
+      // Track engagement on page unload
+      window.addEventListener('beforeunload', endEngagement);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          endEngagement();
+        }
+      });
+    }
+
+    private setupFormTracking(): void {
+      // Track all form interactions
+      document.addEventListener('submit', (e) => {
+        const form = e.target as HTMLFormElement;
+        if (form.tagName === 'FORM') {
+          const formId = form.id || form.className || 'unknown';
+          const formAction = form.action || window.location.href;
+          
+          this.track('Form Submit', {
+            formId,
+            action: formAction,
+            method: form.method || 'GET',
+            page: window.location.pathname
+          });
+        }
+      });
+
+      // Track form field interactions
+      document.addEventListener('focusin', (e) => {
+        const element = e.target as HTMLElement;
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)) {
+          const form = element.closest('form');
+          const formId = form?.id || form?.className || 'unknown';
+          
+          this.track('Form Field Focus', {
+            fieldType: element.tagName.toLowerCase(),
+            fieldName: (element as HTMLInputElement).name || 'unnamed',
+            formId,
+            page: window.location.pathname
+          });
+        }
+      });
+    }
+
+    private setupDownloadTracking(): void {
+      document.addEventListener('click', (e) => {
+        const link = (e.target as HTMLElement).closest('a') as HTMLAnchorElement;
+        if (!link) return;
+
+        const href = link.href;
+        if (!href) return;
+
+        // Track external links
+        if (link.hostname !== window.location.hostname) {
+          this.track('External Link Click', {
+            url: href,
+            text: link.textContent?.trim() || 'No text',
+            page: window.location.pathname
+          });
+        }
+
+        // Track downloads
+        const downloadExtensions = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|mp3|mp4|avi|mov)$/i;
+        if (downloadExtensions.test(href)) {
+          this.track('File Download', {
+            filename: href.split('/').pop() || 'unknown',
+            url: href,
+            page: window.location.pathname
+          });
+        }
+
+        // Track mailto and tel links
+        if (href.startsWith('mailto:')) {
+          this.track('Email Link Click', {
+            email: href.replace('mailto:', ''),
+            page: window.location.pathname
+          });
+        }
+
+        if (href.startsWith('tel:')) {
+          this.track('Phone Link Click', {
+            phone: href.replace('tel:', ''),
+            page: window.location.pathname
+          });
+        }
+      });
+    }
+
+    private setupNavigationTracking(): void {
+      // Track navigation menu interactions
+      document.addEventListener('click', (e) => {
+        const element = e.target as HTMLElement;
+        const navLink = element.closest('[data-section]') as HTMLAnchorElement;
+        
+        if (navLink) {
+          const section = navLink.getAttribute('data-section');
+          const linkText = navLink.textContent?.trim() || 'Unknown';
+          
+          this.track('Navigation Click', {
+            section: section || 'unknown',
+            text: linkText,
+            type: navLink.closest('.side-nav') ? 'desktop' : 'mobile',
+            page: window.location.pathname
+          });
+        }
+      });
+    }
+
+    private setupGenericElementTracking(): void {
+      // Track elements with data-umami-event attributes
+      document.addEventListener('click', (e) => {
+        const element = e.target as HTMLElement;
+        const trackingElement = element.closest('[data-umami-event]') as HTMLElement;
+        
+        if (trackingElement) {
+          const eventName = trackingElement.getAttribute('data-umami-event');
+          if (eventName) {
+            // Collect all data-umami-event-* attributes
+            const eventData: Record<string, string> = {
+              page: window.location.pathname,
+              element: trackingElement.tagName.toLowerCase()
+            };
+
+            Array.from(trackingElement.attributes).forEach(attr => {
+              if (attr.name.startsWith('data-umami-event-')) {
+                const key = attr.name.replace('data-umami-event-', '');
+                eventData[key] = attr.value;
+              }
+            });
+
+            this.track(eventName, eventData);
+          }
+        }
+      });
+    }
+  }
+
+  // Initialize analytics when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new UmamiAnalytics());
+  } else {
+    new UmamiAnalytics();
+  }
+</script>

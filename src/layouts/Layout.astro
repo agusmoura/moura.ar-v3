@@ -5,6 +5,7 @@ import ScrollAnimations from '@components/effects/ScrollAnimations.astro';
 import SEO from '@components/seo/SEO.astro';
 import SkipLink from '@components/accessibility/SkipLink.astro';
 import FocusManager from '@components/accessibility/FocusManager.astro';
+import UmamiTracker from '@components/analytics/UmamiTracker.astro';
 import '@fontsource-variable/noto-serif-jp';
 import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
@@ -19,6 +20,7 @@ export interface Props {
   preload?: Array<Preload>;
   canonical?: string;
   image?: string;
+  hideMenu?: boolean;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   image = '/og-image.jpg',
   canonical = new URL(Astro.url.pathname, Astro.site),
   preload = [],
+  hideMenu = false,
 } = Astro.props;
 
 const canonicalURL = new URL(canonical, Astro.url);
@@ -75,11 +78,29 @@ const backgroundConfig = {
     <SpaceBackground {...backgroundConfig} />
     <ScrollAnimations />
     <FocusManager />
-    <DesktopSideNav />
-    <MobileNav />
+    {
+      !hideMenu && (
+        <>
+          <DesktopSideNav />
+          <MobileNav />
+        </>
+      )
+    }
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
+
+    <!-- Umami Analytics Tracker - Only in production -->
+    {
+      import.meta.env.NODE_ENV === 'production' && (
+        <UmamiTracker 
+          enableScrollTracking={true}
+          enableEngagementTracking={true}
+          enableFormTracking={true}
+          enableDownloadTracking={true}
+        />
+      )
+    }
 
     <!-- Simplified Performance Monitoring -->
     <script>

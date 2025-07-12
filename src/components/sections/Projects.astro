@@ -206,6 +206,9 @@ const filteredProjects = projects
         <a
           href="/projects"
           class="relative flex items-center justify-center px-6 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 bg-gradient-to-r from-background via-charcoal to-background text-foreground text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 group overflow-hidden w-full max-w-[280px] sm:max-w-none sm:min-w-[320px] border border-border hover:border-accent z-10"
+          data-umami-event="View All Projects"
+          data-umami-event-location="Home Projects Section"
+          data-umami-event-count={filteredProjects.length}
         >
           <!-- Efecto de ondas con colores dorados -->
           <div

@@ -92,7 +92,14 @@ const gridStyles = getGridStyles(project);
   <a
     href={`/projects/${project.slug}`}
     class="absolute inset-0 z-40"
-    aria-label={`Ver proyecto ${project.title}`}></a>
+    aria-label={`Ver proyecto ${project.title}`}
+    data-umami-event="Project Card Click"
+    data-umami-event-project={project.slug}
+    data-umami-event-title={project.title}
+    data-umami-event-category={project.category}
+    data-umami-event-position={index}
+    data-umami-event-location="Home Projects Grid"
+  ></a>
 
   <!-- Contenedor de imágenes -->
   <div class="relative w-full h-full overflow-hidden rounded-xl sm:rounded-2xl">

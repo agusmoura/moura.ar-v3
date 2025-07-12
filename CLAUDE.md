@@ -162,3 +162,9 @@ curl -X POST http://localhost:4321/api/contact \
 - **State Management**: Minimal client-side JavaScript, mostly server-rendered
 - **SEO**: Comprehensive meta tags and Rich Results implementation
 - **Performance**: Prefetch strategy enabled for viewport-based loading
+
+## Analytics Configuration
+
+- The site does not use Google Analytics
+- Using a self-hosted Umami analytics server located at https://analytics.moura.ar/
+- Tracking script for this site: `<script defer src="https://analytics.moura.ar/script.js" data-website-id="388f61d9-d676-4279-a193-9e87a38e3c4b"></script>`
