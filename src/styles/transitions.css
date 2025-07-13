@@ -1,0 +1,266 @@
+/* Transiciones espaciales personalizadas para Astro View Transitions */
+
+/* Configuración global de transiciones */
+html {
+  view-transition-name: root;
+}
+
+/* SpaceBackground persistente - configuración específica */
+space-background {
+  view-transition-name: space-background;
+}
+
+/* Optimización específica para el fondo espacial persistente */
+::view-transition-old(space-background),
+::view-transition-new(space-background) {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+/* Asegurar que no hay transición en el fondo espacial */
+::view-transition-group(space-background) {
+  animation-duration: 0s !important;
+}
+
+/* Transición principal - efecto de "viaje espacial" */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+::view-transition-old(root) {
+  animation-name: space-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: space-fade-in;
+}
+
+/* Animaciones de fade con efectos espaciales */
+@keyframes space-fade-out {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+    filter: blur(0px) brightness(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.95) rotateY(-5deg);
+    filter: blur(2px) brightness(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) rotateY(-10deg);
+    filter: blur(4px) brightness(0.6);
+  }
+}
+
+@keyframes space-fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.1) rotateY(10deg);
+    filter: blur(4px) brightness(1.2);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05) rotateY(5deg);
+    filter: blur(2px) brightness(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+/* Transición especial para el contenido principal */
+main {
+  view-transition-name: main-content;
+}
+
+::view-transition-old(main-content),
+::view-transition-new(main-content) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(main-content) {
+  animation-name: content-slide-out;
+}
+
+::view-transition-new(main-content) {
+  animation-name: content-slide-in;
+}
+
+@keyframes content-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+  }
+}
+
+@keyframes content-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+/* Transiciones para navegación móvil y de escritorio */
+.side-nav {
+  view-transition-name: desktop-navigation;
+}
+
+.mobile-nav {
+  view-transition-name: mobile-navigation;
+}
+
+::view-transition-old(desktop-navigation),
+::view-transition-new(desktop-navigation),
+::view-transition-old(mobile-navigation),
+::view-transition-new(mobile-navigation) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(desktop-navigation),
+::view-transition-old(mobile-navigation) {
+  animation-name: nav-fade-out;
+}
+
+::view-transition-new(desktop-navigation),
+::view-transition-new(mobile-navigation) {
+  animation-name: nav-fade-in;
+}
+
+@keyframes nav-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes nav-fade-in {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Transiciones específicas para proyectos */
+.project-hero {
+  view-transition-name: project-hero;
+}
+
+::view-transition-old(project-hero),
+::view-transition-new(project-hero) {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(project-hero) {
+  animation-name: project-zoom-out;
+}
+
+::view-transition-new(project-hero) {
+  animation-name: project-zoom-in;
+}
+
+@keyframes project-zoom-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(8px);
+  }
+}
+
+@keyframes project-zoom-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.2);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* Optimización para reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.2s !important;
+    animation-timing-function: ease !important;
+  }
+  
+  @keyframes space-fade-out {
+    to {
+      opacity: 0;
+      transform: none;
+      filter: none;
+    }
+  }
+  
+  @keyframes space-fade-in {
+    from {
+      opacity: 0;
+      transform: none;
+      filter: none;
+    }
+  }
+  
+  @keyframes content-slide-out {
+    from, to {
+      transform: none;
+      filter: none;
+    }
+  }
+  
+  @keyframes content-slide-in {
+    from, to {
+      transform: none;
+      filter: none;
+    }
+  }
+  
+  @keyframes project-zoom-out {
+    from, to {
+      transform: none;
+      filter: none;
+    }
+  }
+  
+  @keyframes project-zoom-in {
+    from, to {
+      transform: none;
+      filter: none;
+    }
+  }
+}
+
+/* Fallback suave para navegadores que no soportan View Transitions */
+@supports not (view-transition-name: none) {
+  * {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+}

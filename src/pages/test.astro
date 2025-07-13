@@ -1,0 +1,80 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout
+  title="Agustin Mouriño | Desarrollador Full-Stack & Diseñador UX/UI"
+  description="Desarrollador de software y diseñador gráfico interdisciplinario. Fusiono código elegante, arte ancestral y astronomía para crear soluciones atemporales. Explora proyectos, reflexiones filosóficas y mi viaje entre lo técnico y lo eterno. 🌌✨"
+  canonical="https://www.moura.ar"
+  hideMenu={true}
+>
+  <main
+    class="container mx-auto px-4 pt-20 pb-16 max-w-7xl flex flex-col items-center justify-between"
+  >
+    <div class="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+      <!-- Left Column: Story with mobile-optimized design -->
+      <div
+        class="relative mx-4 w-full max-w-sm space-y-6 rounded-2xl backdrop-blur-enhanced p-6 sm:mx-6 sm:max-w-lg sm:p-8 md:mx-8 md:max-w-xl md:p-10 md:space-y-8 lg:mx-0 lg:max-w-2xl lg:flex-1"
+        data-aos="fade-right"
+        data-aos-duration="800"
+        data-aos-delay="400"
+      >
+        <div>
+          <h3 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">
+            <span
+              class="bg-gradient-to-r from-accent-light to-accent bg-clip-text text-transparent font-serif font-bold"
+            >
+              Mi historia
+            </span>
+          </h3>
+
+          <div class="space-y-4 md:space-y-6">
+            <p
+              class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent md:before:h-4"
+            >
+            </p>
+            <p
+              class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent-light md:before:h-4"
+            >
+            </p>
+            <p
+              class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent md:before:h-4"
+            >
+            </p>
+          </div>
+
+          {/* Decorative elements */}
+          <div
+            class="mt-6 mb-4 h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent md:mt-8 md:mb-6"
+          >
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex space-x-2">
+              {
+                [1, 2, 3].map((i) => (
+                  <div
+                    class="w-2 h-2 bg-accent rounded-full animate-pulse"
+                    style={{ animationDelay: `${i * 0.5}s` }}
+                  />
+                ))
+              }
+            </div>
+            <p class="text-xs text-foreground/70 uppercase tracking-wider">
+              Desarrollador • Diseñador • Explorador
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Visual with responsive positioning -->
+      <div
+        class="relative flex w-full max-w-sm items-center justify-center sm:max-w-lg md:max-w-xl lg:max-w-lg lg:flex-1"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="600"
+      >
+      </div>
+    </div>
+  </main>
+</Layout>

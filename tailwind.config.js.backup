@@ -14,6 +14,12 @@ export default {
         'accent-light': '#e0c587',
         'light-2': '#CCCCCC',
       },
+      backdropBlur: {
+        xs: '2px',
+        sm: '4px',
+        md: '8px',
+        lg: '16px',
+      },
     },
   },
   plugins: [],
