@@ -10,13 +10,7 @@ interface Props {
   image?: string;
 }
 
-const {
-  title,
-  description,
-  preload,
-  canonical,
-  image = 'https://cdn.moura.ar/og.jpg',
-} = Astro.props as Props;
+const { title, description, preload, canonical, image = '/og-image.webp' } = Astro.props as Props;
 
 const determineCanonicalURL = () => {
   if (Astro.url.host.includes('localhost')) return 'http://localhost:4321';

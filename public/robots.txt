@@ -1,4 +1,21 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://moura.ar/sitemap.xml
+# Disallow sensitive paths
+Disallow: /api/
+Disallow: /_assets/
+Disallow: /scripts/
+
+# Allow important directories
+Allow: /projects/
+Allow: /assets/
+
+# Crawl delay for polite bots
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://moura.ar/sitemap-index.xml
+Sitemap: https://moura.ar/sitemap-0.xml
+
+# Additional info
+# Last updated: 2025-01-11

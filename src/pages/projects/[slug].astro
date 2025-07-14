@@ -1,6 +1,6 @@
 ---
 import { parseText } from '@/utils/textParser';
-import ProjectLayout from '@layouts/ProjectLayout.astro';
+import Layout from '@layouts/Layout.astro';
 import { Icon } from 'astro-icon/components';
 import { Image } from 'astro:assets';
 import { getCollection, getEntry, render } from 'astro:content';
@@ -149,7 +149,7 @@ function getProjectThemeColors(project: any) {
 }
 ---
 
-<ProjectLayout
+<Layout
   title={`${project.data.title} | Agustín Mouriño`}
   description={project.data.description}
   canonical={`https://www.moura.ar/projects/${project.data.slug}`}
@@ -628,14 +628,12 @@ function getProjectThemeColors(project: any) {
       </div>
     </section>
   </main>
-</ProjectLayout>
+</Layout>
 
 <style is:global define:vars={{
   projectPrimary: themeColors.primary,
-  projectSecondary: themeColors.secondary,
   projectSurface: themeColors.surface,
   projectForeground: themeColors.foreground,
-  projectBackground: themeColors.background,
   projectBorder: themeColors.border,
   projectTitleGradient: project.data.theme?.title_gradient || 'linear-gradient(to right, #121FCF 45%, #CF1512 100%)'
 }}>

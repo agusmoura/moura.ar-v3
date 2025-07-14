@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import icon from 'astro-icon';
 import { defineConfig } from 'astro/config';
 import rehypeRaw from 'rehype-raw';
+import sitemap from '@astrojs/sitemap';
 
 import mdx from '@astrojs/mdx';
 
@@ -13,7 +14,15 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
-  integrations: [icon(), mdx()],
+  integrations: [
+    icon(),
+    mdx(),
+    sitemap({
+      changefreq: 'weekly',
+      priority: 0.7,
+      lastmod: new Date(),
+    }),
+  ],
   site: 'https://moura.ar', // Cambia esto a tu dominio real
   markdown: {
     syntaxHighlight: false,
@@ -42,9 +51,27 @@ export default defineConfig({
       minify: 'esbuild',
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ['astro'],
-            animations: ['swiper'],
+          manualChunks: (id) => {
+            // Vendor chunk for core libraries
+            if (id.includes('node_modules')) {
+              // Swiper gets its own chunk (lazy loaded)
+              if (id.includes('swiper')) {
+                return 'swiper';
+              }
+              // AOS gets its own chunk (lazy loaded)
+              if (id.includes('aos')) {
+                return 'aos';
+              }
+              // Other vendor libraries
+              return 'vendor';
+            }
+            // Component-specific chunks
+            if (id.includes('PersonalCarousel')) {
+              return 'carousel';
+            }
+            if (id.includes('ScrollAnimations')) {
+              return 'scroll-animations';
+            }
           },
           assetFileNames: (assetInfo) => {
             if (!assetInfo.name) return 'assets/[name]-[hash][extname]';

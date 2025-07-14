@@ -1,0 +1,32 @@
+---
+// Skip link component for keyboard navigation
+---
+
+<a href="#main-content" class="skip-link">
+  Ir al contenido principal
+</a>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    transition: top 0.3s ease;
+  }
+
+  .skip-link:focus {
+    top: 0;
+  }
+
+  .skip-link:hover {
+    background: #333;
+  }
+</style>

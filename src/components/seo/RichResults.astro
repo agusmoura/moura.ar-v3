@@ -1,25 +1,81 @@
 ---
-/** https://developers.google.com/search/docs/appearance/structured-data/organization */
-const organizationSchema = {
+/** https://developers.google.com/search/docs/appearance/structured-data/person */
+const personSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  url: 'https://www.moura.ar',
-  image: 'https://cdn.moura.ar/og.jpg',
+  '@type': 'Person',
+  '@id': 'https://moura.ar/#person',
+  name: 'Agustín Mouriño',
+  alternateName: 'Agus Moura',
+  url: 'https://moura.ar',
+  image: 'https://moura.ar/og-image.webp',
   sameAs: [
     'https://www.instagram.com/agus_moura1',
     'https://x.com/agus_moura',
     'https://github.com/agusmoura',
+    'https://www.linkedin.com/in/agus-moura',
   ],
-  logo: 'https://cdn.moura.ar/og.jpg',
-  name: 'Agustin Mouriño',
-  alternateName: 'Agus Moura',
-  description: 'Web Oficial de Agustin Mouriño, desarrollador y diseñador',
+  jobTitle: 'Full-Stack Developer & UX/UI Designer',
+  description:
+    'Desarrollador de software y diseñador interdisciplinario. Fusiono código elegante, arte ancestral y astronomía para crear soluciones atemporales.',
+  knowsAbout: [
+    'JavaScript',
+    'TypeScript',
+    'React',
+    'Astro',
+    'Node.js',
+    'UX/UI Design',
+    'Full-Stack Development',
+    'Web Development',
+    'Design Systems',
+  ],
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Freelance',
+    url: 'https://moura.ar',
+  },
+  homeLocation: {
+    '@type': 'Place',
+    name: 'Buenos Aires, Argentina',
+  },
+};
+
+/** https://developers.google.com/search/docs/appearance/structured-data/website */
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': 'https://moura.ar/#website',
+  url: 'https://moura.ar',
+  name: 'Agustín Moura - Portfolio',
+  description: 'Portfolio personal de Agustín Moura, desarrollador Full-Stack y diseñador UX/UI',
+  inLanguage: 'es-ES',
+  author: {
+    '@id': 'https://moura.ar/#person',
+  },
+  publisher: {
+    '@id': 'https://moura.ar/#person',
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://moura.ar/projects?search={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
 };
 
 const FAQs = [
   {
-    question: '¿Quién es Agustin Mouriño?',
-    answer: `Agustin Mouriño es un <strong>desarrollador de software y diseñador web ux/ui</strong>`,
+    question: '¿Quién es Agustín Mouriño?',
+    answer: `Agustín Mouriño es un desarrollador Full-Stack y diseñador UX/UI especializado en crear soluciones web innovadoras. Combina desarrollo técnico con diseño centrado en el usuario.`,
+  },
+  {
+    question: '¿Qué servicios ofrece Agustín Moura?',
+    answer: `Ofrezco desarrollo web completo, diseño UX/UI, consultoría técnica y creación de sistemas de diseño. Trabajo con tecnologías modernas como React, Astro, Node.js y TypeScript.`,
+  },
+  {
+    question: '¿Cómo contactar a Agustín Moura?',
+    answer: `Puedes contactarme a través del formulario de contacto en mi sitio web moura.ar, o seguirme en mis redes sociales para ver mi trabajo más reciente.`,
   },
 ];
 
@@ -27,18 +83,38 @@ const FAQs = [
 const FAQSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    FAQs.map(({ answer, question }) => ({
-      '@type': 'Question',
-      name: question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: answer,
-      },
-    })),
+  mainEntity: FAQs.map(({ answer, question }) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: answer,
+    },
+  })),
+};
+
+/** https://developers.google.com/search/docs/appearance/structured-data/breadcrumb */
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Inicio',
+      item: 'https://moura.ar',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Proyectos',
+      item: 'https://moura.ar/projects',
+    },
   ],
 };
 ---
 
-<script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
 <script is:inline type="application/ld+json" set:html={JSON.stringify(FAQSchema)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
