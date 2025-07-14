@@ -1,10 +1,9 @@
 ---
 import { parseText } from '@/utils/textParser';
-import ProjectLayout from '@layouts/ProjectLayout.astro';
+import Layout from '@layouts/Layout.astro';
 import { Icon } from 'astro-icon/components';
 import { Image } from 'astro:assets';
 import { getCollection, getEntry, render } from 'astro:content';
-
 const pt = (text: string) => parseText(text);
 
 // Obtener el slug de la URL
@@ -149,15 +148,16 @@ function getProjectThemeColors(project: any) {
 }
 ---
 
-<ProjectLayout
+<Layout
   title={`${project.data.title} | Agustín Mouriño`}
   description={project.data.description}
   canonical={`https://www.moura.ar/projects/${project.data.slug}`}
   spaceBackgroundColor={spaceBackgroundColor}
+  hideMenu={true}
 >
   <main class="min-h-screen">
     <!-- Hero Section Modernizado -->
-    <section class="relative overflow-hidden pt-4 pb-16 min-h-screen flex items-center">
+    <section class="project-hero relative overflow-hidden pt-4 pb-16 min-h-screen flex items-center">
 
       <div class="container mx-auto px-4  xl:max-w-7xl w-full">
         <!-- Breadcrumb -->

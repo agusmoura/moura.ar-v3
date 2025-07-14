@@ -7,7 +7,8 @@ import '@fontsource-variable/noto-serif-jp';
 import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import '@styles/global.css';
-import { ClientRouter } from 'astro:transitions';
+import '@styles/transitions.css';
+import { getSpaceConfigForPage } from '@/config/spaceBackground';
 
 export interface Props {
   title: string;
@@ -29,23 +30,8 @@ const {
 
 const canonicalURL = new URL(canonical, Astro.url);
 
-const backgroundConfig = {
-  starDensity: 0.001, // Menos denso para no distraer del contenido
-  minTwinkleSpeed: 0.6,
-  maxTwinkleSpeed: 1.2,
-  minDelay: 3000,
-  maxDelay: 8000,
-  starColor: '#ecad22',
-  trailColor: '#e0c587',
-  starWidth: 12,
-  starHeight: 2,
-  backgroundColor: spaceBackgroundColor,
-  gravityEnabled: false, // Deshabilitado para contenido centrado
-  gravityStrength: 0,
-  mouseGravityEnabled: false,
-  mouseGravityStrength: 0,
-  mouseGravityRadius: 0,
-};
+// Usar la MISMA configuración que Layout principal para persistencia total
+const backgroundConfig = getSpaceConfigForPage('main', spaceBackgroundColor);
 ---
 
 <!doctype html>
@@ -58,10 +44,11 @@ const backgroundConfig = {
       canonical={canonicalURL}
       preload={preload}
     />
-    <ClientRouter />
+    <meta name="astro-view-transitions-enabled" content="true" />
+    <meta name="astro-view-transitions-fallback" content="animate" />
   </head>
   <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
-    <SpaceBackground {...backgroundConfig} />
+    <SpaceBackground {...backgroundConfig} transition:persist transition:name="space-background" />
     <ScrollAnimations />
     <slot />
 

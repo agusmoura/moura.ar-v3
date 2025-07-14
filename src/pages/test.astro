@@ -3,78 +3,244 @@ import Layout from '@layouts/Layout.astro';
 ---
 
 <Layout
-  title="Agustin Mouriño | Desarrollador Full-Stack & Diseñador UX/UI"
-  description="Desarrollador de software y diseñador gráfico interdisciplinario. Fusiono código elegante, arte ancestral y astronomía para crear soluciones atemporales. Explora proyectos, reflexiones filosóficas y mi viaje entre lo técnico y lo eterno. 🌌✨"
-  canonical="https://www.moura.ar"
+  title="Backdrop Filter Test | Moura.ar"
+  description="Página de prueba para diagnosticar y arreglar backdrop-filter"
+  canonical="https://www.moura.ar/test"
   hideMenu={true}
 >
-  <main
-    class="container mx-auto px-4 pt-20 pb-16 max-w-7xl flex flex-col items-center justify-between"
-  >
-    <div class="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
-      <!-- Left Column: Story with mobile-optimized design -->
+  <main class="min-h-screen relative overflow-hidden">
+    <!-- 🎯 FONDO DE PRUEBA - Z-INDEX 1 -->
+    <div class="fixed inset-0 z-1 pointer-events-none">
+      <!-- Gradiente de fondo fuerte -->
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      </div>
+
+      <!-- Texto gigante con alto contraste -->
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div
+          class="text-9xl md:text-[12rem] font-black text-white/90 select-none leading-none text-center"
+        >
+          GLASS<br />EFFECT<br />TEST
+        </div>
+      </div>
+
+      <!-- Elementos decorativos con colores brillantes -->
+      <div class="absolute top-20 left-20 w-32 h-32 bg-yellow-400 rounded-full opacity-80"></div>
+      <div class="absolute bottom-20 right-20 w-24 h-24 bg-pink-400 rounded-full opacity-80"></div>
+      <div class="absolute top-1/2 left-10 w-16 h-16 bg-green-400 rounded-full opacity-80"></div>
+      <div class="absolute top-1/4 right-1/4 w-20 h-20 bg-red-400 rounded-full opacity-80"></div>
+
+      <!-- Patrón de líneas -->
       <div
-        class="relative mx-4 w-full max-w-sm space-y-6 rounded-2xl backdrop-blur-enhanced p-6 sm:mx-6 sm:max-w-lg sm:p-8 md:mx-8 md:max-w-xl md:p-10 md:space-y-8 lg:mx-0 lg:max-w-2xl lg:flex-1"
-        data-aos="fade-right"
-        data-aos-duration="800"
-        data-aos-delay="400"
+        class="absolute inset-0 opacity-30"
+        style="background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.3) 40px, rgba(255,255,255,0.3) 42px);"
       >
-        <div>
-          <h3 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">
-            <span
-              class="bg-gradient-to-r from-accent-light to-accent bg-clip-text text-transparent font-serif font-bold"
-            >
-              Mi historia
-            </span>
-          </h3>
+      </div>
 
-          <div class="space-y-4 md:space-y-6">
-            <p
-              class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent md:before:h-4"
-            >
-            </p>
-            <p
-              class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent-light md:before:h-4"
-            >
-            </p>
-            <p
-              class="relative pl-4 text-sm leading-relaxed text-light-2 md:text-base before:absolute before:left-0 before:top-2 before:h-3 before:w-px before:bg-accent md:before:h-4"
-            >
+      <!-- Texto adicional -->
+      <div class="absolute top-1/4 left-1/4 text-4xl font-bold text-cyan-300">BACKDROP BLUR</div>
+      <div class="absolute bottom-1/4 right-1/4 text-3xl font-bold text-lime-300">
+        GLASS MORPHISM
+      </div>
+    </div>
+
+    <!-- 🔍 CONTENEDOR DE PRUEBAS - Z-INDEX 10 -->
+    <div class="relative z-10 min-h-screen p-8 flex flex-col gap-8">
+      <!-- Título -->
+      <div class="text-center">
+        <h1 class="text-4xl font-bold text-white mb-4">🎨 Backdrop Filter Test</h1>
+        <p class="text-white/80">Probando diferentes intensidades de backdrop-blur</p>
+      </div>
+
+      <!-- Grid de pruebas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <!-- Test 1: backdrop-blur-sm -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-sm">
+          <h3 class="text-white font-bold text-lg mb-3">backdrop-blur-sm</h3>
+          <p class="text-white/90">Blur de 4px - Efecto ligero</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">
+              El texto detrás debería verse ligeramente desenfocado
             </p>
           </div>
+        </div>
 
-          {/* Decorative elements */}
-          <div
-            class="mt-6 mb-4 h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent md:mt-8 md:mb-6"
-          >
-          </div>
-
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex space-x-2">
-              {
-                [1, 2, 3].map((i) => (
-                  <div
-                    class="w-2 h-2 bg-accent rounded-full animate-pulse"
-                    style={{ animationDelay: `${i * 0.5}s` }}
-                  />
-                ))
-              }
-            </div>
-            <p class="text-xs text-foreground/70 uppercase tracking-wider">
-              Desarrollador • Diseñador • Explorador
+        <!-- Test 2: backdrop-blur-md -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-md">
+          <h3 class="text-white font-bold text-lg mb-3">backdrop-blur-md</h3>
+          <p class="text-white/90">Blur de 12px - Efecto medio</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">
+              El texto detrás debería verse moderadamente desenfocado
             </p>
+          </div>
+        </div>
+
+        <!-- Test 3: backdrop-blur-lg -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-lg">
+          <h3 class="text-white font-bold text-lg mb-3">backdrop-blur-lg</h3>
+          <p class="text-white/90">Blur de 16px - Efecto fuerte</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">
+              El texto detrás debería verse claramente desenfocado
+            </p>
+          </div>
+        </div>
+
+        <!-- Test 4: backdrop-blur-xl -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-xl">
+          <h3 class="text-white font-bold text-lg mb-3">backdrop-blur-xl</h3>
+          <p class="text-white/90">Blur de 24px - Efecto muy fuerte</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">El texto detrás debería verse muy desenfocado</p>
+          </div>
+        </div>
+
+        <!-- Test 5: backdrop-blur-2xl -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-2xl">
+          <h3 class="text-white font-bold text-lg mb-3">backdrop-blur-2xl</h3>
+          <p class="text-white/90">Blur de 40px - Efecto extremo</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">
+              El texto detrás debería verse extremadamente desenfocado
+            </p>
+          </div>
+        </div>
+
+        <!-- Test 6: backdrop-blur-3xl -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-3xl">
+          <h3 class="text-white font-bold text-lg mb-3">backdrop-blur-3xl</h3>
+          <p class="text-white/90">Blur de 64px - Efecto máximo</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">
+              El texto detrás debería estar completamente desenfocado
+            </p>
+          </div>
+        </div>
+
+        <!-- Test 7: CSS Custom -->
+        <div
+          class="relative p-6 rounded-2xl border border-white/30 bg-white/10"
+          style="backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);"
+        >
+          <h3 class="text-white font-bold text-lg mb-3">CSS Custom</h3>
+          <p class="text-white/90">Blur de 30px - Custom CSS</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">Usando CSS directo para verificar funcionamiento</p>
+          </div>
+        </div>
+
+        <!-- Test 8: Saturate + Blur -->
+        <div
+          class="relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-xl backdrop-saturate-150"
+        >
+          <h3 class="text-white font-bold text-lg mb-3">Blur + Saturate</h3>
+          <p class="text-white/90">Blur 24px + Saturate 150%</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">Combinación de blur y saturación</p>
+          </div>
+        </div>
+
+        <!-- Test 9: Sin backdrop-filter -->
+        <div class="relative p-6 rounded-2xl border border-white/30 bg-white/10">
+          <h3 class="text-white font-bold text-lg mb-3">Sin backdrop-filter</h3>
+          <p class="text-white/90">Control - Sin efecto</p>
+          <div class="mt-4 p-3 bg-white/20 rounded-lg">
+            <p class="text-white/80 text-sm">El texto detrás se ve completamente nítido</p>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Visual with responsive positioning -->
+      <!-- Diagnóstico -->
       <div
-        class="relative flex w-full max-w-sm items-center justify-center sm:max-w-lg md:max-w-xl lg:max-w-lg lg:flex-1"
-        data-aos="fade-up"
-        data-aos-duration="800"
-        data-aos-delay="600"
+        class="max-w-4xl mx-auto mt-8 p-6 rounded-2xl border border-white/30 bg-white/5 backdrop-blur-lg"
       >
+        <h2 class="text-2xl font-bold text-white mb-4">🔍 Diagnóstico</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="font-bold text-white/90 mb-2">¿Qué debería pasar?</h3>
+            <ul class="text-white/80 text-sm space-y-1">
+              <li>✅ El texto gigante "GLASS EFFECT TEST" debe verse desenfocado</li>
+              <li>✅ Los círculos de colores deben verse borrosos</li>
+              <li>✅ El patrón de líneas debe verse difuso</li>
+              <li>✅ Mayor blur = menos definición del fondo</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold text-white/90 mb-2">Si no funciona:</h3>
+            <ul class="text-white/80 text-sm space-y-1">
+              <li>🔴 Problema con stacking context</li>
+              <li>🔴 Backdrop-filter no soportado</li>
+              <li>🔴 CSS no se aplica correctamente</li>
+              <li>🔴 Z-index mal configurado</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Script de diagnóstico -->
+    <script>
+      // Detectar soporte para backdrop-filter
+      function checkBackdropSupport() {
+        const testElement = document.createElement('div');
+        testElement.style.backdropFilter = 'blur(1px)';
+        const supports = testElement.style.backdropFilter === 'blur(1px)';
+
+        const testElementWebkit = document.createElement('div');
+        (testElementWebkit.style as any)['-webkit-backdrop-filter'] = 'blur(1px)';
+        const supportsWebkit =
+          (testElementWebkit.style as any)['-webkit-backdrop-filter'] === 'blur(1px)';
+
+        console.log('🔍 Backdrop Filter Support:', { supports, supportsWebkit });
+
+        return supports || supportsWebkit;
+      }
+
+      // Ejecutar diagnóstico
+      document.addEventListener('DOMContentLoaded', () => {
+        const supported = checkBackdropSupport();
+
+        if (!supported) {
+          console.warn('⚠️ Backdrop-filter no soportado en este navegador');
+          document.body.style.setProperty('--backdrop-support', 'false');
+        } else {
+          console.log('✅ Backdrop-filter soportado');
+          document.body.style.setProperty('--backdrop-support', 'true');
+        }
+      });
+    </script>
   </main>
 </Layout>
+
+<style>
+  /* Forzar stacking context correcto */
+  main {
+    position: relative;
+    z-index: 0;
+  }
+
+  /* Asegurar que el fondo esté detrás */
+  main > div:first-child {
+    position: fixed;
+    z-index: 1;
+  }
+
+  /* Asegurar que el contenido esté encima */
+  main > div:last-child {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Clase de respaldo si backdrop-filter no funciona */
+  @supports not (backdrop-filter: blur(1px)) {
+    .backdrop-blur-sm,
+    .backdrop-blur-md,
+    .backdrop-blur-lg,
+    .backdrop-blur-xl,
+    .backdrop-blur-2xl,
+    .backdrop-blur-3xl {
+      background-color: rgba(255, 255, 255, 0.3) !important;
+    }
+  }
+</style>

@@ -16,13 +16,13 @@ export default defineConfig({
     mode: 'standalone',
   }),
   integrations: [
-    icon(), 
+    icon(),
     mdx(),
     sitemap({
       changefreq: 'weekly',
       priority: 0.7,
       lastmod: new Date(),
-    })
+    }),
   ],
   site: 'https://moura.ar', // Cambia esto a tu dominio real
   markdown: {
@@ -46,12 +46,13 @@ export default defineConfig({
     plugins: [
       tailwindcss(),
       // Bundle analyzer - only in build mode
-      process.env.NODE_ENV === 'production' && visualizer({
-        filename: 'dist/stats.html',
-        open: false,
-        gzipSize: true,
-        brotliSize: true,
-      }),
+      process.env.NODE_ENV === 'production' &&
+        visualizer({
+          filename: 'dist/stats.html',
+          open: false,
+          gzipSize: true,
+          brotliSize: true,
+        }),
     ].filter(Boolean),
     ssr: {
       noExternal: ['@tailwindcss/vite'],

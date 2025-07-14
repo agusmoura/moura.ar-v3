@@ -6,22 +6,74 @@
         <rect x="-20" y="200" class="mask-left"></rect>
         <rect x="300" y="200" class="mask-right"></rect>
       </mask>
+      
+      <!-- Black hole event horizon gradient -->
+      <radialGradient id="event-horizon" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color: #000000; stop-opacity: 0.9" />
+        <stop offset="15%" style="stop-color: #0a0a0a; stop-opacity: 0.7" />
+        <stop offset="30%" style="stop-color: #1a1a1a; stop-opacity: 0.5" />
+        <stop offset="50%" style="stop-color: #2a2a2a; stop-opacity: 0.3" />
+        <stop offset="70%" style="stop-color: #333333; stop-opacity: 0.15" />
+        <stop offset="100%" style="stop-color: #444444; stop-opacity: 0" />
+      </radialGradient>
+      
+      <!-- Accretion disk gradient -->
+      <radialGradient id="accretion-disk" cx="50%" cy="50%" r="50%">
+        <stop offset="25%" style="stop-color: rgba(158, 0, 255, 0); stop-opacity: 0" />
+        <stop offset="35%" style="stop-color: rgba(158, 0, 255, 0.1); stop-opacity: 0.1" />
+        <stop offset="45%" style="stop-color: rgba(46, 185, 223, 0.15); stop-opacity: 0.15" />
+        <stop offset="60%" style="stop-color: rgba(255, 165, 0, 0.1); stop-opacity: 0.1" />
+        <stop offset="80%" style="stop-color: rgba(255, 69, 0, 0.05); stop-opacity: 0.05" />
+        <stop offset="100%" style="stop-color: rgba(255, 0, 0, 0); stop-opacity: 0" />
+      </radialGradient>
+      
+      <!-- Gravitational lensing filter -->
+      <filter id="gravitational-lens" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+        <feOffset in="blur" dx="0" dy="0" result="offset"/>
+        <feFlood flood-color="rgba(158, 0, 255, 0.3)" result="color"/>
+        <feComposite in="color" in2="offset" operator="in" result="glow"/>
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="glow"/>
+        </feMerge>
+      </filter>
     </defs>
     <g class="orbit-group">
-      <circle class="orbit-inner" cx="300" cy="300" r="250"></circle>
-      <circle class="orbit-outer" cx="300" cy="300" r="290"></circle>
+      <!-- Accretion disk (rotating energy ring) -->
+      <circle class="accretion-disk" cx="300" cy="300" r="180" 
+              fill="url(#accretion-disk)" 
+              opacity="0.6" />
+      
+      <!-- Event horizon (central black hole) -->
+      <circle class="event-horizon" cx="300" cy="300" r="80" 
+              fill="url(#event-horizon)" />
+      
+      <!-- Orbit rings with gravitational lensing effect -->
+      <circle class="orbit-inner" cx="300" cy="300" r="250" 
+              filter="url(#gravitational-lens)"></circle>
+      <circle class="orbit-outer" cx="300" cy="300" r="290" 
+              filter="url(#gravitational-lens)"></circle>
 
+      <!-- Planets with enhanced gravitational effects -->
       <g class="planet-group-inner">
-        <circle class="planet planet-inner" cx="300" cy="50" r="8"></circle>
-        <circle class="planet planet-inner" cx="50" cy="300" r="8"></circle>
-        <circle class="planet planet-inner" cx="300" cy="550" r="8"></circle>
-        <circle class="planet planet-inner" cx="550" cy="300" r="8"></circle>
+        <circle class="planet planet-inner" cx="300" cy="50" r="8" 
+                filter="url(#gravitational-lens)"></circle>
+        <circle class="planet planet-inner" cx="50" cy="300" r="8" 
+                filter="url(#gravitational-lens)"></circle>
+        <circle class="planet planet-inner" cx="300" cy="550" r="8" 
+                filter="url(#gravitational-lens)"></circle>
+        <circle class="planet planet-inner" cx="550" cy="300" r="8" 
+                filter="url(#gravitational-lens)"></circle>
       </g>
 
       <g class="planet-group-outer">
-        <circle class="planet planet-outer" cx="300" cy="10" r="8"></circle>
-        <circle class="planet planet-outer" cx="10" cy="300" r="8"></circle>
-        <circle class="planet planet-outer" cx="495" cy="515" r="8"></circle>
+        <circle class="planet planet-outer" cx="300" cy="10" r="8" 
+                filter="url(#gravitational-lens)"></circle>
+        <circle class="planet planet-outer" cx="10" cy="300" r="8" 
+                filter="url(#gravitational-lens)"></circle>
+        <circle class="planet planet-outer" cx="495" cy="515" r="8" 
+                filter="url(#gravitational-lens)"></circle>
       </g>
     </g>
   </svg>
@@ -31,7 +83,7 @@
   .orbit-container {
     --orbit-color: var(--color-muted);
     position: absolute;
-    z-index: -10;
+    z-index: 1;
     width: 100%;
     max-width: 600px;
     aspect-ratio: 1;
@@ -94,6 +146,47 @@
     animation: planet-rotate 120s linear infinite;
   }
 
+  /* Black hole effects */
+  .event-horizon {
+    opacity: 0.8;
+    animation: event-horizon-pulse 4s ease-in-out infinite alternate;
+  }
+
+  .accretion-disk {
+    transform-origin: 300px 300px;
+    animation: accretion-rotate 80s linear infinite, 
+               accretion-pulse 3s ease-in-out infinite alternate;
+  }
+
+  /* Enhanced gravitational effects on orbit elements */
+  .orbit-inner,
+  .orbit-outer {
+    fill: none;
+    stroke: var(--color-foreground);
+    stroke-width: 1.5;
+    opacity: 0.7;
+    animation: gravity-distortion 8s ease-in-out infinite alternate;
+  }
+
+  .planet {
+    stroke: var(--color-foreground);
+    stroke-width: 1.5;
+    fill: var(--color-background);
+    transform-origin: 300px 300px;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Subtle gravitational lensing effect */
+  .planet-group-inner .planet-inner {
+    animation: planet-rotate 60s linear infinite,
+               gravity-lens 6s ease-in-out infinite alternate;
+  }
+
+  .planet-group-outer .planet-outer {
+    animation: planet-rotate 120s linear infinite,
+               gravity-lens 8s ease-in-out infinite alternate;
+  }
+
   @media (max-width: 1024px) {
     .orbit-container {
       max-width: 400px;
@@ -136,6 +229,69 @@
     }
     to {
       opacity: 1;
+    }
+  }
+
+  /* Black hole animation keyframes */
+  @keyframes event-horizon-pulse {
+    0% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes accretion-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes accretion-pulse {
+    0% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes gravity-distortion {
+    0% {
+      opacity: 0.6;
+      stroke-width: 1.5;
+    }
+    100% {
+      opacity: 0.9;
+      stroke-width: 2;
+    }
+  }
+
+  @keyframes gravity-lens {
+    0% {
+      filter: brightness(1) drop-shadow(0 0 2px rgba(158, 0, 255, 0.3));
+    }
+    100% {
+      filter: brightness(1.2) drop-shadow(0 0 6px rgba(46, 185, 223, 0.5));
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .event-horizon,
+    .accretion-disk,
+    .orbit-inner,
+    .orbit-outer,
+    .planet-inner,
+    .planet-outer {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
     }
   }
 </style>

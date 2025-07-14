@@ -201,11 +201,18 @@ const {
     private totalStars = 0;
     private STARS_PER_BATCH = 200;
     private loadingStartTime = 0;
+    private static globalInstance: SpaceBackground | null = null;
+    private readonly STORAGE_KEY = 'space-background-state';
+    private readonly STORAGE_VERSION = '1.0';
 
     constructor() {
       super();
+
       this.canvas = this.querySelector('.space-canvas') as HTMLCanvasElement;
       this.ctx = this.canvas?.getContext('2d', { alpha: false });
+
+      // Set this as the global instance
+      SpaceBackground.globalInstance = this;
 
       try {
         this.config = JSON.parse(this.dataset.config || '{}');
@@ -257,6 +264,114 @@ const {
       this.setupBackground();
     }
 
+    private isViewTransition(): boolean {
+      return (
+        document.documentElement.classList.contains('view-transition-active') ||
+        // Fallback check for Astro's view transitions
+        (document as any).startViewTransition !== undefined ||
+        // Additional check for any transition state
+        performance.now() - (window as any)._lastNavigationStart < 100
+      );
+    }
+
+    private saveStateToStorage(): void {
+      try {
+        const state = {
+          version: this.STORAGE_VERSION,
+          timestamp: Date.now(),
+          width: this.width,
+          height: this.height,
+          stars: this.stars,
+          isLoading: this.isLoading,
+          loadingProgress: this.loadingProgress,
+          fadeInProgress: this.fadeInProgress,
+          totalStars: this.totalStars,
+          config: this.config,
+        };
+        sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+      } catch (error) {
+        console.warn('Failed to save space background state:', error);
+      }
+    }
+
+    private loadStateFromStorage(): boolean {
+      try {
+        const stored = sessionStorage.getItem(this.STORAGE_KEY);
+        if (!stored) return false;
+
+        const state = JSON.parse(stored);
+
+        // Check version compatibility
+        if (state.version !== this.STORAGE_VERSION) {
+          sessionStorage.removeItem(this.STORAGE_KEY);
+          return false;
+        }
+
+        // Check if stored state is too old (more than 1 hour)
+        const now = Date.now();
+        if (now - state.timestamp > 3600000) {
+          sessionStorage.removeItem(this.STORAGE_KEY);
+          return false;
+        }
+
+        // Check if dimensions changed significantly (more than 20% difference)
+        const widthDiff = Math.abs(this.width - state.width) / state.width;
+        const heightDiff = Math.abs(this.height - state.height) / state.height;
+        if (widthDiff > 0.2 || heightDiff > 0.2) {
+          sessionStorage.removeItem(this.STORAGE_KEY);
+          return false;
+        }
+
+        // Restore state
+        this.stars = state.stars || [];
+        this.isLoading = state.isLoading ?? false;
+        this.loadingProgress = state.loadingProgress ?? 1;
+        this.fadeInProgress = state.fadeInProgress ?? 1;
+        this.totalStars = state.totalStars || this.stars.length;
+
+        return true;
+      } catch (error) {
+        console.warn('Failed to load space background state:', error);
+        sessionStorage.removeItem(this.STORAGE_KEY);
+        return false;
+      }
+    }
+
+    private copyStateFrom(instance: SpaceBackground): void {
+      // Copy configuration and state
+      this.config = instance.config;
+      this.stars = instance.stars;
+      this.shootingStars = instance.shootingStars;
+      this.shootingStarPool = instance.shootingStarPool;
+      this.isLoading = instance.isLoading;
+      this.loadingProgress = instance.loadingProgress;
+      this.fadeInProgress = instance.fadeInProgress;
+      this.totalStars = instance.totalStars;
+      this.loadingStartTime = instance.loadingStartTime;
+      this.mouseGravityStrength = instance.mouseGravityStrength;
+      this.mouseGravityRadius = instance.mouseGravityRadius;
+      this.shootingStarColors = instance.shootingStarColors;
+      this.trailColors = instance.trailColors;
+      this.frameCount = instance.frameCount;
+      this.lastTime = instance.lastTime;
+      this.nextShootingStarTime = instance.nextShootingStarTime;
+
+      // Get new canvas element and context
+      this.canvas = this.querySelector('.space-canvas') as HTMLCanvasElement;
+      this.ctx = this.canvas?.getContext('2d', { alpha: false });
+
+      // Set this as the new global instance
+      SpaceBackground.globalInstance = this;
+
+      // Setup the new canvas with preserved state
+      this.setupCanvasWithState();
+    }
+
+    connectedCallback(): void {
+      // Setup background when element is connected to DOM
+      this.setupBackground();
+    }
+
     private hexToRgb(hex: string): { r: number; g: number; b: number } {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result
@@ -268,13 +383,34 @@ const {
         : { r: 255, g: 255, b: 255 };
     }
 
+    private setupCanvasWithState(): void {
+      if (!this.canvas || !this.ctx) return;
+
+      // Canvas styles are handled by CSS now (position: fixed, etc.)
+      this.canvas.style.opacity = '1';
+      this.canvas.style.transition = 'opacity 1s ease-in-out';
+
+      this.findOrbitContainer();
+      this.setupMouseTracking();
+      this.setupCanvas();
+
+      // Continue animation from where we left off
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.addEventListener('resize', this.handleResize.bind(this));
+        this.lastTime = performance.now();
+        this.animateFrame();
+      } else {
+        this.renderStatic();
+      }
+
+      // Save the current state after canvas setup
+      this.saveStateToStorage();
+    }
+
     private setupBackground(): void {
       if (!this.canvas || !this.ctx) return;
 
-      this.canvas.style.position = 'absolute';
-      this.canvas.style.inset = '0';
-      this.canvas.style.width = '100%';
-      this.canvas.style.height = '100%';
+      // Canvas styles are handled by CSS now (position: fixed, etc.)
       this.canvas.style.opacity = '1';
       this.canvas.style.transition = 'opacity 1s ease-in-out';
 
@@ -292,11 +428,16 @@ const {
       this.loadingStartTime = performance.now();
       this.initializeShootingStarPool();
       this.initializeStars();
-      this.startProgressiveLoading();
 
+      // Start animation immediately to show loader
       window.addEventListener('resize', this.handleResize.bind(this));
       this.lastTime = performance.now();
       this.animateFrame();
+
+      // Start progressive loading after first render
+      requestAnimationFrame(() => {
+        this.startProgressiveLoading();
+      });
     }
 
     private setupMouseTracking(): void {
@@ -309,9 +450,9 @@ const {
     }
 
     private setupCanvas(): void {
-      const rect = this.canvas.getBoundingClientRect();
-      this.width = rect.width;
-      this.height = rect.height;
+      // Use viewport dimensions since canvas is position: fixed
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
       this.dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance
 
       this.canvas.width = this.width * this.dpr;
@@ -326,15 +467,36 @@ const {
     }
 
     private initializeStars(): void {
+      // Try to load from storage first
+      if (this.loadStateFromStorage()) {
+        console.log('Loaded stars from storage:', this.stars.length);
+        // If loaded from storage, we're not loading
+        this.isLoading = false;
+        this.loadingProgress = 1;
+        this.fadeInProgress = 1;
+        return;
+      }
+
+      // Generate new stars if no stored state
       const { starDensity } = this.config.stars;
       const area = this.width * this.height;
       this.totalStars = Math.floor(area * starDensity);
       this.stars = [];
       this.loadingProgress = 0;
+      this.isLoading = true;
     }
 
     private startProgressiveLoading(): void {
+      // If we already have stars from storage, skip loading
+      if (this.stars.length > 0) {
+        this.finishLoading();
+        return;
+      }
+
+      // Ensure we show the loading state
       this.isLoading = true;
+      this.loadingProgress = 0;
+
       // Add some initial stars immediately
       this.addInitialStars();
       this.loadNextStarBatch();
@@ -399,6 +561,8 @@ const {
 
       setTimeout(() => {
         this.fadeInProgress = 1;
+        // Save state after loading is complete
+        this.saveStateToStorage();
       }, 100);
     }
 
@@ -853,23 +1017,151 @@ const {
 
     private renderLoadingState(ctx: CanvasRenderingContext2D): void {
       const progress = this.loadingProgress;
+      const time = performance.now() * 0.003;
       const centerX = this.width / 2;
       const centerY = this.height / 2;
-      const radius = 3;
 
-      ctx.fillStyle = this.config.stars.starsColor;
-      ctx.globalAlpha = 0.6;
+      // Create cosmic nebula background
+      const nebula = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        0,
+        centerX,
+        centerY,
+        Math.min(this.width, this.height) * 0.4
+      );
+      nebula.addColorStop(0, 'rgba(158, 0, 255, 0.3)');
+      nebula.addColorStop(0.4, 'rgba(46, 185, 223, 0.2)');
+      nebula.addColorStop(0.7, 'rgba(138, 43, 226, 0.1)');
+      nebula.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-      for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2;
-        const x = centerX + Math.cos(angle) * 20;
-        const y = centerY + Math.sin(angle) * 20;
+      ctx.fillStyle = nebula;
+      ctx.fillRect(0, 0, this.width, this.height);
 
-        const dotProgress = Math.max(0, Math.min(1, progress * 8 - i));
-        ctx.globalAlpha = 0.2 + dotProgress * 0.6;
+      // Pulsing central galaxy core
+      const coreRadius = 15 + Math.sin(time * 2) * 5;
+      const coreGradient = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        0,
+        centerX,
+        centerY,
+        coreRadius
+      );
+      coreGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      coreGradient.addColorStop(0.3, 'rgba(158, 0, 255, 0.8)');
+      coreGradient.addColorStop(0.7, 'rgba(46, 185, 223, 0.6)');
+      coreGradient.addColorStop(1, 'rgba(46, 185, 223, 0)');
 
+      ctx.fillStyle = coreGradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Rotating spiral arms with particles
+      for (let arm = 0; arm < 3; arm++) {
+        const armAngle = (arm / 3) * Math.PI * 2 + time * 0.5;
+
+        for (let i = 0; i < 20; i++) {
+          const t = i / 20;
+          const spiralAngle = armAngle + t * Math.PI * 4;
+          const radius = t * 100 * (0.5 + progress * 0.5);
+
+          const x = centerX + Math.cos(spiralAngle) * radius;
+          const y = centerY + Math.sin(spiralAngle) * radius;
+
+          // Particle size varies with distance and progress
+          const particleSize = (3 - t * 2) * (0.3 + progress * 0.7);
+          const opacity = (1 - t * 0.7) * (0.4 + progress * 0.6);
+
+          // Shimmer effect
+          const shimmer = 0.7 + 0.3 * Math.sin(time * 3 + i * 0.5);
+
+          ctx.globalAlpha = opacity * shimmer;
+
+          // Color transition from core to edge
+          const hue = t < 0.5 ? `rgba(158, 0, 255, ${opacity})` : `rgba(46, 185, 223, ${opacity})`;
+          ctx.fillStyle = hue;
+
+          ctx.beginPath();
+          ctx.arc(x, y, particleSize, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Add glow effect for larger particles
+          if (particleSize > 1.5) {
+            ctx.shadowColor = hue;
+            ctx.shadowBlur = particleSize * 2;
+            ctx.beginPath();
+            ctx.arc(x, y, particleSize * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+        }
+      }
+
+      // Shooting stars during loading
+      for (let i = 0; i < 3; i++) {
+        const shootTime = (time + i * 2) % 6;
+        if (shootTime < 2) {
+          const t = shootTime / 2;
+          const angle = (i / 3) * Math.PI * 2 + time * 0.2;
+          const startRadius = 80;
+          const endRadius = 150;
+
+          const currentRadius = startRadius + (endRadius - startRadius) * t;
+          const x = centerX + Math.cos(angle) * currentRadius;
+          const y = centerY + Math.sin(angle) * currentRadius;
+
+          const opacity = Math.sin(t * Math.PI) * 0.8;
+          const trailLength = 20;
+
+          ctx.lineCap = 'round';
+          ctx.lineWidth = 2;
+
+          const gradient = ctx.createLinearGradient(
+            x - Math.cos(angle) * trailLength,
+            y - Math.sin(angle) * trailLength,
+            x,
+            y
+          );
+          gradient.addColorStop(0, 'rgba(46, 185, 223, 0)');
+          gradient.addColorStop(1, `rgba(46, 185, 223, ${opacity})`);
+
+          ctx.strokeStyle = gradient;
+          ctx.beginPath();
+          ctx.moveTo(x - Math.cos(angle) * trailLength, y - Math.sin(angle) * trailLength);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+      }
+
+      // Progress indicator as expanding energy ring
+      const progressRadius = 120 * progress;
+      if (progress > 0.1) {
+        ctx.strokeStyle = `rgba(158, 0, 255, ${0.8 * (1 - progress)})`;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([10, 5]);
+        ctx.lineDashOffset = -time * 20;
         ctx.beginPath();
-        ctx.arc(x, y, radius * dotProgress, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, progressRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Floating energy particles
+      for (let i = 0; i < 15; i++) {
+        const angle = (i / 15) * Math.PI * 2 + time * 0.3;
+        const radius = 60 + Math.sin(time * 2 + i) * 20;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+
+        const size = 1 + Math.sin(time * 4 + i * 0.7) * 0.5;
+        const opacity = 0.6 + Math.sin(time * 3 + i * 0.5) * 0.4;
+
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(158, 0, 255, 1)' : 'rgba(46, 185, 223, 1)';
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -880,6 +1172,7 @@ const {
       if (!this.ctx) return;
 
       // Only fill background if color is set
+      // Always show background color first
       if (this.config.backgroundColor) {
         this.ctx.fillStyle = this.config.backgroundColor;
         this.ctx.fillRect(0, 0, this.width, this.height);
@@ -942,6 +1235,14 @@ const {
     }
 
     disconnectedCallback(): void {
+      // Save state before disconnecting
+      this.saveStateToStorage();
+
+      // Don't clean up during view transitions
+      if (this.isViewTransition()) {
+        return;
+      }
+
       if (this.animationId) {
         cancelAnimationFrame(this.animationId);
         this.animationId = null;
@@ -958,6 +1259,11 @@ const {
       if (this.canvas) {
         this.canvas.removeEventListener('mouseleave', this.handleMouseLeave);
       }
+
+      // Clear global instance if this is the current one
+      if (SpaceBackground.globalInstance === this) {
+        SpaceBackground.globalInstance = null;
+      }
     }
 
     private handleMouseMove = (event: MouseEvent) => {
@@ -965,9 +1271,9 @@ const {
       if (now - this.lastMouseMove < this.MOUSE_THROTTLE) return;
 
       this.lastMouseMove = now;
-      const rect = this.canvas.getBoundingClientRect();
-      this.mouseX = event.clientX - rect.left;
-      this.mouseY = event.clientY - rect.top;
+      // Since canvas is position: fixed, use clientX/Y directly
+      this.mouseX = event.clientX;
+      this.mouseY = event.clientY;
     };
 
     private handleMouseLeave = () => {
@@ -985,21 +1291,52 @@ const {
 
 <style>
   space-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
+    /* CRÍTICO: Mínimas propiedades para no interferir con backdrop-filter */
+    display: block;
     pointer-events: none;
-    contain: layout style paint;
-    will-change: transform;
+    /* NO usar position, z-index, o cualquier propiedad que cree stacking context */
+    /* El canvas hijo usará position: fixed directamente */
   }
 
   .space-canvas {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    /* CRÍTICO: Canvas debe usar position fixed para ser visible a backdrop-filter */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* CRÍTICO: z-index debe estar por debajo del contenido */
+    z-index: -1;
+    /* CRÍTICO: Propiedades mínimas para evitar interferencia con backdrop-filter */
+    isolation: auto;
+    contain: none;
+    transform: none;
+    filter: none;
+    opacity: 1;
+    mix-blend-mode: normal;
+    /* Evitar propiedades que interfieran con backdrop-filter */
+    -webkit-transform: none;
+    -webkit-filter: none;
+    backface-visibility: visible;
+    will-change: auto;
+  }
+
+  /* Asegurar que elementos con backdrop-filter puedan acceder al canvas */
+  space-background,
+  .space-canvas {
+    /* Forzar que sean parte del mismo layer de composición */
+    will-change: auto;
+    contain: none;
+  }
+
+  /* Optimización para webkit */
+  @supports (-webkit-backdrop-filter: blur(1px)) {
+    .space-canvas {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
   }
 </style>

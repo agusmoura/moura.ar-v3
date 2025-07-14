@@ -16,6 +16,10 @@ This is **Moura.ar v3**, a personal portfolio website built with Astro v5, featu
 - **Animations**: Custom space-themed background effects
 - **Bundle Analysis**: vite-bundle-visualizer
 
+## Tailwind Configuration
+
+- Este proyecto usa Tailwind 4. No utiliza la configuracion de tailwind config. Todo se condfigura desde css
+
 ## Essential Commands
 
 ```bash
