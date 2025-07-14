@@ -67,7 +67,10 @@ const backgroundConfig = {
     />
     <ClientRouter />
   </head>
-  <body class="min-h-svh bg-background text-foreground antialiased overflow-x-hidden">
+  <body
+    class="min-h-svh text-foreground antialiased overflow-x-hidden"
+    style={`background-color: ${spaceBackgroundColor};`}
+  >
     <SpaceBackground {...backgroundConfig} />
     <ScrollAnimations />
     <FocusManager />
