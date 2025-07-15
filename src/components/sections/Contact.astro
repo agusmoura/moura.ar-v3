@@ -209,43 +209,35 @@ const projectTypes: ProjectType[] = [
 
 <section id="contact" class="relative pt-20 md:pt-32 overflow-hidden">
   <div class="container relative mx-auto px-4 lg:px-8 xl:max-w-6xl w-full max-w-full">
-    <!-- Main Header with optimized animations -->
-    <header class="mb-12 space-y-6 text-center md:mb-16 max-w-full">
-      <div class="mb-4 inline-block w-full max-w-full" data-aos="fade-up" data-aos-duration="600">
-        <p
-          class="mb-2 text-sm font-medium uppercase tracking-wider text-accent-light opacity-80 flex items-center gap-2 justify-center flex-wrap max-w-full"
-        >
-          <Icon
-            name="heroicons:paper-airplane"
-            class="h-4 w-4 md:h-5 md:w-5 flex-shrink-0"
-            aria-hidden="true"
-          />
-          <span class="whitespace-nowrap">Conectemos y construyamos</span>
-          <Icon
-            name="heroicons:paper-airplane"
-            class="h-4 w-4 md:h-5 md:w-5 flex-shrink-0"
-            aria-hidden="true"
-          />
-        </p>
+    <!-- Enhanced Hero Section with stronger value proposition -->
+    <header class="mb-16 space-y-8 text-center md:mb-20 max-w-full">
+      <!-- Status Badge -->
+      <div class="mb-6 inline-block w-full max-w-full" data-aos="fade-up" data-aos-duration="600">
         <div
-          class="h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent max-w-full"
+          class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm"
         >
+          <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse" aria-hidden="true"></div>
+          <span class="text-sm font-medium text-accent-light uppercase tracking-wide"
+            >Disponible para nuevos proyectos</span
+          >
+          <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse" aria-hidden="true"></div>
         </div>
       </div>
 
-      <div class="space-y-4 max-w-full">
+      <!-- Main Heading with improved hierarchy -->
+      <div class="space-y-6 max-w-full">
         <h2
-          class="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-tight text-balance max-w-full px-2 sm:px-0"
-          set:html={pt('Tu próximo [[**proyecto**]] merece una [[**nueva perspectiva**]]')}
+          class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight text-balance max-w-full px-2 sm:px-0"
+          set:html={pt('Transformemos tu [[**visión**]] en [[**realidad digital**]]')}
           data-aos="fade-up"
           data-aos-duration="800"
           data-aos-delay="200"
         />
 
         <p
-          class="text-foreground mx-auto max-w-full sm:max-w-lg md:max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed px-2 sm:px-0"
+          class="text-foreground mx-auto max-w-full sm:max-w-lg md:max-w-3xl text-base sm:text-lg md:text-xl leading-relaxed px-2 sm:px-0 opacity-90"
           set:html={pt(
-            'Cada proyecto importante nace de una buena conversación. No se trata solo de programar o diseñar: se trata de [[**entender**]], de [[**pensar juntos**]], de construir algo [[**claro**]] y que [[**funcione**]].'
+            'Cada proyecto excepcional comienza con una conversación. Te acompaño desde la [[**idea inicial**]] hasta el [[**lanzamiento**]], creando soluciones que realmente [[**funcionan**]].'
           )}
           data-aos="fade-up"
           data-aos-duration="800"
@@ -254,17 +246,17 @@ const projectTypes: ProjectType[] = [
       </div>
     </header>
 
-    <!-- Optimized Layout Structure -->
-    <div class="relative mb-16 md:mb-24 max-w-full overflow-hidden">
+    <!-- Enhanced Layout Structure with improved hierarchy -->
+    <div class="relative mb-16 md:mb-24 max-w-full">
       <!-- Decorative number - optimized positioning and hidden on mobile -->
       <span
         class="absolute -left-2 -top-2 text-4xl font-bold text-white/5 hidden lg:block xl:-left-6 xl:-top-6 xl:text-6xl select-none pointer-events-none"
         aria-hidden="true">03</span
       >
 
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8 xl:gap-12 max-w-full">
-        <!-- Left Column: Contact Form -->
-        <div class="order-2 lg:order-1 w-full max-w-full">
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8 max-w-full">
+        <!-- Primary Column: Contact Form (spans 2 columns on large screens) -->
+        <div class="order-1 w-full max-w-full">
           <!-- Contact Form Component -->
           <div
             class="relative w-full max-w-full space-y-6 rounded-2xl border border-white/5 bg-background/10 p-4 sm:p-6 md:p-8 backdrop-blur-xs overflow-hidden"
@@ -377,7 +369,11 @@ const projectTypes: ProjectType[] = [
                   >
                     {
                       projectTypes.map((projectType) => (
-                        <label class="project-pill" id={`project-${projectType.id}`} title={projectType.description}>
+                        <label
+                          class="project-pill"
+                          id={`project-${projectType.id}`}
+                          title={projectType.description}
+                        >
                           <input
                             type="checkbox"
                             name="project-type"
@@ -476,27 +472,9 @@ const projectTypes: ProjectType[] = [
                     autocomplete="off"
                     value=""
                   />
-                  <input
-                    type="text"
-                    name="phone"
-                    tabindex="-1"
-                    autocomplete="off"
-                    value=""
-                  />
-                  <input
-                    type="url"
-                    name="url"
-                    tabindex="-1"
-                    autocomplete="off"
-                    value=""
-                  />
-                  <input
-                    type="text"
-                    name="company"
-                    tabindex="-1"
-                    autocomplete="off"
-                    value=""
-                  />
+                  <input type="text" name="phone" tabindex="-1" autocomplete="off" value="" />
+                  <input type="url" name="url" tabindex="-1" autocomplete="off" value="" />
+                  <input type="text" name="company" tabindex="-1" autocomplete="off" value="" />
                 </div>
 
                 <!-- Enhanced Submit Button with loading states -->
@@ -559,193 +537,11 @@ const projectTypes: ProjectType[] = [
               </div>
             </div>
           </div>
-
-          <!-- CV Download CTA -->
-          <div
-            class="relative group overflow-hidden"
-            data-aos="fade-in"
-            data-aos-duration="800"
-            data-aos-delay="800"
-          >
-            <!-- Campo gravitacional extendido para las partículas - responsive -->
-            <div
-              class="absolute -inset-4 sm:-inset-8 md:-inset-12 lg:-inset-16 pointer-events-none overflow-hidden"
-            >
-              <!-- Órbitas de fondo - responsive sizes -->
-              <div
-                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 border border-accent/10 rounded-full animate-spin"
-                style="animation-duration: 8s;"
-              >
-              </div>
-              <div
-                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 border border-accent/20 rounded-full animate-spin"
-                style="animation-duration: 6s; animation-direction: reverse;"
-              >
-              </div>
-
-              <!-- Partículas orbitales - responsive distances -->
-              <div
-                class="cv-orbital-particle hidden sm:block"
-                style="--angle: 0deg; --distance: 40px; --size: 2px; --speed: 4s; --delay: 0s;"
-              >
-              </div>
-              <div
-                class="cv-orbital-particle hidden sm:block"
-                style="--angle: 90deg; --distance: 35px; --size: 1px; --speed: 3s; --delay: -1s;"
-              >
-              </div>
-              <div
-                class="cv-orbital-particle hidden sm:block"
-                style="--angle: 180deg; --distance: 45px; --size: 1.5px; --speed: 5s; --delay: -2s;"
-              >
-              </div>
-              <div
-                class="cv-orbital-particle hidden sm:block"
-                style="--angle: 270deg; --distance: 38px; --size: 2px; --speed: 3.5s; --delay: -3s;"
-              >
-              </div>
-
-              <!-- Partículas externas - hidden on small screens -->
-              <div
-                class="cv-particle-far hidden md:block"
-                style="--angle: 45deg; --distance: 70px; --size: 1px; --speed: 8s; --delay: 0s;"
-              >
-              </div>
-              <div
-                class="cv-particle-far hidden md:block"
-                style="--angle: 135deg; --distance: 65px; --size: 1.5px; --speed: 7s; --delay: -2s;"
-              >
-              </div>
-              <div
-                class="cv-particle-far hidden md:block"
-                style="--angle: 225deg; --distance: 75px; --size: 1px; --speed: 9s; --delay: -4s;"
-              >
-              </div>
-              <div
-                class="cv-particle-far hidden md:block"
-                style="--angle: 315deg; --distance: 68px; --size: 2px; --speed: 6s; --delay: -6s;"
-              >
-              </div>
-            </div>
-
-            <!-- Enhanced background effects -->
-            <div
-              class="absolute -inset-1 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-700 group-hover:duration-300 bg-gradient-to-r from-accent/30 via-accent-light/20 to-accent/30"
-              aria-hidden="true"
-            >
-            </div>
-            <div
-              class="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300 bg-gradient-to-r from-accent/20 via-accent-light/10 to-accent/20"
-              aria-hidden="true"
-            >
-            </div>
-
-            <!-- Enhanced CV Button -->
-            <a
-              href="/cv.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="relative flex flex-col items-center justify-center p-6 md:p-8 bg-gradient-to-br from-charcoal/80 via-background/90 to-charcoal/80 border border-border hover:border-accent rounded-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent/10 active:scale-95 group overflow-hidden backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
-              aria-label="Descargar Curriculum Vitae en formato PDF"
-              data-umami-event="cv_download"
-              data-umami-event-source="contact_section"
-            >
-              <!-- Ripple effect -->
-              <div
-                class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-all duration-500 bg-gradient-to-r from-accent via-accent-light to-accent"
-                aria-hidden="true"
-              >
-              </div>
-
-              <!-- Enhanced Content -->
-              <div class="relative flex flex-col items-center gap-4 z-10">
-                <!-- Enhanced Icon with effects -->
-                <div class="relative">
-                  <div
-                    class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                  >
-                    <Icon
-                      name="heroicons:document-arrow-down"
-                      class="h-7 w-7 md:h-8 md:w-8 text-background transition-all duration-300 group-hover:scale-110"
-                      aria-hidden="true"
-                    />
-                    <!-- Glow effect -->
-                    <div
-                      class="absolute inset-0 bg-accent rounded-full opacity-0 group-hover:opacity-30 blur-md scale-150 transition-all duration-300"
-                      aria-hidden="true"
-                    >
-                    </div>
-                  </div>
-                  <!-- Orbital ring -->
-                  <div
-                    class="absolute inset-0 w-14 h-14 md:w-16 md:h-16 border-2 border-accent/30 rounded-full animate-spin group-hover:border-accent/60 transition-colors duration-300"
-                    style="animation-duration: 3s; will-change: transform;"
-                    aria-hidden="true"
-                  >
-                  </div>
-                </div>
-
-                <!-- Enhanced Text -->
-                <div class="text-center">
-                  <h5
-                    class="font-serif text-xl font-bold text-foreground group-hover:text-accent transition-colors duration-300 mb-2"
-                  >
-                    Curriculum Vitae
-                  </h5>
-                  <p
-                    class="font-mono text-sm text-light-2 group-hover:text-foreground transition-colors duration-300 max-w-xs leading-relaxed"
-                  >
-                    Explorá mi trayectoria completa en el
-                    <span class="text-accent font-medium">universo digital</span>
-                  </p>
-                </div>
-
-                <!-- Enhanced Technical indicators -->
-                <div
-                  class="flex items-center gap-4 text-xs font-mono text-light-2/70 group-hover:text-light-2 transition-colors duration-300"
-                >
-                  <span class="flex items-center gap-1">
-                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse" aria-hidden="true">
-                    </div>
-                    PDF
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <Icon name="heroicons:arrow-down-tray" class="h-3 w-3" aria-hidden="true" />
-                    Download
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <Icon name="heroicons:document-text" class="h-3 w-3" aria-hidden="true" />
-                    2025
-                  </span>
-                </div>
-              </div>
-
-              <!-- Ripple effect on active -->
-              <div
-                class="absolute inset-0 opacity-0 group-active:opacity-100 transition-opacity duration-200"
-                aria-hidden="true"
-              >
-                <div
-                  class="absolute inset-0 bg-accent opacity-20 rounded-2xl transform scale-0 group-active:scale-100 transition-transform duration-200"
-                >
-                </div>
-              </div>
-            </a>
-
-            <!-- Description text -->
-            <div class="mt-4 text-center">
-              <p
-                class="text-xs text-light-2/60 group-hover:text-light-2/80 transition-colors duration-300 font-mono"
-              >
-                Descarga directa • Actualizado enero 2025
-              </p>
-            </div>
-          </div>
         </div>
 
-        <!-- Right Column: Enhanced Contact Information -->
+        <!-- Secondary Column: Support Information -->
         <div
-          class="order-1 lg:order-2 space-y-4 md:space-y-6 w-full max-w-full"
+          class="order-2 lg:order-2 lg:col-span-1 space-y-4 md:space-y-6 w-full max-w-full"
           data-aos="fade-in"
           data-aos-duration="1000"
           data-aos-delay="600"
@@ -897,6 +693,190 @@ const projectTypes: ProjectType[] = [
           </div>
         </div>
       </div>
+
+      <!-- CV Download CTA - Centered below both columns -->
+      <div
+        class="flex justify-center mt-12 md:mt-16"
+        data-aos="fade-in"
+        data-aos-duration="800"
+        data-aos-delay="800"
+      >
+        <div class="relative group">
+          <!-- Campo gravitacional extendido para las partículas - responsive -->
+          <div
+            class="absolute -inset-4 sm:-inset-8 md:-inset-12 lg:-inset-16 pointer-events-none overflow-hidden"
+          >
+            <!-- Órbitas de fondo - responsive sizes -->
+            <div
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 border border-accent/10 rounded-full animate-spin"
+              style="animation-duration: 8s;"
+            >
+            </div>
+            <div
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 border border-accent/20 rounded-full animate-spin"
+              style="animation-duration: 6s; animation-direction: reverse;"
+            >
+            </div>
+
+            <!-- Partículas orbitales - responsive distances -->
+            <div
+              class="cv-orbital-particle hidden sm:block"
+              style="--angle: 0deg; --distance: 40px; --size: 2px; --speed: 4s; --delay: 0s;"
+            >
+            </div>
+            <div
+              class="cv-orbital-particle hidden sm:block"
+              style="--angle: 90deg; --distance: 35px; --size: 1px; --speed: 3s; --delay: -1s;"
+            >
+            </div>
+            <div
+              class="cv-orbital-particle hidden sm:block"
+              style="--angle: 180deg; --distance: 45px; --size: 1.5px; --speed: 5s; --delay: -2s;"
+            >
+            </div>
+            <div
+              class="cv-orbital-particle hidden sm:block"
+              style="--angle: 270deg; --distance: 38px; --size: 2px; --speed: 3.5s; --delay: -3s;"
+            >
+            </div>
+
+            <!-- Partículas externas - hidden on small screens -->
+            <div
+              class="cv-particle-far hidden md:block"
+              style="--angle: 45deg; --distance: 70px; --size: 1px; --speed: 8s; --delay: 0s;"
+            >
+            </div>
+            <div
+              class="cv-particle-far hidden md:block"
+              style="--angle: 135deg; --distance: 65px; --size: 1.5px; --speed: 7s; --delay: -2s;"
+            >
+            </div>
+            <div
+              class="cv-particle-far hidden md:block"
+              style="--angle: 225deg; --distance: 75px; --size: 1px; --speed: 9s; --delay: -4s;"
+            >
+            </div>
+            <div
+              class="cv-particle-far hidden md:block"
+              style="--angle: 315deg; --distance: 68px; --size: 2px; --speed: 6s; --delay: -6s;"
+            >
+            </div>
+          </div>
+
+          <!-- Enhanced background effects -->
+          <div
+            class="absolute -inset-1 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-700 group-hover:duration-300 bg-gradient-to-r from-accent/30 via-accent-light/20 to-accent/30"
+            aria-hidden="true"
+          >
+          </div>
+          <div
+            class="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300 bg-gradient-to-r from-accent/20 via-accent-light/10 to-accent/20"
+            aria-hidden="true"
+          >
+          </div>
+
+          <!-- Enhanced CV Button -->
+          <a
+            href="/cv.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="relative flex flex-col items-center justify-center p-6 md:p-8 bg-gradient-to-br from-charcoal/80 via-background/90 to-charcoal/80 border border-border hover:border-accent rounded-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent/10 active:scale-95 group overflow-hidden backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background w-96 md:w-[500px] lg:w-[600px]"
+            aria-label="Descargar Curriculum Vitae en formato PDF"
+            data-umami-event="cv_download"
+            data-umami-event-source="contact_section"
+          >
+            <!-- Ripple effect -->
+            <div
+              class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-all duration-500 bg-gradient-to-r from-accent via-accent-light to-accent"
+              aria-hidden="true"
+            >
+            </div>
+
+            <!-- Enhanced Content -->
+            <div class="relative flex flex-col items-center gap-4 z-10">
+              <!-- Enhanced Icon with effects -->
+              <div class="relative">
+                <div
+                  class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                >
+                  <Icon
+                    name="heroicons:document-arrow-down"
+                    class="h-7 w-7 md:h-8 md:w-8 text-background transition-all duration-300 group-hover:scale-110"
+                    aria-hidden="true"
+                  />
+                  <!-- Glow effect -->
+                  <div
+                    class="absolute inset-0 bg-accent rounded-full opacity-0 group-hover:opacity-30 blur-md scale-150 transition-all duration-300"
+                    aria-hidden="true"
+                  >
+                  </div>
+                </div>
+                <!-- Orbital ring -->
+                <div
+                  class="absolute inset-0 w-14 h-14 md:w-16 md:h-16 border-2 border-accent/30 rounded-full animate-spin group-hover:border-accent/60 transition-colors duration-300"
+                  style="animation-duration: 3s; will-change: transform;"
+                  aria-hidden="true"
+                >
+                </div>
+              </div>
+
+              <!-- Enhanced Text -->
+              <div class="text-center">
+                <h5
+                  class="font-serif text-xl font-bold text-foreground group-hover:text-accent transition-colors duration-300 mb-2"
+                >
+                  Curriculum Vitae
+                </h5>
+                <p
+                  class="font-mono text-sm text-light-2 group-hover:text-foreground transition-colors duration-300 max-w-xs leading-relaxed"
+                >
+                  Explorá mi trayectoria completa en el
+                  <span class="text-accent font-medium">universo digital</span>
+                </p>
+              </div>
+
+              <!-- Enhanced Technical indicators -->
+              <div
+                class="flex items-center gap-4 text-xs font-mono text-light-2/70 group-hover:text-light-2 transition-colors duration-300"
+              >
+                <span class="flex items-center gap-1">
+                  <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse" aria-hidden="true">
+                  </div>
+                  PDF
+                </span>
+                <span class="flex items-center gap-1">
+                  <Icon name="heroicons:arrow-down-tray" class="h-3 w-3" aria-hidden="true" />
+                  Descargar
+                </span>
+                <span class="flex items-center gap-1">
+                  <Icon name="heroicons:document-text" class="h-3 w-3" aria-hidden="true" />
+                  2025
+                </span>
+              </div>
+            </div>
+
+            <!-- Ripple effect on active -->
+            <div
+              class="absolute inset-0 opacity-0 group-active:opacity-100 transition-opacity duration-200"
+              aria-hidden="true"
+            >
+              <div
+                class="absolute inset-0 bg-accent opacity-20 rounded-2xl transform scale-0 group-active:scale-100 transition-transform duration-200"
+              >
+              </div>
+            </div>
+          </a>
+
+          <!-- Description text -->
+          <div class="mt-4 text-center">
+            <p
+              class="text-xs text-light-2/60 group-hover:text-light-2/80 transition-colors duration-300 font-mono"
+            >
+              Descarga directa • Actualizado enero 2025
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -906,6 +886,36 @@ const projectTypes: ProjectType[] = [
   .container {
     max-width: 100%;
     overflow-x: hidden;
+  }
+
+  /* Value Proposition Pills */
+  .value-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(var(--color-accent-rgb), 0.1);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.2);
+    border-radius: 9999px;
+    color: var(--color-accent-light);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+  }
+
+  .value-pill:hover {
+    background: rgba(var(--color-accent-rgb), 0.15);
+    border-color: rgba(var(--color-accent-rgb), 0.3);
+    transform: translateY(-1px);
+  }
+
+  @media (min-width: 640px) {
+    .value-pill {
+      font-size: 0.875rem;
+      padding: 0.625rem 1rem;
+    }
   }
 
   /* CV Orbital Particles */
@@ -1356,7 +1366,7 @@ const projectTypes: ProjectType[] = [
 <script>
   // Lazy load the contact form functionality
   import { initContactForm } from '@/utils/contact-form-client';
-  
+
   // Initialize contact form when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initContactForm);
