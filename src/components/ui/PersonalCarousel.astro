@@ -109,13 +109,14 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
 
                               <div class="relative flex-1 px-4 sm:px-4">
                                 {card.image ? (
-                                  <Image
+                                  <img
                                     src={card.image}
                                     alt={card.title}
-                                    width={300}
-                                    height={300}
-                                    class="h-full w-full object-contain"
+                                    width="300"
+                                    height="300"
+                                    class="h-full w-full object-contain transition-opacity duration-300"
                                     loading="lazy"
+                                    decoding="async"
                                   />
                                 ) : (
                                   <div class="flex h-full items-center justify-center">
