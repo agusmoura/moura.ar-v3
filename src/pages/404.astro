@@ -1,0 +1,142 @@
+---
+import { Icon } from 'astro-icon/components';
+import Layout from '@layouts/Layout.astro';
+
+// SEO optimizations for 404 pages
+const title = '404 - Página no encontrada | Moura.ar';
+const description =
+  'La página que buscas parece haberse perdido en el espacio. Explora otros sectores de mi universo digital o regresa a la base.';
+---
+
+<Layout title={title} description={description} hideMenu={true}>
+  <div class="min-h-[80vh] flex items-center justify-center px-4">
+    <div class="text-center max-w-2xl mx-auto">
+      <!-- Space-themed 404 illustration -->
+      <div class="relative mb-8">
+        <div class="text-8xl md:text-9xl font-bold text-accent/20 select-none">404</div>
+
+        <!-- Floating astronaut/satellite icon -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div class="relative">
+            <!-- Orbit ring -->
+            <div
+              class="absolute inset-0 w-24 h-24 border-2 border-accent/30 rounded-full animate-spin"
+              style="animation-duration: 8s;"
+            >
+            </div>
+            <!-- Satellite/astronaut icon -->
+            <div class="w-24 h-24 flex items-center justify-center">
+              <Icon name="heroicons:signal" class="w-12 h-12 text-accent animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div class="space-y-4 mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-foreground">Sector no encontrado</h1>
+        <p class="text-lg text-muted max-w-lg mx-auto">
+          Parece que esta coordenada se ha perdido en el espacio. La página que buscas ha derivado
+          hacia una galaxia lejana.
+        </p>
+      </div>
+
+      <!-- Navigation options -->
+      <div class="space-y-6">
+        <!-- Primary action - Back to home -->
+        <div>
+          <a
+            href="/"
+            class="inline-flex items-center gap-3 px-6 py-3 bg-accent text-background font-semibold rounded-full hover:bg-accent-emphasis transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+            data-umami-event="404 Home Click"
+          >
+            <Icon name="heroicons:home" class="w-5 h-5" />
+            Regresar a la base
+          </a>
+        </div>
+
+        <!-- Secondary navigation options -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-md mx-auto">
+          <a
+            href="/#projects"
+            class="flex flex-col items-center gap-2 p-4 border border-border rounded-lg hover:border-accent/50 transition-all duration-300 group"
+            data-umami-event="404 Projects Click"
+          >
+            <Icon
+              name="heroicons:adjustments-horizontal"
+              class="w-6 h-6 text-accent group-hover:scale-110 transition-transform"
+            />
+            <span class="text-sm font-medium">Proyectos</span>
+          </a>
+
+          <a
+            href="/#about"
+            class="flex flex-col items-center gap-2 p-4 border border-border rounded-lg hover:border-accent/50 transition-all duration-300 group"
+            data-umami-event="404 About Click"
+          >
+            <Icon
+              name="heroicons:beaker"
+              class="w-6 h-6 text-accent group-hover:scale-110 transition-transform"
+            />
+            <span class="text-sm font-medium">Principios</span>
+          </a>
+
+          <a
+            href="/#contact"
+            class="flex flex-col items-center gap-2 p-4 border border-border rounded-lg hover:border-accent/50 transition-all duration-300 group"
+            data-umami-event="404 Contact Click"
+          >
+            <Icon
+              name="heroicons:envelope"
+              class="w-6 h-6 text-accent group-hover:scale-110 transition-transform"
+            />
+            <span class="text-sm font-medium">Contacto</span>
+          </a>
+        </div>
+
+        <!-- Additional help -->
+        <div class="pt-4 border-t border-border/30">
+          <p class="text-sm text-muted">
+            Buscabas algo específico?
+            <a href="/#contact" class="text-accent hover:text-accent-emphasis underline" data-umami-event="404 Help Contact">
+              Contáctame
+            </a>
+            y te ayudo a encontrarlo.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style></style>
+
+<script>
+  // TypeScript declaration for Umami
+  declare global {
+    interface Window {
+      umami?: {
+        track: (eventName: string, eventData?: Record<string, string | number | boolean>) => void;
+        identify: (userId: string, userData?: Record<string, string | number | boolean>) => void;
+      };
+    }
+  }
+
+  // Enhanced accessibility: focus management
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set focus on the main heading for screen readers
+    const heading = document.querySelector('h1');
+    if (heading) {
+      heading.focus();
+    }
+
+    // Track 404 page visits with Umami analytics
+    if (typeof window.umami !== 'undefined') {
+      window.umami.track('404 Page Visit', {
+        url: window.location.href,
+        referrer: document.referrer || 'Direct',
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+</script>
