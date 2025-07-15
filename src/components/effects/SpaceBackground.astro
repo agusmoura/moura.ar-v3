@@ -373,8 +373,8 @@ const {
     private lastHeight: number = 0;
     private isMobile: boolean = false;
     private stableHeight: number = 0;
-    // Performance optimization - limit active shooting stars
-    private readonly maxActiveShootingStars: number = 3;
+    // Performance optimization - limit active shooting stars to prevent lag issues
+    private readonly maxActiveShootingStars: number = 2;
     // Black hole effect tracking
     private blackHoleRotationTime: number = 0;
 
@@ -681,8 +681,8 @@ const {
     }
 
     private initializeShootingStarPool(): void {
-      // Pre-create shooting stars for object pooling
-      const poolSize = 5;
+      // Pre-create shooting stars for object pooling - reduced pool size for better performance
+      const poolSize = 3; // Smaller pool since we only need max 2 active
       for (let i = 0; i < poolSize; i++) {
         this.shootingStarPool.push({
           x: 0,
@@ -696,23 +696,12 @@ const {
           maxTrailLength: 10,
         });
       }
-      this.shootingStarPool.push({
-        x: 0,
-        y: 0,
-        angle: 0,
-        speed: 0,
-        length: this.config.shootingStars.starWidth,
-        opacity: 1,
-        active: false,
-        trail: [],
-        maxTrailLength: 10,
-      });
     }
 
     private getShootingStar(): ShootingStar | null {
-      // Get from pool or create new one
+      // Get from pool or create new one - strict limit to prevent lag
       let star = this.shootingStarPool.find((s) => !s.active);
-      if (!star && this.shootingStarPool.length < 10) {
+      if (!star && this.shootingStarPool.length < 3) { // Reduced from 10 to 3
         star = {
           x: 0,
           y: 0,
@@ -722,7 +711,7 @@ const {
           opacity: 1,
           active: false,
           trail: [],
-          maxTrailLength: 20,
+          maxTrailLength: 15, // Reduced trail length for better performance
         };
         this.shootingStarPool.push(star);
       }
@@ -736,6 +725,11 @@ const {
     }
 
     private createShootingStar(): void {
+      // Double-check we haven't exceeded the limit before creating
+      if (this.shootingStars.length >= this.maxActiveShootingStars) {
+        return;
+      }
+      
       const star = this.getShootingStar();
       if (!star) return;
 
@@ -1060,6 +1054,7 @@ const {
 
       // Create new shooting star if it's time and we haven't reached the limit
       if (this.config.shootingStars.enabled && performance.now() >= this.nextShootingStarTime) {
+        // Only create if we're below the strict limit
         if (this.shootingStars.length < this.maxActiveShootingStars) {
           this.createShootingStar();
         }
