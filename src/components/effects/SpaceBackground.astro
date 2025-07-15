@@ -69,9 +69,6 @@ const {
 ---
 
 <space-background
-  transition:name="space-background"
-  transition:persist
-  transition:persist-key="space-background-config"
   data-config={JSON.stringify({
     stars: {
       starDensity,
@@ -109,6 +106,8 @@ const {
 </space-background>
 
 <script>
+  // Interfaces para TypeScript del SpaceBackground optimizado
+
   interface Star {
     x: number;
     y: number;
@@ -116,6 +115,166 @@ const {
     opacity: number;
     twinkleSpeed: number | null;
     twinklePhase: number;
+  }
+
+  interface CachedStarData {
+    x: number;
+    y: number;
+    radius: number;
+    opacity: number;
+    twinkleSpeed: number | null;
+    twinklePhase: number;
+    normalizedX: number;  // 0-1 para escalado responsive
+    normalizedY: number;  // 0-1 para escalado responsive
+  }
+
+  interface StarFieldCache {
+    version: string;
+    userId: string;
+    created: number;
+    lastAccessed: number;
+    baseConfig: {
+      starDensity: number;
+      allStarsTwinkle: boolean;
+      twinkleProbability: number;
+      minTwinkleSpeed: number;
+      maxTwinkleSpeed: number;
+    };
+    referenceCanvas: { width: number; height: number };
+    stars: CachedStarData[];
+    checksum: string;
+    metadata: {
+      generationTime: number;
+      starCount: number;
+      algorithm: string;
+    };
+  }
+
+  // Seeded Random Number Generator para patrones determinísticos
+  class SeededRandom {
+    private m: number = 0x80000000; // 2^31
+    private a: number = 1103515245;
+    private c: number = 12345;
+    private state: number;
+
+    constructor(seed: number) {
+      this.state = seed ? seed : Math.floor(Math.random() * (this.m - 1));
+    }
+
+    next(): number {
+      this.state = (this.a * this.state + this.c) % this.m;
+      return this.state / (this.m - 1);
+    }
+
+    nextInRange(min: number, max: number): number {
+      return min + this.next() * (max - min);
+    }
+
+    nextGaussian(): number {
+      // Box-Muller transform para distribución normal
+      const u1 = this.next();
+      const u2 = this.next();
+      return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+  }
+
+  // Utilidades de cache y hash
+  class StarFieldCacheManager {
+    private static readonly CACHE_KEY = 'moura-space-background-v3';
+    private static readonly CACHE_VERSION = '3.0.0';
+    private static readonly TTL_DAYS = 30;
+
+    static generateUserId(): string {
+      const existingId = localStorage.getItem('moura-user-id');
+      if (existingId) return existingId;
+      
+      // Generar UUID v4 simple
+      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      
+      localStorage.setItem('moura-user-id', uuid);
+      return uuid;
+    }
+
+    static generateChecksum(data: CachedStarData[]): string {
+      // Simple hash para validación de integridad
+      let hash = 0;
+      const str = JSON.stringify(data);
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return hash.toString(36);
+    }
+
+    static saveCache(cache: StarFieldCache): boolean {
+      try {
+        cache.lastAccessed = Date.now();
+        cache.checksum = this.generateChecksum(cache.stars);
+        localStorage.setItem(this.CACHE_KEY, JSON.stringify(cache));
+        return true;
+      } catch (error) {
+        console.warn('Failed to save star field cache:', error);
+        return false;
+      }
+    }
+
+    static loadCache(): StarFieldCache | null {
+      try {
+        const cached = localStorage.getItem(this.CACHE_KEY);
+        if (!cached) return null;
+
+        const cache: StarFieldCache = JSON.parse(cached);
+        
+        // Validaciones de integridad
+        if (cache.version !== this.CACHE_VERSION) {
+          this.clearCache();
+          return null;
+        }
+
+        // Verificar TTL
+        const age = Date.now() - cache.created;
+        const maxAge = this.TTL_DAYS * 24 * 60 * 60 * 1000;
+        if (age > maxAge) {
+          this.clearCache();
+          return null;
+        }
+
+        // Verificar checksum
+        const expectedChecksum = this.generateChecksum(cache.stars);
+        if (cache.checksum !== expectedChecksum) {
+          console.warn('Star field cache corrupted, regenerating');
+          this.clearCache();
+          return null;
+        }
+
+        // Actualizar último acceso
+        cache.lastAccessed = Date.now();
+        this.saveCache(cache);
+        
+        return cache;
+      } catch (error) {
+        console.warn('Failed to load star field cache:', error);
+        this.clearCache();
+        return null;
+      }
+    }
+
+    static clearCache(): void {
+      localStorage.removeItem(this.CACHE_KEY);
+    }
+
+    static isCacheValidForCanvas(cache: StarFieldCache, width: number, height: number): boolean {
+      const tolerance = 0.1; // 10% tolerance
+      const widthDiff = Math.abs(cache.referenceCanvas.width - width) / width;
+      const heightDiff = Math.abs(cache.referenceCanvas.height - height) / height;
+      
+      return widthDiff <= tolerance && heightDiff <= tolerance;
+    }
   }
 
   interface ShootingStar {
@@ -305,7 +464,8 @@ const {
       if (this.isMobile) {
         // Use visual viewport API if available for better mobile handling
         if ('visualViewport' in window && window.visualViewport) {
-          (window.visualViewport as any).addEventListener(
+          const visualViewport = window.visualViewport as any;
+          visualViewport.addEventListener(
             'resize',
             this.handleMobileViewportChange.bind(this)
           );
@@ -348,8 +508,66 @@ const {
     }
 
     private initializeStars(): void {
+      const startTime = performance.now();
+
+      // Intentar cargar desde cache primero
+      const cachedData = StarFieldCacheManager.loadCache();
+      
+      if (cachedData && this.isConfigCompatible(cachedData.baseConfig) && 
+          StarFieldCacheManager.isCacheValidForCanvas(cachedData, this.width, this.height)) {
+        
+        console.log(`🌟 Loading stars from cache (${cachedData.stars.length} stars)`);
+        this.loadStarsFromCache(cachedData);
+        
+        const loadTime = performance.now() - startTime;
+        console.log(`⚡ Stars loaded in ${loadTime.toFixed(2)}ms (cached)`);
+        return;
+      }
+
+      // Generar nuevo patrón determinístico
+      console.log('🎲 Generating new deterministic star pattern');
+      this.generateDeterministicStars();
+      
+      // Guardar en cache
+      this.saveTCache();
+      
+      const generationTime = performance.now() - startTime;
+      console.log(`✨ Stars generated in ${generationTime.toFixed(2)}ms (new pattern)`);
+    }
+
+    private isConfigCompatible(cachedConfig: StarFieldCache['baseConfig']): boolean {
+      const current = this.config.stars;
+      return (
+        cachedConfig.starDensity === current.starDensity &&
+        cachedConfig.allStarsTwinkle === current.allStarsTwinkle &&
+        cachedConfig.twinkleProbability === current.twinkleProbability &&
+        Math.abs(cachedConfig.minTwinkleSpeed - current.minTwinkleSpeed) < 0.01 &&
+        Math.abs(cachedConfig.maxTwinkleSpeed - current.maxTwinkleSpeed) < 0.01
+      );
+    }
+
+    private loadStarsFromCache(cache: StarFieldCache): void {
+      // Convertir coordenadas normalizadas a posiciones actuales
+      this.stars = cache.stars.map(cachedStar => ({
+        x: cachedStar.normalizedX * this.width,
+        y: cachedStar.normalizedY * this.height,
+        radius: cachedStar.radius,
+        opacity: cachedStar.opacity,
+        twinkleSpeed: cachedStar.twinkleSpeed,
+        twinklePhase: cachedStar.twinklePhase,
+      }));
+    }
+
+    private generateDeterministicStars(): void {
       const { starDensity, allStarsTwinkle, twinkleProbability, minTwinkleSpeed, maxTwinkleSpeed } =
         this.config.stars;
+
+      // Crear semilla única basada en user ID + configuración
+      const userId = StarFieldCacheManager.generateUserId();
+      const configSeed = this.generateConfigSeed();
+      const masterSeed = this.hashString(userId + configSeed);
+      
+      const rng = new SeededRandom(masterSeed);
 
       const area = this.width * this.height;
       const numStars = Math.min(
@@ -358,18 +576,76 @@ const {
       );
 
       this.stars = Array.from({ length: numStars }, () => {
-        const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
+        const shouldTwinkle = allStarsTwinkle || rng.next() < twinkleProbability;
         return {
-          x: Math.random() * this.width,
-          y: Math.random() * this.height,
-          radius: Math.random() * 0.05 + 0.5,
-          opacity: Math.random() * 0.5 + 0.5,
+          x: rng.next() * this.width,
+          y: rng.next() * this.height,
+          radius: rng.nextInRange(0.5, 0.55),
+          opacity: rng.nextInRange(0.5, 1.0),
           twinkleSpeed: shouldTwinkle
-            ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
+            ? rng.nextInRange(minTwinkleSpeed, maxTwinkleSpeed)
             : null,
-          twinklePhase: Math.random() * Math.PI * 2,
+          twinklePhase: rng.next() * Math.PI * 2,
         };
       });
+    }
+
+    private generateConfigSeed(): string {
+      const config = this.config.stars;
+      return `${config.starDensity}-${config.allStarsTwinkle}-${config.twinkleProbability}-${config.minTwinkleSpeed}-${config.maxTwinkleSpeed}`;
+    }
+
+    private hashString(str: string): number {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash);
+    }
+
+    private saveTCache(): void {
+      const userId = StarFieldCacheManager.generateUserId();
+      
+      // Convertir estrellas a formato con coordenadas normalizadas
+      const normalizedStars: CachedStarData[] = this.stars.map(star => ({
+        x: star.x,
+        y: star.y,
+        radius: star.radius,
+        opacity: star.opacity,
+        twinkleSpeed: star.twinkleSpeed,
+        twinklePhase: star.twinklePhase,
+        normalizedX: star.x / this.width,
+        normalizedY: star.y / this.height,
+      }));
+
+      const cache: StarFieldCache = {
+        version: '3.0.0',
+        userId,
+        created: Date.now(),
+        lastAccessed: Date.now(),
+        baseConfig: {
+          starDensity: this.config.stars.starDensity,
+          allStarsTwinkle: this.config.stars.allStarsTwinkle,
+          twinkleProbability: this.config.stars.twinkleProbability,
+          minTwinkleSpeed: this.config.stars.minTwinkleSpeed,
+          maxTwinkleSpeed: this.config.stars.maxTwinkleSpeed,
+        },
+        referenceCanvas: {
+          width: this.width,
+          height: this.height,
+        },
+        stars: normalizedStars,
+        checksum: '', // Will be generated by saveCache
+        metadata: {
+          generationTime: performance.now(),
+          starCount: this.stars.length,
+          algorithm: 'SeededRandom-v3.0.0',
+        },
+      };
+
+      StarFieldCacheManager.saveCache(cache);
     }
 
     private initializeShootingStarPool(): void {
@@ -903,7 +1179,13 @@ const {
 
       // Throttle based on battery status
       if ('getBattery' in navigator) {
-        (navigator as any).getBattery().then((battery: any) => {
+        interface BatteryManager {
+          level: number;
+          charging: boolean;
+        }
+        
+        const getBattery = (navigator as { getBattery(): Promise<BatteryManager> }).getBattery;
+        getBattery().then((battery: BatteryManager) => {
           if (battery.level < 0.2) return true; // Low battery
         });
       }
@@ -918,7 +1200,7 @@ const {
 
       // Use longer debounce for mobile to avoid UI bar changes
       this.resizeTimeout = window.setTimeout(() => {
-        const visualViewport = (window as any).visualViewport;
+        const visualViewport = window.visualViewport as any;
         if (!visualViewport) return;
 
         const newWidth = visualViewport.width;
@@ -998,13 +1280,29 @@ const {
         // Recalculate stars to maintain consistent density
         this.initializeStars();
       } else {
-        // Just reposition existing stars proportionally
-        const widthRatio = this.width / oldWidth;
-        const heightRatio = this.height / oldHeight;
+        // Use smart scaling: check if cached data is available for better scaling
+        const cachedData = StarFieldCacheManager.loadCache();
+        
+        if (cachedData && this.isConfigCompatible(cachedData.baseConfig)) {
+          // Use normalized coordinates for perfect scaling
+          console.log('🔄 Rescaling stars using cached normalized coordinates');
+          this.stars = cachedData.stars.map(cachedStar => ({
+            x: cachedStar.normalizedX * this.width,
+            y: cachedStar.normalizedY * this.height,
+            radius: cachedStar.radius,
+            opacity: cachedStar.opacity,
+            twinkleSpeed: cachedStar.twinkleSpeed,
+            twinklePhase: cachedStar.twinklePhase,
+          }));
+        } else {
+          // Fallback: proportional scaling
+          const widthRatio = this.width / oldWidth;
+          const heightRatio = this.height / oldHeight;
 
-        for (const star of this.stars) {
-          star.x *= widthRatio;
-          star.y *= heightRatio;
+          for (const star of this.stars) {
+            star.x *= widthRatio;
+            star.y *= heightRatio;
+          }
         }
       }
     }
@@ -1033,7 +1331,8 @@ const {
       // Clean up event listeners
       if (this.isMobile) {
         if ('visualViewport' in window && window.visualViewport) {
-          (window.visualViewport as any).removeEventListener(
+          const visualViewport = window.visualViewport as any;
+          visualViewport.removeEventListener(
             'resize',
             this.handleMobileViewportChange.bind(this)
           );
