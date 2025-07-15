@@ -377,20 +377,14 @@ const projectTypes: ProjectType[] = [
                   >
                     {
                       projectTypes.map((projectType) => (
-                        <label class="project-pill" id={`project-${projectType.id}`}>
+                        <label class="project-pill" id={`project-${projectType.id}`} title={projectType.description}>
                           <input
                             type="checkbox"
                             name="project-type"
                             value={projectType.value}
                             class="pill-input sr-only"
                           />
-                          <div
-                            class="pill-content"
-                            tabindex="0"
-                            role="checkbox"
-                            aria-checked="false"
-                            title={projectType.description}
-                          >
+                          <div class="pill-content">
                             <Icon
                               name={projectType.icon}
                               class="w-4 h-4 md:w-5 md:h-5 flex-shrink-0"
@@ -478,6 +472,27 @@ const projectTypes: ProjectType[] = [
                   <input
                     type="email"
                     name="email_confirm"
+                    tabindex="-1"
+                    autocomplete="off"
+                    value=""
+                  />
+                  <input
+                    type="text"
+                    name="phone"
+                    tabindex="-1"
+                    autocomplete="off"
+                    value=""
+                  />
+                  <input
+                    type="url"
+                    name="url"
+                    tabindex="-1"
+                    autocomplete="off"
+                    value=""
+                  />
+                  <input
+                    type="text"
+                    name="company"
                     tabindex="-1"
                     autocomplete="off"
                     value=""
@@ -632,6 +647,8 @@ const projectTypes: ProjectType[] = [
               rel="noopener noreferrer"
               class="relative flex flex-col items-center justify-center p-6 md:p-8 bg-gradient-to-br from-charcoal/80 via-background/90 to-charcoal/80 border border-border hover:border-accent rounded-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent/10 active:scale-95 group overflow-hidden backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
               aria-label="Descargar Curriculum Vitae en formato PDF"
+              data-umami-event="cv_download"
+              data-umami-event-source="contact_section"
             >
               <!-- Ripple effect -->
               <div
@@ -757,6 +774,9 @@ const projectTypes: ProjectType[] = [
                     rel={contact.id === 'email' ? undefined : 'noopener noreferrer'}
                     class="flex items-start gap-3 md:gap-4 p-3 rounded-lg border border-white/5 bg-background/5 hover:bg-accent/5 hover:border-accent/20 transition-all duration-200 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background max-w-full overflow-hidden"
                     aria-label={contact.ariaLabel}
+                    data-umami-event="contact_method_click"
+                    data-umami-event-platform={contact.id}
+                    data-umami-event-url={contact.url}
                   >
                     <div class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-accent/10 group-hover:bg-accent/20 rounded-lg flex items-center justify-center transition-colors duration-200">
                       <Icon
@@ -1334,465 +1354,13 @@ const projectTypes: ProjectType[] = [
 </style>
 
 <script>
-  // Type declarations for global objects
-  declare global {
-    function gtag(type: string, action: string, parameters?: Record<string, any>): void;
+  // Lazy load the contact form functionality
+  import { initContactForm } from '@/utils/contact-form-client';
+  
+  // Initialize contact form when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initContactForm);
+  } else {
+    initContactForm();
   }
-
-  // Enhanced Form Validation and Interaction with 2025 best practices
-  document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('contact-form') as HTMLFormElement;
-    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-
-    if (!form || !submitBtn) return;
-
-    // Capture UTM parameters from URL and populate hidden fields
-    function captureUTMParameters() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const utmParams = [
-        'utm_source',
-        'utm_medium',
-        'utm_campaign',
-        'utm_term',
-        'utm_content',
-        'utm_id',
-      ];
-
-      utmParams.forEach((param) => {
-        const value = urlParams.get(param);
-        const field = document.getElementById(param) as HTMLInputElement;
-        if (field && value) {
-          field.value = value;
-        }
-      });
-    }
-
-    // Initialize UTM capture
-    captureUTMParameters();
-
-    // Enhanced field validation rules with better error messages
-    const validators = {
-      name: {
-        validate: (value: string): string | null => {
-          if (value.length < 2) return 'El nombre debe tener al menos 2 caracteres';
-          if (value.length > 50) return 'El nombre es muy largo (máximo 50 caracteres)';
-          if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(value)) return 'El nombre solo puede contener letras';
-          return null;
-        },
-        debounceTime: 500,
-      },
-      email: {
-        validate: (value: string): string | null => {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value)) return 'Ingresá una dirección de email válida';
-          return null;
-        },
-        debounceTime: 800,
-      },
-      message: {
-        validate: (value: string): string | null => {
-          if (value.length < 20)
-            return `El mensaje debe tener al menos 20 caracteres (${value.length}/20)`;
-          if (value.length > 500) return 'El mensaje es muy largo (máximo 500 caracteres)';
-          return null;
-        },
-        debounceTime: 300,
-      },
-      projectType: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        validate: (_value: string): string | null => {
-          const checked = form.querySelectorAll('input[name="project-type"]:checked');
-          if (checked.length === 0) return 'Seleccioná al menos un tipo de proyecto';
-          return null;
-        },
-        debounceTime: 0,
-      },
-    };
-
-    // Debounced validation to improve performance
-    const debounceMap = new Map();
-    const debounce = (func: Function, delay: number, key: string) => {
-      clearTimeout(debounceMap.get(key));
-      debounceMap.set(key, setTimeout(func, delay));
-    };
-
-    // Enhanced real-time validation with accessibility support (FIXED - sin recursión)
-    function validateField(fieldName: string, value: string | boolean, showErrors = true): boolean {
-      const validator = validators[fieldName as keyof typeof validators];
-      if (!validator) return false;
-
-      const field =
-        form.querySelector('[data-validate="' + fieldName + '"]') ||
-        form.querySelector('[name="' + fieldName + '"]');
-      if (!field) return false;
-
-      const fieldContainer = field.closest('.form-field');
-      const errorElement = fieldContainer?.querySelector('.form-error');
-
-      let error: string | null = null;
-      let hasValue = false;
-
-      if (fieldName === 'projectType') {
-        error = validator.validate('');
-        // Check if any project type is selected
-        hasValue = form.querySelectorAll('input[name="project-type"]:checked').length > 0;
-      } else if (typeof validator.validate === 'function') {
-        error = validator.validate(value as string);
-        hasValue = Boolean(value && (value as string).trim());
-      }
-
-      // Update field state with enhanced visual feedback
-      if (fieldContainer) {
-        fieldContainer.classList.remove('valid', 'invalid');
-        if (hasValue && !error) {
-          fieldContainer.classList.add('valid');
-          // Announce success to screen readers
-          if (showErrors) {
-            const validationIcon = fieldContainer.querySelector('.validation-icon');
-            if (validationIcon) {
-              validationIcon.classList.remove('hidden');
-            }
-          }
-        } else if (hasValue && error && showErrors) {
-          fieldContainer.classList.add('invalid');
-        }
-      }
-
-      // Enhanced error display with better accessibility
-      if (errorElement && showErrors) {
-        if (error) {
-          errorElement.classList.remove('hidden');
-          errorElement.classList.add('show');
-          const errorSpan = errorElement.querySelector('span');
-          if (errorSpan) errorSpan.textContent = error;
-
-          // Announce error to screen readers immediately
-          errorElement.setAttribute('aria-live', 'assertive');
-        } else {
-          errorElement.classList.add('hidden');
-          errorElement.classList.remove('show');
-          errorElement.setAttribute('aria-live', 'polite');
-        }
-      }
-
-      // REMOVED: updateProgressIndicator() call to prevent infinite recursion
-      return !error;
-    }
-
-    // Enhanced character counter for textarea with live announcements
-    const messageField = form.querySelector('#message') as HTMLTextAreaElement;
-    const counter = form.querySelector('.counter-text') as HTMLElement;
-    if (messageField && counter) {
-      messageField.addEventListener('input', function () {
-        const count = this.value.length;
-        counter.textContent = count + ' / 500';
-
-        // Visual feedback for character limits
-        if (count > 450) {
-          counter.style.color = '#ef4444';
-        } else if (count > 400) {
-          counter.style.color = '#f59e0b';
-        } else {
-          counter.style.color = 'var(--color-light-2)';
-        }
-
-        // Announce milestones to screen readers
-        if (count === 20 || count === 100 || count === 200 || count === 400 || count === 450) {
-          counter.setAttribute('aria-live', 'polite');
-          setTimeout(() => counter.setAttribute('aria-live', 'off'), 1000);
-        }
-      });
-    }
-
-    // Add enhanced validation listeners with debouncing
-    ['name', 'email', 'message'].forEach(function (fieldName) {
-      const field = form.querySelector('[data-validate="' + fieldName + '"]') as
-        | HTMLInputElement
-        | HTMLTextAreaElement;
-      if (field) {
-        field.addEventListener('blur', function () {
-          validateField(fieldName, field.value, true);
-          checkFormValidity(); // Ensure button state updates
-        });
-
-        field.addEventListener('input', function () {
-          const validator = validators[fieldName as keyof typeof validators];
-          if (validator) {
-            debounce(
-              () => {
-                validateField(fieldName, field.value, true);
-                checkFormValidity();
-              },
-              validator.debounceTime,
-              fieldName
-            );
-          } else {
-            // Fallback for immediate check
-            checkFormValidity();
-          }
-        });
-      }
-    });
-
-    // Enhanced project type checkboxes with keyboard support
-    const projectLabels = form.querySelectorAll('.project-pill') as NodeListOf<HTMLLabelElement>;
-
-    projectLabels.forEach((label) => {
-      const checkbox = label.querySelector('input[name="project-type"]') as HTMLInputElement;
-      const pill = label.querySelector('.pill-content') as HTMLElement;
-
-      if (!checkbox || !pill) return;
-
-      // Función para manejar el toggle del checkbox
-      function toggleCheckbox() {
-        checkbox.checked = !checkbox.checked;
-
-        // Trigger change event para que otros listeners se ejecuten
-        const event = new Event('change', { bubbles: true });
-        checkbox.dispatchEvent(event);
-      }
-
-      // Keyboard support for custom pills
-      pill.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleCheckbox();
-        }
-      });
-
-      // Click support
-      pill.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleCheckbox();
-      });
-
-      // Main change listener that handles all state updates
-      checkbox.addEventListener('change', function () {
-        updatePillState(pill, checkbox.checked);
-        validateField('projectType', '', true);
-        checkFormValidity();
-      });
-
-      // Initialize ARIA states
-      updatePillState(pill, checkbox.checked);
-    });
-
-    function updatePillState(pill: HTMLElement, checked: boolean) {
-      pill.setAttribute('aria-checked', checked.toString());
-      pill.setAttribute('tabindex', '0');
-
-      // Update visual state
-      if (checked) {
-        pill.classList.add('pill-selected');
-      } else {
-        pill.classList.remove('pill-selected');
-      }
-    }
-
-    // Enhanced form validity check with better performance
-    function checkFormValidity(): boolean {
-      const nameField = form.querySelector('#name') as HTMLInputElement;
-      const emailField = form.querySelector('#email') as HTMLInputElement;
-      const messageField = form.querySelector('#message') as HTMLTextAreaElement;
-
-      const name = nameField?.value.trim() || '';
-      const email = emailField?.value.trim() || '';
-      const message = messageField?.value.trim() || '';
-
-      // Direct validation without calling validateField to avoid recursion
-      const nameValid = name.length >= 2 && name.length <= 50 && /^[a-zA-ZÀ-ÿ\s]+$/.test(name);
-      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      const messageValid = message.length >= 20 && message.length <= 500;
-      const projectValid = form.querySelectorAll('input[name="project-type"]:checked').length > 0;
-
-      const isValid = nameValid && emailValid && messageValid && projectValid;
-
-      if (submitBtn) {
-        submitBtn.disabled = !isValid;
-        submitBtn.setAttribute('aria-disabled', (!isValid).toString());
-      }
-
-      return isValid;
-    }
-
-    // Function to disable all form inputs after successful submission
-    function disableFormInputs() {
-      const inputs = form.querySelectorAll('input, textarea, button');
-      inputs.forEach((input) => {
-        (input as HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement).disabled = true;
-      });
-
-      // Also disable the project type pills
-      const pills = form.querySelectorAll('.pill-content');
-      pills.forEach((pill) => {
-        const pillElement = pill as HTMLElement;
-        pillElement.setAttribute('tabindex', '-1');
-        pillElement.style.pointerEvents = 'none';
-        pillElement.style.opacity = '0.5';
-      });
-    }
-
-    // Function to show success state in the button
-    function showSuccessState() {
-      const buttonContent = submitBtn.querySelector('.button-content');
-      const buttonLoader = submitBtn.querySelector('.button-loader');
-
-      // Hide loader
-      if (buttonLoader) buttonLoader.classList.add('hidden');
-
-      // Update button content with success icon and text
-      if (buttonContent) {
-        buttonContent.innerHTML = `
-          <svg class="w-5 h-5 text-green-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          <span class="text-green-800 font-medium">Enviado correctamente</span>
-        `;
-        buttonContent.classList.remove('hidden');
-      }
-
-      // Update button styles with success state
-      submitBtn.classList.add('success-state');
-      submitBtn.disabled = true;
-      submitBtn.setAttribute('aria-label', 'Mensaje enviado correctamente');
-    }
-
-    // Enhanced form submission with better error handling and security
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      // Final validation check
-      if (!checkFormValidity()) {
-        // Focus on first invalid field for better UX
-        const firstInvalidField = form.querySelector(
-          '.form-field.invalid input, .form-field.invalid textarea'
-        );
-        if (firstInvalidField) {
-          (firstInvalidField as HTMLElement).focus();
-        }
-        return;
-      }
-
-      // Show enhanced loading state
-      const buttonContent = submitBtn.querySelector('.button-content');
-      const buttonLoader = submitBtn.querySelector('.button-loader');
-
-      if (buttonContent) buttonContent.classList.add('hidden');
-      if (buttonLoader) buttonLoader.classList.remove('hidden');
-      submitBtn.disabled = true;
-      submitBtn.setAttribute('aria-busy', 'true');
-
-      try {
-        // Collect form data with enhanced security measures
-        const formData = new FormData(form);
-
-        // Check honeypot fields
-        if (formData.get('website') || formData.get('email_confirm')) {
-          throw new Error('Spam detected');
-        }
-
-        const projectTypes: string[] = [];
-        const checkedBoxes = form.querySelectorAll(
-          'input[name="project-type"]:checked'
-        ) as NodeListOf<HTMLInputElement>;
-        checkedBoxes.forEach(function (checkbox) {
-          projectTypes.push(checkbox.value);
-        });
-        formData.set('project-type', projectTypes.join(', '));
-
-        // Add timestamp for additional security
-        formData.set('timestamp', Date.now().toString());
-
-        // Submit to API endpoint with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-        const response = await fetch('/api/contact', {
-          method: 'POST',
-          body: formData,
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          // Enhanced success handling - Disable form but keep visible
-          disableFormInputs();
-          showSuccessState();
-
-          // Track successful submission (if analytics available)
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'form_submit', {
-              event_category: 'Contact',
-              event_label: 'Success',
-            });
-          }
-        } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-      } catch (error) {
-        console.error('Form submission error:', error);
-
-        let errorMessage = 'Hubo un error al enviar el mensaje. Por favor, intentá nuevamente.';
-
-        if (error instanceof Error) {
-          if (error.name === 'AbortError') {
-            errorMessage = 'El envío tardó demasiado. Verificá tu conexión e intentá nuevamente.';
-          } else if (error.message === 'Spam detected') {
-            errorMessage = 'Error de validación. Refrescá la página e intentá nuevamente.';
-          }
-        }
-
-        // Show user-friendly error message with better accessibility
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'form-error show mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
-        errorDiv.setAttribute('role', 'alert');
-        errorDiv.setAttribute('aria-live', 'assertive');
-        errorDiv.innerHTML = `
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span class="text-red-700 font-medium">${errorMessage}</span>
-          </div>
-        `;
-
-        form.appendChild(errorDiv);
-
-        // Remove error message after 8 seconds
-        setTimeout(() => {
-          if (errorDiv.parentNode) {
-            errorDiv.parentNode.removeChild(errorDiv);
-          }
-        }, 8000);
-
-        // Track failed submission (if analytics available)
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'form_submit', {
-            event_category: 'Contact',
-            event_label: 'Error',
-          });
-        }
-      } finally {
-        // Reset loading state
-        if (buttonContent) buttonContent.classList.remove('hidden');
-        if (buttonLoader) buttonLoader.classList.add('hidden');
-        submitBtn.disabled = false;
-        submitBtn.setAttribute('aria-busy', 'false');
-      }
-    });
-
-    // Add global form change listener as backup
-    form.addEventListener('input', function () {
-      checkFormValidity();
-    });
-
-    form.addEventListener('change', function () {
-      checkFormValidity();
-    });
-
-    // Initial form state check
-    checkFormValidity();
-  });
 </script>

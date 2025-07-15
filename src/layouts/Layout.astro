@@ -98,6 +98,16 @@ const backgroundConfig = {
       )
     }
 
+    <!-- Enhanced Analytics -->
+    <script>
+      // Import and initialize page analytics
+      import('/src/utils/page-analytics.js').then(() => {
+        // Page analytics auto-initializes
+      }).catch(error => {
+        console.warn('Page analytics failed to load:', error);
+      });
+    </script>
+
     <!-- Simplified Performance Monitoring -->
     <script>
       // Only register Service Worker in production
