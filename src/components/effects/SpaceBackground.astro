@@ -27,6 +27,12 @@ interface Props {
   gravityX?: number | null; // null = center
   gravityY?: number | null; // null = center
 
+  // Black Hole props (for hero orbit only)
+  blackHoleEnabled?: boolean;
+  blackHoleRotationSpeed?: number;
+  blackHoleSpiralStrength?: number;
+  blackHoleEventHorizonRadius?: number;
+
   // Mouse Gravity props
   mouseGravityEnabled?: boolean;
   mouseGravityStrength?: number;
@@ -60,6 +66,12 @@ const {
   gravityStrength = 8000,
   gravityX = null,
   gravityY = null,
+
+  // Black Hole defaults
+  blackHoleEnabled = true,
+  blackHoleRotationSpeed = 0.0002, // Slow rotation (radians per frame)
+  blackHoleSpiralStrength = 0.00005, // Gradual inward spiral
+  blackHoleEventHorizonRadius = 0.3, // 30% of orbit radius
 
   // Mouse Gravity defaults
   mouseGravityEnabled = true,
@@ -95,6 +107,12 @@ const {
       x: gravityX,
       y: gravityY,
     },
+    blackHole: {
+      enabled: blackHoleEnabled,
+      rotationSpeed: blackHoleRotationSpeed,
+      spiralStrength: blackHoleSpiralStrength,
+      eventHorizonRadius: blackHoleEventHorizonRadius,
+    },
     mouseGravity: {
       enabled: mouseGravityEnabled,
       strength: mouseGravityStrength,
@@ -124,8 +142,8 @@ const {
     opacity: number;
     twinkleSpeed: number | null;
     twinklePhase: number;
-    normalizedX: number;  // 0-1 para escalado responsive
-    normalizedY: number;  // 0-1 para escalado responsive
+    normalizedX: number; // 0-1 para escalado responsive
+    normalizedY: number; // 0-1 para escalado responsive
   }
 
   interface StarFieldCache {
@@ -187,14 +205,14 @@ const {
     static generateUserId(): string {
       const existingId = localStorage.getItem('moura-user-id');
       if (existingId) return existingId;
-      
+
       // Generar UUID v4 simple
       const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
         return v.toString(16);
       });
-      
+
       localStorage.setItem('moura-user-id', uuid);
       return uuid;
     }
@@ -205,7 +223,7 @@ const {
       const str = JSON.stringify(data);
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32-bit integer
       }
       return hash.toString(36);
@@ -229,7 +247,7 @@ const {
         if (!cached) return null;
 
         const cache: StarFieldCache = JSON.parse(cached);
-        
+
         // Validaciones de integridad
         if (cache.version !== this.CACHE_VERSION) {
           this.clearCache();
@@ -255,7 +273,7 @@ const {
         // Actualizar último acceso
         cache.lastAccessed = Date.now();
         this.saveCache(cache);
-        
+
         return cache;
       } catch (error) {
         console.warn('Failed to load star field cache:', error);
@@ -272,7 +290,7 @@ const {
       const tolerance = 0.1; // 10% tolerance
       const widthDiff = Math.abs(cache.referenceCanvas.width - width) / width;
       const heightDiff = Math.abs(cache.referenceCanvas.height - height) / height;
-      
+
       return widthDiff <= tolerance && heightDiff <= tolerance;
     }
   }
@@ -315,6 +333,12 @@ const {
       x: number | null;
       y: number | null;
     };
+    blackHole: {
+      enabled: boolean;
+      rotationSpeed: number;
+      spiralStrength: number;
+      eventHorizonRadius: number;
+    };
     mouseGravity: {
       enabled: boolean;
       strength: number;
@@ -351,6 +375,8 @@ const {
     private stableHeight: number = 0;
     // Performance optimization - limit active shooting stars
     private readonly maxActiveShootingStars: number = 3;
+    // Black hole effect tracking
+    private blackHoleRotationTime: number = 0;
 
     constructor() {
       super();
@@ -386,6 +412,12 @@ const {
             strength: 8000,
             x: null,
             y: null,
+          },
+          blackHole: {
+            enabled: true,
+            rotationSpeed: 0.0008,
+            spiralStrength: 0.0002,
+            eventHorizonRadius: 0.3,
           },
           mouseGravity: {
             enabled: true,
@@ -464,11 +496,11 @@ const {
       if (this.isMobile) {
         // Use visual viewport API if available for better mobile handling
         if ('visualViewport' in window && window.visualViewport) {
-          const visualViewport = window.visualViewport as any;
-          visualViewport.addEventListener(
-            'resize',
-            this.handleMobileViewportChange.bind(this)
-          );
+          interface VisualViewport extends EventTarget {
+            addEventListener(type: string, listener: EventListener): void;
+          }
+          const visualViewport = window.visualViewport as VisualViewport;
+          visualViewport.addEventListener('resize', this.handleMobileViewportChange.bind(this));
         } else {
           window.addEventListener('resize', this.handleMobileResize.bind(this));
         }
@@ -512,13 +544,15 @@ const {
 
       // Intentar cargar desde cache primero
       const cachedData = StarFieldCacheManager.loadCache();
-      
-      if (cachedData && this.isConfigCompatible(cachedData.baseConfig) && 
-          StarFieldCacheManager.isCacheValidForCanvas(cachedData, this.width, this.height)) {
-        
+
+      if (
+        cachedData &&
+        this.isConfigCompatible(cachedData.baseConfig) &&
+        StarFieldCacheManager.isCacheValidForCanvas(cachedData, this.width, this.height)
+      ) {
         console.log(`🌟 Loading stars from cache (${cachedData.stars.length} stars)`);
         this.loadStarsFromCache(cachedData);
-        
+
         const loadTime = performance.now() - startTime;
         console.log(`⚡ Stars loaded in ${loadTime.toFixed(2)}ms (cached)`);
         return;
@@ -527,10 +561,10 @@ const {
       // Generar nuevo patrón determinístico
       console.log('🎲 Generating new deterministic star pattern');
       this.generateDeterministicStars();
-      
+
       // Guardar en cache
       this.saveTCache();
-      
+
       const generationTime = performance.now() - startTime;
       console.log(`✨ Stars generated in ${generationTime.toFixed(2)}ms (new pattern)`);
     }
@@ -548,7 +582,7 @@ const {
 
     private loadStarsFromCache(cache: StarFieldCache): void {
       // Convertir coordenadas normalizadas a posiciones actuales
-      this.stars = cache.stars.map(cachedStar => ({
+      this.stars = cache.stars.map((cachedStar) => ({
         x: cachedStar.normalizedX * this.width,
         y: cachedStar.normalizedY * this.height,
         radius: cachedStar.radius,
@@ -566,7 +600,7 @@ const {
       const userId = StarFieldCacheManager.generateUserId();
       const configSeed = this.generateConfigSeed();
       const masterSeed = this.hashString(userId + configSeed);
-      
+
       const rng = new SeededRandom(masterSeed);
 
       const area = this.width * this.height;
@@ -582,9 +616,7 @@ const {
           y: rng.next() * this.height,
           radius: rng.nextInRange(0.5, 0.55),
           opacity: rng.nextInRange(0.5, 1.0),
-          twinkleSpeed: shouldTwinkle
-            ? rng.nextInRange(minTwinkleSpeed, maxTwinkleSpeed)
-            : null,
+          twinkleSpeed: shouldTwinkle ? rng.nextInRange(minTwinkleSpeed, maxTwinkleSpeed) : null,
           twinklePhase: rng.next() * Math.PI * 2,
         };
       });
@@ -599,7 +631,7 @@ const {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32-bit integer
       }
       return Math.abs(hash);
@@ -607,9 +639,9 @@ const {
 
     private saveTCache(): void {
       const userId = StarFieldCacheManager.generateUserId();
-      
+
       // Convertir estrellas a formato con coordenadas normalizadas
-      const normalizedStars: CachedStarData[] = this.stars.map(star => ({
+      const normalizedStars: CachedStarData[] = this.stars.map((star) => ({
         x: star.x,
         y: star.y,
         radius: star.radius,
@@ -844,6 +876,8 @@ const {
         const rect = this.orbitContainer.getBoundingClientRect();
         if (rect.width > 0 && rect.height > 0) {
           const gravityCoords = this.getGravityCoordinates();
+
+          // Apply regular gravitational lensing first
           currentPosition = this.applySingleGravitationalLensing(
             star,
             {
@@ -853,6 +887,25 @@ const {
             2.0,
             0.3
           );
+
+          // Apply black hole effects if enabled
+          if (this.config.blackHole.enabled) {
+            currentPosition = this.applyBlackHoleEffects(
+              {
+                x: currentPosition.x,
+                y: currentPosition.y,
+                radius: star.radius,
+                opacity: star.opacity,
+                twinkleSpeed: star.twinkleSpeed,
+                twinklePhase: star.twinklePhase,
+              },
+              {
+                x: gravityCoords.x,
+                y: gravityCoords.y,
+              },
+              gravityCoords.width
+            );
+          }
         }
       }
 
@@ -885,6 +938,48 @@ const {
       }
 
       return currentPosition;
+    }
+
+    private applyBlackHoleEffects(
+      star: Star,
+      blackHoleCenter: { x: number; y: number },
+      orbitWidth: number
+    ): { x: number; y: number } {
+      const dx = star.x - blackHoleCenter.x;
+      const dy = star.y - blackHoleCenter.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Define black hole influence radius (based on orbit size)
+      const maxBlackHoleRadius = (orbitWidth / 2) * 0.8; // 80% of orbit radius
+      if (distance > maxBlackHoleRadius) {
+        return { x: star.x, y: star.y };
+      }
+
+      // Calculate influence strength (stronger closer to center)
+      const influenceStrength = 1 - distance / maxBlackHoleRadius;
+      const eventHorizonRadius = maxBlackHoleRadius * this.config.blackHole.eventHorizonRadius;
+
+      // 1. Rotational Effect (left to right / clockwise)
+      const currentAngle = Math.atan2(dy, dx);
+      const rotationAmount =
+        this.config.blackHole.rotationSpeed * influenceStrength * this.blackHoleRotationTime;
+      const newAngle = currentAngle + rotationAmount;
+
+      // 2. Spiral Inward Effect
+      let spiralDistance = distance;
+      if (distance > eventHorizonRadius) {
+        const spiralAmount = this.config.blackHole.spiralStrength * influenceStrength;
+        spiralDistance = Math.max(distance - spiralAmount, eventHorizonRadius);
+      }
+
+      // 3. Event Horizon Effect - stars get trapped at the event horizon
+      const finalDistance = Math.max(spiralDistance, eventHorizonRadius);
+
+      // Calculate new position
+      const newX = blackHoleCenter.x + Math.cos(newAngle) * finalDistance;
+      const newY = blackHoleCenter.y + Math.sin(newAngle) * finalDistance;
+
+      return { x: newX, y: newY };
     }
 
     private applySingleGravitationalLensing(
@@ -987,20 +1082,53 @@ const {
         ctx.clearRect(0, 0, this.width, this.height);
       }
 
-      // Draw stars with gravitational lensing
-      ctx.fillStyle = '#fff';
+      // Draw stars with gravitational lensing and black hole effects
       const time = performance.now() * 0.001;
 
       for (const star of this.stars) {
         let opacity = star.opacity;
-
-        if (star.twinkleSpeed !== null) {
-          opacity = 0.5 + 0.5 * Math.sin(time / star.twinkleSpeed + star.twinklePhase);
-        }
+        let fillStyle = '#fff'; // Default white color
+        let twinkleSpeed = star.twinkleSpeed;
 
         // Apply gravitational lensing to star position
         const lensedPosition = this.applyMultipleGravitationalLensing(star);
 
+        // Calculate black hole visual effects if enabled and orbit exists
+        if (this.config.blackHole.enabled && this.orbitContainer && this.orbitRect) {
+          const gravityCoords = this.getGravityCoordinates();
+          const dx = lensedPosition.x - gravityCoords.x;
+          const dy = lensedPosition.y - gravityCoords.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxBlackHoleRadius = (gravityCoords.width / 2) * 0.8;
+
+          if (distance <= maxBlackHoleRadius) {
+            const influenceStrength = 1 - distance / maxBlackHoleRadius;
+            const eventHorizonRadius =
+              maxBlackHoleRadius * this.config.blackHole.eventHorizonRadius;
+
+            // Redshift effect - stars become redder closer to the black hole
+            if (distance <= eventHorizonRadius * 1.5) {
+              const redshiftStrength = Math.min(influenceStrength * 0.7, 0.7);
+              const red = Math.floor(255 * (1 - redshiftStrength * 0.3));
+              const green = Math.floor(255 * (1 - redshiftStrength * 0.6));
+              const blue = Math.floor(255 * (1 - redshiftStrength * 0.8));
+              fillStyle = `rgb(${red}, ${green}, ${blue})`;
+            }
+
+            // Time dilation effect - slower twinkling near black hole
+            if (twinkleSpeed !== null && distance <= eventHorizonRadius * 2) {
+              const dilationFactor = 1 + influenceStrength * 2; // Up to 3x slower
+              twinkleSpeed = star.twinkleSpeed! * dilationFactor;
+            }
+          }
+        }
+
+        // Apply twinkling with potentially modified speed
+        if (twinkleSpeed !== null) {
+          opacity = 0.5 + 0.5 * Math.sin(time / twinkleSpeed + star.twinklePhase);
+        }
+
+        ctx.fillStyle = fillStyle;
         ctx.globalAlpha = opacity;
         ctx.beginPath();
         ctx.arc(lensedPosition.x, lensedPosition.y, star.radius, 0, Math.PI * 2);
@@ -1141,12 +1269,37 @@ const {
         this.ctx.clearRect(0, 0, this.width, this.height);
       }
 
-      this.ctx.fillStyle = '#fff';
-
       for (const star of this.stars) {
+        let fillStyle = '#fff'; // Default white color
+
         // Apply gravitational lensing to star position
         const lensedPosition = this.applyMultipleGravitationalLensing(star);
 
+        // Calculate black hole visual effects if enabled and orbit exists
+        if (this.config.blackHole.enabled && this.orbitContainer && this.orbitRect) {
+          const gravityCoords = this.getGravityCoordinates();
+          const dx = lensedPosition.x - gravityCoords.x;
+          const dy = lensedPosition.y - gravityCoords.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxBlackHoleRadius = (gravityCoords.width / 2) * 0.8;
+
+          if (distance <= maxBlackHoleRadius) {
+            const influenceStrength = 1 - distance / maxBlackHoleRadius;
+            const eventHorizonRadius =
+              maxBlackHoleRadius * this.config.blackHole.eventHorizonRadius;
+
+            // Redshift effect - stars become redder closer to the black hole
+            if (distance <= eventHorizonRadius * 1.5) {
+              const redshiftStrength = Math.min(influenceStrength * 0.7, 0.7);
+              const red = Math.floor(255 * (1 - redshiftStrength * 0.3));
+              const green = Math.floor(255 * (1 - redshiftStrength * 0.6));
+              const blue = Math.floor(255 * (1 - redshiftStrength * 0.8));
+              fillStyle = `rgb(${red}, ${green}, ${blue})`;
+            }
+          }
+        }
+
+        this.ctx.fillStyle = fillStyle;
         this.ctx.globalAlpha = star.opacity;
         this.ctx.beginPath();
         this.ctx.arc(lensedPosition.x, lensedPosition.y, star.radius, 0, Math.PI * 2);
@@ -1158,6 +1311,9 @@ const {
       const currentTime = performance.now();
       const deltaTime = Math.min(currentTime - this.lastTime, 16.67); // Cap at 60fps maximum
       this.lastTime = currentTime;
+
+      // Update black hole rotation time
+      this.blackHoleRotationTime += deltaTime;
 
       // Throttle animation based on tab visibility and performance
       if (document.hidden || this.shouldThrottleAnimation()) {
@@ -1183,7 +1339,7 @@ const {
           level: number;
           charging: boolean;
         }
-        
+
         const getBattery = (navigator as { getBattery(): Promise<BatteryManager> }).getBattery;
         getBattery().then((battery: BatteryManager) => {
           if (battery.level < 0.2) return true; // Low battery
@@ -1200,7 +1356,11 @@ const {
 
       // Use longer debounce for mobile to avoid UI bar changes
       this.resizeTimeout = window.setTimeout(() => {
-        const visualViewport = window.visualViewport as any;
+        interface VisualViewport {
+          width: number;
+          height: number;
+        }
+        const visualViewport = window.visualViewport as VisualViewport;
         if (!visualViewport) return;
 
         const newWidth = visualViewport.width;
@@ -1282,11 +1442,11 @@ const {
       } else {
         // Use smart scaling: check if cached data is available for better scaling
         const cachedData = StarFieldCacheManager.loadCache();
-        
+
         if (cachedData && this.isConfigCompatible(cachedData.baseConfig)) {
           // Use normalized coordinates for perfect scaling
           console.log('🔄 Rescaling stars using cached normalized coordinates');
-          this.stars = cachedData.stars.map(cachedStar => ({
+          this.stars = cachedData.stars.map((cachedStar) => ({
             x: cachedStar.normalizedX * this.width,
             y: cachedStar.normalizedY * this.height,
             radius: cachedStar.radius,
@@ -1331,11 +1491,11 @@ const {
       // Clean up event listeners
       if (this.isMobile) {
         if ('visualViewport' in window && window.visualViewport) {
-          const visualViewport = window.visualViewport as any;
-          visualViewport.removeEventListener(
-            'resize',
-            this.handleMobileViewportChange.bind(this)
-          );
+          interface VisualViewport extends EventTarget {
+            removeEventListener(type: string, listener: EventListener): void;
+          }
+          const visualViewport = window.visualViewport as VisualViewport;
+          visualViewport.removeEventListener('resize', this.handleMobileViewportChange.bind(this));
         } else {
           window.removeEventListener('resize', this.handleMobileResize.bind(this));
         }
