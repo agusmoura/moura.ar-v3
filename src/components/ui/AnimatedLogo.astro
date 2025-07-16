@@ -1,0 +1,238 @@
+---
+interface Props {
+  size?: number;
+  className?: string;
+  animationDelay?: number;
+  fillColor?: string;
+}
+
+const {
+  size = 48,
+  className = '',
+  animationDelay = 0,
+  fillColor = '#ffffff',
+} = Astro.props;
+
+const uniqueId = `logo-${Math.random().toString(36).substring(2, 9)}`;
+---
+
+<div class={`animated-logo ${className}`} style={`--animation-delay: ${animationDelay}ms`}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 436 512"
+    class="logo-svg"
+    aria-label="Logo Agustín Moura"
+  >
+    <defs>
+      <mask id={`${uniqueId}-reveal`}>
+        <rect width="100%" height="100%" fill="black" />
+        <circle class="reveal-core" cx="371" cy="248" r="0" fill="white" />
+        <circle class="reveal-wave-1" cx="371" cy="248" r="0" fill="white" />
+        <circle class="reveal-wave-2" cx="371" cy="248" r="0" fill="white" />
+        <circle class="reveal-wave-3" cx="371" cy="248" r="0" fill="white" />
+        <circle class="reveal-branch-1" cx="200" cy="150" r="0" fill="white" />
+        <circle class="reveal-branch-2" cx="150" cy="350" r="0" fill="white" />
+        <circle class="reveal-branch-3" cx="280" cy="400" r="0" fill="white" />
+      </mask>
+
+      <radialGradient id={`${uniqueId}-energy`} cx="371" cy="248" r="50%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+        <stop offset="30%" stop-color="#efbb47" stop-opacity="0.8" />
+        <stop offset="70%" stop-color="#efbb47" stop-opacity="0.4" />
+        <stop offset="100%" stop-color="transparent" />
+      </radialGradient>
+
+      <filter id={`${uniqueId}-glow`}>
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    <circle
+      class="energy-core"
+      cx="371"
+      cy="248"
+      r="0"
+      fill={`url(#${uniqueId}-energy)`}
+      filter={`url(#${uniqueId}-glow)`}
+    />
+
+    <g class="logo-structure" mask={`url(#${uniqueId}-reveal)`}>
+      <path
+        d="m371.271 248.561-.665.03c.122-.188.243-.379.364-.57.103.18.202.36.301.54ZM133.198 347.476c-.561 22.764-33.926 22.793-34.502 0 .565-22.764 33.923-22.794 34.502 0Z"
+        fill={fillColor}
+      />
+      <path
+        d="M359.452 253.74c-55.3 84.225-129.877 166.799-214.456 222.126-31.049 18.813-89.359 53.764-127.267 25.502-75.345-84.614 109.828-316.788 174.712-381.295 3.817.68 7.634 1.477 11.452 2.389C125.85 199.306 43.881 306.215 15.761 416.463c-5.069 22.698-10.075 58.954 9.639 75.463 21.693 16.105 54.8 2.29 75.164-7.159 103.002-55.698 176.878-144.612 243.09-240.954a35.24 35.24 0 0 0 15.798 9.927ZM398.209 219.946c.201 14.94-12.128 27.935-26.938 28.615-.099-.18-.198-.36-.301-.54-.121.191-.242.382-.364.57-23.737 1.121-38.349-26.94-23.983-45.779 16.173-21.959 51.725-10.198 51.586 17.134Z"
+        fill={fillColor}
+      />
+      <path
+        d="M224.345 413.776a637.044 637.044 0 0 0 5.443-5.042l-5.443 5.042ZM425.37 19.949c-53.02-61.652-162.632 35.543-208.454 76.268a276.002 276.002 0 0 1 11.503 3.543C365.732-23.025 487.06-26.414 378.318 185.763a35.211 35.211 0 0 1 15.787 8.876c22.486-44.838 60.523-127.515 31.265-174.69Z"
+        fill={fillColor}
+      />
+      <path
+        d="M224.344 413.777a622.6 622.6 0 0 0 5.444-5.043l-5.444 5.043Zm-87.541-54.713a24.104 24.104 0 0 1-5.777 6.913c21.149 15.807 44.222 29.063 68.649 39.034a689.477 689.477 0 0 0 5.447-5.086c-24.75-10.35-48.043-24.624-68.319-40.861Zm275.107-45.929c-1.46-23.639-8.141-46.216-18.48-67.245a35.22 35.22 0 0 1-12.12 7.324c57.289 112.983-32.701 187.899-144.056 157.6a798.142 798.142 0 0 1-5.447 5.102c79.745 26.163 185.587-2.691 180.103-102.781ZM76.658 291.874a618.03 618.03 0 0 0-7.19 12.304c7.965 11.008 16.807 21.364 26.104 30.879a24.02 24.02 0 0 1 7.675-7.795c-9.77-10.941-18.804-22.808-26.589-35.388ZM353.542 188.534a35.474 35.474 0 0 0-11.437 9.35c-41.065-42.801-93.432-74.787-151.962-84.904C83.309 94.512 16.223 168.685 65.001 270.422a804.76 804.76 0 0 0-8.523 13.848c-55.612-86.908-12.737-194.536 97-190.747 76.328 1.224 148.934 39.88 200.064 95.011Z"
+        fill={fillColor}
+      />
+    </g>
+  </svg>
+</div>
+
+<style>
+.animated-logo {
+  --animation-delay: 0ms;
+  display: inline-block;
+}
+
+.logo-svg {
+  display: block;
+  overflow: visible;
+}
+
+.energy-core {
+  opacity: 0;
+  animation: coreAwaken 1s ease-out forwards;
+  animation-delay: calc(var(--animation-delay) + 200ms);
+}
+
+.reveal-core {
+  animation: expandCore 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 600ms);
+}
+
+.reveal-wave-1 {
+  animation: expandWave 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 800ms);
+}
+
+.reveal-wave-2 {
+  animation: expandWave 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 1000ms);
+}
+
+.reveal-wave-3 {
+  animation: expandWave 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 1200ms);
+}
+
+.reveal-branch-1 {
+  animation: expandBranch 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 1400ms);
+}
+
+.reveal-branch-2 {
+  animation: expandBranch 1.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 1600ms);
+}
+
+.reveal-branch-3 {
+  animation: expandBranch 1.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--animation-delay) + 1800ms);
+}
+
+@keyframes coreAwaken {
+  0% {
+    opacity: 0;
+    r: 0;
+  }
+  30% {
+    opacity: 1;
+    r: 8;
+  }
+  100% {
+    opacity: 0.6;
+    r: 15;
+  }
+}
+
+@keyframes expandCore {
+  from { r: 0; }
+  to { r: 40; }
+}
+
+@keyframes expandWave {
+  from { r: 0; }
+  to { r: 350; }
+}
+
+@keyframes expandBranch {
+  from { r: 0; }
+  to { r: 250; }
+}
+
+.animated-logo:hover .energy-core {
+  animation: corePulse 0.6s ease-in-out infinite;
+}
+
+.animated-logo:hover .logo-structure {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+@keyframes corePulse {
+  0%, 100% { r: 15; opacity: 0.6; }
+  50% { r: 20; opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .energy-core {
+    animation: simpleAppear 0.8s ease forwards;
+    animation-delay: calc(var(--animation-delay) + 200ms);
+  }
+  
+  .reveal-core, .reveal-wave-1, .reveal-wave-2, .reveal-wave-3,
+  .reveal-branch-1, .reveal-branch-2, .reveal-branch-3 {
+    animation: instantReveal 0.5s ease forwards;
+    animation-delay: calc(var(--animation-delay) + 400ms);
+  }
+  
+  @keyframes simpleAppear {
+    from { opacity: 0; r: 0; }
+    to { opacity: 0.6; r: 15; }
+  }
+  
+  @keyframes instantReveal {
+    from { r: 0; }
+    to { r: 400; }
+  }
+}
+</style>
+
+<script>
+class CrystalLogoComponent {
+  element: HTMLElement;
+  hasPlayedOnce: boolean;
+
+  constructor(element: HTMLElement) {
+    this.element = element;
+    this.hasPlayedOnce = false;
+    this.init();
+  }
+  
+  init(): void {
+    if (!('IntersectionObserver' in window)) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !this.hasPlayedOnce) {
+          this.hasPlayedOnce = true;
+          this.element.classList.add('crystallizing');
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '100px' });
+    
+    observer.observe(this.element);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.animated-logo').forEach(logo => {
+    new CrystalLogoComponent(logo as HTMLElement);
+  });
+});
+</script>

@@ -13,6 +13,8 @@ import '@styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import DesktopSideNav from '@components/ui/DesktopSideNav.astro';
 import MobileNav from '@components/ui/MobileNav.astro';
+import Footer from '@components/ui/Footer.astro';
+import AnimatedLogo from '@components/ui/AnimatedLogo.astro';
 
 export interface Props {
   title: string;
@@ -74,6 +76,20 @@ const backgroundConfig = {
     <SpaceBackground {...backgroundConfig} />
     <ScrollAnimations />
     <FocusManager />
+    
+    <!-- Animated Logo - Fixed position top left -->
+    {
+      !hideMenu && (
+        <div class="fixed top-6 left-6 z-50 animate-fade-in">
+          <AnimatedLogo 
+            size={56} 
+            className="text-primary hover:text-accent transition-colors duration-300"
+            animationDelay={800}
+          />
+        </div>
+      )
+    }
+    
     {
       !hideMenu && (
         <>
@@ -85,6 +101,9 @@ const backgroundConfig = {
     <main id="main-content" tabindex="-1" class="relative z-10">
       <slot />
     </main>
+
+    <!-- Footer -->
+    <Footer />
 
     <!-- Umami Analytics Tracker - Only in production -->
     {

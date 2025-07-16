@@ -1,0 +1,992 @@
+---
+import { Icon } from 'astro-icon/components';
+import { parseText } from '@/utils/textParser';
+
+const pt = (text: string) => parseText(text);
+
+interface NavigationLink {
+  href: string;
+  label: string;
+  icon: string;
+  external?: boolean;
+}
+
+interface SocialLink {
+  href: string;
+  label: string;
+  icon: string;
+  username: string;
+}
+
+const navigationLinks: NavigationLink[] = [
+  { href: '#', label: 'Inicio', icon: 'heroicons:home' },
+  { href: '#about', label: 'Principios', icon: 'heroicons:beaker' },
+  { href: '#projects', label: 'Proyectos', icon: 'heroicons:adjustments-horizontal' },
+  { href: '#contact', label: 'Contacto', icon: 'heroicons:envelope' },
+];
+
+const socialLinks: SocialLink[] = [
+  {
+    href: 'https://github.com/agusmoura',
+    label: 'GitHub',
+    icon: 'simple-icons:github',
+    username: '@agusmoura',
+  },
+  {
+    href: 'https://linkedin.com/in/agustin-mourino',
+    label: 'LinkedIn',
+    icon: 'simple-icons:linkedin',
+    username: '/in/agustin-mourino',
+  },
+  {
+    href: '/cv.pdf',
+    label: 'Curriculum',
+    icon: 'heroicons:document-arrow-down',
+    username: 'CV 2025',
+  },
+];
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer" role="contentinfo" aria-label="Información del sitio">
+  <div class="container relative mx-auto px-4 lg:px-8 max-w-6xl">
+    <!-- Footer Card Container -->
+    <div class="footer-card">
+      <!-- Main Footer Content -->
+      <div class="footer-content">
+      <!-- Decorative particles container -->
+      <div class="footer-particles" aria-hidden="true">
+        <div
+          class="footer-particle"
+          style="--x: 10%; --y: 20%; --size: 2px; --speed: 4s; --delay: 0s;"
+        ></div>
+        <div
+          class="footer-particle"
+          style="--x: 85%; --y: 30%; --size: 1px; --speed: 6s; --delay: -2s;"
+        ></div>
+        <div
+          class="footer-particle"
+          style="--x: 60%; --y: 15%; --size: 1.5px; --speed: 5s; --delay: -4s;"
+        ></div>
+      </div>
+
+      <!-- Grid Layout: 1 col mobile, 3 cols desktop -->
+      <div class="footer-grid">
+        <!-- Column 1: Branding & Description -->
+        <div class="footer-brand" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+          <div class="brand-content">
+            <!-- Logo/Brand with orbital decoration -->
+            <div class="brand-header">
+              <div class="brand-orbit-container">
+                <div class="brand-orbit" aria-hidden="true"></div>
+                <h2 class="brand-title">
+                  <span class="brand-text">Moura</span>
+                  <span class="brand-accent">.ar</span>
+                </h2>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <p
+              class="brand-description"
+              set:html={pt(
+                'Desarrollador [[**full-stack**]] y diseñador [[**UX/UI**]] creando experiencias digitales que conectan tecnología con humanidad.'
+              )}
+            />
+
+            <!-- Tagline -->
+            <div class="brand-tagline">
+              <div class="tagline-dots">
+                {
+                  [1, 2, 3].map((i) => (
+                    <div
+                      class="tagline-dot"
+                      style={{ animationDelay: `${i * 0.5}s` }}
+                      aria-hidden="true"
+                    />
+                  ))
+                }
+              </div>
+              <span class="tagline-text">Transformando ideas en realidades digitales</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Navigation Links -->
+        <div
+          class="footer-navigation"
+          data-aos="fade-up"
+          data-aos-duration="600"
+          data-aos-delay="400"
+        >
+          <h3 class="footer-section-title">
+            <Icon name="heroicons:link" class="section-icon" aria-hidden="true" />
+            Navegación
+          </h3>
+
+          <nav class="nav-links" aria-label="Enlaces de navegación del pie de página">
+            {
+              navigationLinks.map((link) => (
+                <a
+                  href={link.href}
+                  class="nav-link group"
+                  data-section={link.href.startsWith('#') ? link.href.substring(1) || 'home' : undefined}
+                >
+                  <Icon name={link.icon} class="nav-link-icon" aria-hidden="true" />
+                  <span class="nav-link-text">{link.label}</span>
+                  <div class="nav-link-glow" aria-hidden="true" />
+                </a>
+              ))
+            }
+          </nav>
+
+          <!-- Social Links -->
+          <div class="social-section">
+            <h4 class="social-title">Conecta conmigo</h4>
+            <div class="social-links">
+              {
+                socialLinks.map((social) => (
+                  <a
+                    href={social.href}
+                    target={social.href.startsWith('http') ? '_blank' : undefined}
+                    rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    class="social-link group"
+                    aria-label={`${social.label}: ${social.username}`}
+                    title={`${social.label}: ${social.username}`}
+                  >
+                    <Icon name={social.icon} class="social-icon" aria-hidden="true" />
+                    <span class="social-username">{social.username}</span>
+                    <div class="social-glow" aria-hidden="true" />
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Legal & Meta Information -->
+        <div class="footer-meta" data-aos="fade-up" data-aos-duration="600" data-aos-delay="600">
+          <h3 class="footer-section-title">
+            <Icon name="heroicons:information-circle" class="section-icon" aria-hidden="true" />
+            Información
+          </h3>
+
+          <div class="meta-content">
+            <!-- Copyright -->
+            <div class="copyright">
+              <p class="copyright-text">
+                © {currentYear}
+                <span class="copyright-name">Agustín Mouriño</span>
+              </p>
+              <p class="copyright-rights">Todos los derechos reservados</p>
+            </div>
+
+            <!-- Built with -->
+            <div class="built-with">
+              <p class="built-title">Construido con</p>
+              <div class="tech-stack">
+                <span class="tech-item">
+                  <Icon name="simple-icons:astro" class="tech-icon" aria-hidden="true" />
+                  Astro
+                </span>
+                <span class="tech-item">
+                  <Icon name="simple-icons:tailwindcss" class="tech-icon" aria-hidden="true" />
+                  Tailwind
+                </span>
+                <span class="tech-item">
+                  <Icon name="heroicons:heart" class="tech-icon heart-icon" aria-hidden="true" />
+                  Amor
+                </span>
+              </div>
+            </div>
+
+            <!-- Meta info -->
+            <div class="meta-info">
+              <p class="meta-item">
+                <Icon name="heroicons:calendar" class="meta-icon" aria-hidden="true" />
+                Actualizado enero 2025
+              </p>
+              <p class="meta-item">
+                <Icon name="heroicons:globe-americas" class="meta-icon" aria-hidden="true" />
+                Buenos Aires, Argentina
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Bottom Bar -->
+    <div class="footer-bottom">
+      <!-- Separator -->
+      <div
+        class="footer-separator"
+        aria-hidden="true"
+      ></div>
+
+      <div class="bottom-content">
+        <!-- Minimal copyright -->
+        <p class="bottom-copyright">
+          <span class="bottom-year">{currentYear}</span>
+          <span class="bottom-separator">•</span>
+          <span class="bottom-name">Moura.ar</span>
+        </p>
+
+        <!-- Back to top button -->
+        <button
+          type="button"
+          class="back-to-top"
+          aria-label="Volver al inicio de la página"
+          title="Volver al inicio"
+          id="back-to-top-btn"
+        >
+          <Icon name="heroicons:arrow-up" class="back-to-top-icon" aria-hidden="true" />
+          <span class="back-to-top-text">Inicio</span>
+          <div class="back-to-top-glow" aria-hidden="true"></div>
+        </button>
+      </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Back to top functionality
+  function initBackToTop() {
+    const backToTopBtn = document.getElementById('back-to-top-btn');
+    if (!backToTopBtn) return;
+
+    backToTopBtn.addEventListener('click', () => {
+      // Smooth scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+
+      // Update focus for accessibility
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.focus();
+      }
+    });
+
+    // Show/hide based on scroll position
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 400;
+      backToTopBtn.style.opacity = scrolled ? '1' : '0.6';
+      backToTopBtn.style.transform = scrolled 
+        ? 'translateY(0) scale(1)' 
+        : 'translateY(4px) scale(0.95)';
+    };
+
+    // Throttled scroll handler for performance
+    let scrollTimeout: number;
+    const throttledScroll = () => {
+      if (scrollTimeout) return;
+      scrollTimeout = window.setTimeout(() => {
+        handleScroll();
+        scrollTimeout = 0;
+      }, 16); // ~60fps
+    };
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
+  }
+
+  // Smooth scroll for footer navigation links
+  function initFooterNavigation() {
+    const footerLinks = document.querySelectorAll('[data-section]');
+    
+    footerLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const sectionId = link.getAttribute('data-section');
+        const href = link.getAttribute('href');
+
+        if (sectionId && href?.startsWith('#')) {
+          e.preventDefault();
+
+          const targetSection = document.getElementById(sectionId);
+          if (targetSection) {
+            targetSection.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+
+            // Update URL
+            const newUrl = href === '#' ? window.location.pathname : href;
+            history.pushState(null, '', newUrl);
+          }
+        }
+      });
+    });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initBackToTop();
+      initFooterNavigation();
+    });
+  } else {
+    initBackToTop();
+    initFooterNavigation();
+  }
+</script>
+
+<style>
+  .footer {
+    --footer-bg: transparent;
+    --footer-border: rgba(255, 255, 255, 0.05);
+    --footer-text: var(--color-foreground);
+    --footer-text-muted: var(--color-text-2);
+    --footer-accent: var(--color-accent);
+    --footer-accent-light: var(--color-accent-light);
+    --footer-card-bg: rgba(var(--color-charcoal-rgb), 0.6);
+    --footer-backdrop-blur: 12px;
+
+    position: relative;
+    background: var(--footer-bg);
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .footer {
+      padding-top: 6rem;
+      padding-bottom: 3rem;
+    }
+  }
+
+  /* Account for mobile menu */
+  @media (max-width: 768px) {
+    .footer {
+      margin-bottom: 5rem; /* Space for mobile nav */
+    }
+  }
+
+  /* Footer Card - glassmorphism like other components */
+  .footer-card {
+    background: var(--footer-card-bg);
+    border: 1px solid var(--footer-border);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    backdrop-filter: blur(var(--footer-backdrop-blur));
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  @media (min-width: 768px) {
+    .footer-card {
+      padding: 3rem;
+      border-radius: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-card {
+      padding: 4rem;
+    }
+  }
+
+  .footer-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Floating particles */
+  .footer-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .footer-particle {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    height: var(--size);
+    background: var(--footer-accent);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: footerParticleFloat var(--speed) ease-in-out infinite var(--delay);
+    will-change: transform, opacity;
+  }
+
+  @keyframes footerParticleFloat {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-20px) scale(1.1);
+      opacity: 0.6;
+    }
+  }
+
+  /* Grid Layout */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* Section Titles */
+  .footer-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--footer-accent);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .section-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  /* Brand Section */
+  .footer-brand {
+    position: relative;
+  }
+
+  .brand-content {
+    padding: 1.5rem;
+    background: rgba(var(--color-charcoal-rgb), 0.3);
+    border: 1px solid var(--footer-border);
+    border-radius: 1rem;
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .brand-content {
+      padding: 2rem;
+      border-radius: 1.5rem;
+    }
+  }
+
+  .brand-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .brand-orbit-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .brand-orbit {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--footer-accent);
+    border-radius: 50%;
+    opacity: 0.3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: brandOrbit 12s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes brandOrbit {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .brand-title {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+    line-height: 1.1;
+  }
+
+  @media (min-width: 768px) {
+    .brand-title {
+      font-size: 2.5rem;
+    }
+  }
+
+  .brand-text {
+    color: var(--footer-text);
+  }
+
+  .brand-accent {
+    color: var(--footer-accent);
+  }
+
+  .brand-description {
+    color: var(--footer-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .brand-tagline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--footer-border);
+  }
+
+  .tagline-dots {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .tagline-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--footer-accent);
+    border-radius: 50%;
+    animation: taglinePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes taglinePulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  .tagline-text {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--footer-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Navigation Section */
+  .footer-navigation {
+    space-y: 2rem;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: var(--footer-text-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--footer-accent);
+    background: rgba(var(--color-accent-rgb), 0.1);
+    border-color: rgba(var(--color-accent-rgb), 0.3);
+    transform: translateX(0.25rem);
+  }
+
+  .nav-link-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .nav-link:hover .nav-link-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .nav-link-text {
+    transition: color 0.3s ease;
+  }
+
+  .nav-link-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--footer-accent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .nav-link:hover .nav-link-glow {
+    opacity: 0.1;
+  }
+
+  /* Social Section */
+  .social-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--footer-border);
+  }
+
+  .social-title {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--footer-accent-light);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+    border-radius: 0.75rem;
+    color: var(--footer-text-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .social-link:hover,
+  .social-link:focus-visible {
+    color: var(--footer-accent);
+    background: rgba(var(--color-accent-rgb), 0.08);
+    transform: translateX(0.25rem);
+  }
+
+  .social-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .social-link:hover .social-icon {
+    transform: scale(1.1);
+  }
+
+  .social-username {
+    font-size: 0.8125rem;
+    opacity: 0.8;
+  }
+
+  .social-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--footer-accent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .social-link:hover .social-glow {
+    opacity: 0.1;
+  }
+
+  /* Meta Section */
+  .footer-meta {
+    space-y: 2rem;
+  }
+
+  .meta-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .copyright {
+    text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    .copyright {
+      text-align: left;
+    }
+  }
+
+  .copyright-text {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--footer-text);
+    margin-bottom: 0.25rem;
+  }
+
+  .copyright-name {
+    color: var(--footer-accent);
+    font-weight: 600;
+  }
+
+  .copyright-rights {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--footer-text-muted);
+    opacity: 0.7;
+  }
+
+  /* Built with section */
+  .built-with {
+    padding: 1rem;
+    background: rgba(var(--color-charcoal-rgb), 0.3);
+    border: 1px solid var(--footer-border);
+    border-radius: 0.75rem;
+    backdrop-filter: blur(4px);
+    text-align: center;
+  }
+
+  .built-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--footer-text-muted);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .tech-stack {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .tech-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--footer-text-muted);
+  }
+
+  .tech-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  .heart-icon {
+    color: #ef4444;
+    animation: heartbeat 2s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  /* Meta info */
+  .meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--footer-text-muted);
+    opacity: 0.8;
+  }
+
+  .meta-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* Footer Bottom */
+  .footer-bottom {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .footer-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--footer-accent), transparent);
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+  }
+
+  .bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bottom-copyright {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--footer-text-muted);
+    opacity: 0.7;
+  }
+
+  .bottom-year {
+    color: var(--footer-accent);
+    font-weight: 600;
+  }
+
+  .bottom-separator {
+    opacity: 0.5;
+  }
+
+  /* Back to top button */
+  .back-to-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(var(--color-accent-rgb), 0.1);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.2);
+    border-radius: 2rem;
+    color: var(--footer-accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(4px);
+  }
+
+  .back-to-top:hover,
+  .back-to-top:focus-visible {
+    background: rgba(var(--color-accent-rgb), 0.2);
+    border-color: var(--footer-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--color-accent-rgb), 0.3);
+  }
+
+  .back-to-top-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .back-to-top:hover .back-to-top-icon {
+    transform: translateY(-1px);
+  }
+
+  .back-to-top-text {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .back-to-top-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--footer-accent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .back-to-top:hover .back-to-top-glow {
+    opacity: 0.2;
+  }
+
+  /* Focus management */
+  .nav-link:focus-visible,
+  .social-link:focus-visible,
+  .back-to-top:focus-visible {
+    outline: 2px solid var(--footer-accent);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .footer-particle,
+    .brand-orbit,
+    .tagline-dot,
+    .heart-icon {
+      animation: none !important;
+    }
+
+    .nav-link,
+    .social-link,
+    .back-to-top,
+    .nav-link-icon,
+    .social-icon,
+    .back-to-top-icon {
+      transition: none !important;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .footer {
+      --footer-border: rgba(255, 255, 255, 0.3);
+    }
+
+    .footer-card {
+      --footer-card-bg: rgba(255, 255, 255, 0.1);
+    }
+
+    .brand-content,
+    .built-with {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-particle,
+    .brand-orbit,
+    .tagline-dot {
+      opacity: 1;
+    }
+  }
+</style>

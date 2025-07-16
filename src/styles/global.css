@@ -235,6 +235,23 @@
     }
   }
 
+  /* Animación de fade-in para el logo */
+  .animate-fade-in {
+    opacity: 0;
+    animation: fadeIn 1s ease-out 0.5s forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Animación de ondas */
   .animate-wave {
     animation: wave 3s ease-in-out infinite;
