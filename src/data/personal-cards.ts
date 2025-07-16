@@ -76,7 +76,7 @@ export const personalCardsData: PersonalCard[] = [
       ],
       link: {
         text: 'Descargar CV completo',
-        url: '/cv',
+        url: '/cv.pdf',
       },
     },
   },

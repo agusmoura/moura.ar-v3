@@ -55,7 +55,7 @@
       "name": "CV",
       "short_name": "CV",
       "description": "Descargar CV",
-      "url": "/cv",
+      "url": "/cv.pdf",
       "icons": [
         {
           "src": "/favicon-32x32.png",

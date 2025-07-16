@@ -377,6 +377,15 @@ const {
     private readonly maxActiveShootingStars: number = 2;
     // Black hole effect tracking
     private blackHoleRotationTime: number = 0;
+    // Logo effect states
+    private explosionActive: boolean = false;
+    private explosionStartTime: number = 0;
+    private explosionDuration: number = 2000; // 2 seconds
+    private logoBlackHoleActive: boolean = false;
+    private logoBlackHoleStartTime: number = 0;
+    private logoBlackHoleDuration: number = 4000; // 4 seconds
+    private logoBlackHoleCenter: { x: number; y: number } = { x: 0, y: 0 };
+    private originalStars: Star[] = [];
 
     constructor() {
       super();
@@ -474,6 +483,9 @@ const {
       // Add mouse tracking
       this.setupMouseTracking();
 
+      // Add logo effect event listeners
+      this.setupLogoEffectListeners();
+
       // Skip animations if user prefers reduced motion
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         this.setupCanvas();
@@ -520,6 +532,14 @@ const {
         window.addEventListener('mousemove', this.handleMouseMove);
         this.canvas.addEventListener('mouseleave', this.handleMouseLeave);
       }
+    }
+
+    private setupLogoEffectListeners(): void {
+      // Listen for star field distortion (explosion effect)
+      window.addEventListener('starFieldDistort', this.handleStarFieldDistort);
+      
+      // Listen for black hole effect from logo
+      window.addEventListener('blackHoleActivated', this.handleBlackHoleActivated);
     }
 
     private setupCanvas(): void {
@@ -864,6 +884,14 @@ const {
     private applyMultipleGravitationalLensing(star: Star): { x: number; y: number } {
       let currentPosition = { x: star.x, y: star.y };
 
+      // Apply logo black hole effect if active - this should OVERRIDE all other effects
+      if (this.logoBlackHoleActive) {
+        currentPosition = this.applyLogoBlackHoleEffect(star, currentPosition);
+        // Return early - black hole effect should dominate
+        return currentPosition;
+      }
+
+      // Apply normal gravity effects first (orbit gravity and mouse gravity)
       // Only apply orbit gravity lensing if orbit element exists and has valid dimensions
       if (this.orbitContainer && this.orbitRect && this.config.gravity.enabled) {
         // Double check that the orbit is actually visible
@@ -928,10 +956,184 @@ const {
           this.mouseGravityRadius
         );
 
-        return mouseLensed;
+        currentPosition = mouseLensed;
+      }
+
+      // Apply explosion effect AFTER all gravity effects (additive, not replacing)
+      if (this.explosionActive) {
+        currentPosition = this.applyExplosionEffect(star, currentPosition);
       }
 
       return currentPosition;
+    }
+
+    private applyLogoBlackHoleEffect(star: Star, currentPosition: { x: number; y: number }): { x: number; y: number } {
+      const currentTime = performance.now();
+      const elapsed = currentTime - this.logoBlackHoleStartTime;
+      const progress = Math.min(elapsed / this.logoBlackHoleDuration, 1);
+      
+      // Calculate distance to black hole center
+      const dx = this.logoBlackHoleCenter.x - currentPosition.x;
+      const dy = this.logoBlackHoleCenter.y - currentPosition.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Create distance-based effect intensity (closer stars are affected more)
+      const maxDistance = Math.max(this.width, this.height);
+      const distanceRatio = Math.min(distance / maxDistance, 1);
+      
+      // More dramatic distance-based delay - closer stars affected much earlier
+      const distanceDelayFactor = 1 - distanceRatio * 0.6; // Increased delay differential
+      const adjustedProgress = Math.max(0, (progress - (1 - distanceDelayFactor) * 0.6) / distanceDelayFactor);
+      
+      // More dramatic effect curves
+      let effectStrength = 0;
+      if (progress < 0.6) {
+        // Intense sucking phase with exponential acceleration
+        const suckProgress = progress / 0.6;
+        effectStrength = 1 - Math.pow(1 - suckProgress, 3); // Steeper curve for more dramatic effect
+      } else {
+        // Dramatic recovery phase
+        const fadeProgress = (progress - 0.6) / 0.4;
+        const smoothFade = 1 - Math.pow(fadeProgress, 2.5); // More pronounced fade
+        effectStrength = smoothFade;
+      }
+      
+      // Apply distance-based delay to the overall effect strength
+      const delayedEffectStrength = effectStrength * Math.max(0, Math.min(1, adjustedProgress));
+      
+      // Much more dramatic suction strength based on distance
+      let suckStrength = 0;
+      if (delayedEffectStrength > 0) {
+        const baseStrength = delayedEffectStrength * 1.2; // Increased base strength
+        const distanceMultiplier = 1 + (1 - distanceRatio) * 1.5; // Much stronger pull for closer stars
+        suckStrength = baseStrength * distanceMultiplier;
+      }
+      
+      // Apply the pull effect with natural falloff
+      const pullX = dx * suckStrength;
+      const pullY = dy * suckStrength;
+      
+      // More intense swirl that creates visible spirals
+      const angle = Math.atan2(dy, dx);
+      const swirlIntensity = Math.sin(adjustedProgress * Math.PI) * (3 + Math.sin(distance * 0.008) * 1.2) * delayedEffectStrength;
+      
+      // Enhanced swirl with multiple layers of rotation
+      const swirlSpeedVariation = 1 + Math.sin(star.x * 0.001 + star.y * 0.001) * 0.5;
+      const primarySwirlSpeed = elapsed * 0.01 * swirlSpeedVariation;
+      const secondarySwirlSpeed = elapsed * 0.004 * (2 - swirlSpeedVariation);
+      
+      // Multi-layered spiral effect
+      const baseRadius = Math.min(distance * 0.4, 200);
+      const radiusVariation = 1 + Math.sin(star.x * 0.002 + star.y * 0.002) * 0.6;
+      const primarySwirlRadius = baseRadius * radiusVariation;
+      const secondarySwirlRadius = baseRadius * 0.5 * radiusVariation;
+      
+      // Primary spiral
+      const primarySwirlX = Math.cos(angle + primarySwirlSpeed) * primarySwirlRadius * 0.5 * swirlIntensity * (1 - distanceRatio * 0.3);
+      const primarySwirlY = Math.sin(angle + primarySwirlSpeed) * primarySwirlRadius * 0.5 * swirlIntensity * (1 - distanceRatio * 0.3);
+      
+      // Secondary counter-spiral for more complex motion
+      const secondarySwirlX = Math.cos(angle - secondarySwirlSpeed) * secondarySwirlRadius * 0.3 * swirlIntensity * (1 - distanceRatio * 0.4);
+      const secondarySwirlY = Math.sin(angle - secondarySwirlSpeed) * secondarySwirlRadius * 0.3 * swirlIntensity * (1 - distanceRatio * 0.4);
+      
+      // Combined swirl effect
+      const swirlX = primarySwirlX + secondarySwirlX;
+      const swirlY = primarySwirlY + secondarySwirlY;
+      
+      // More dramatic chaos that creates visible disturbances
+      const chaosRadius = 300; // Increased radius
+      let chaosX = 0;
+      let chaosY = 0;
+      
+      if (distance < chaosRadius && delayedEffectStrength > 0) {
+        const chaosStrength = (chaosRadius - distance) / chaosRadius * delayedEffectStrength * 1.5; // Increased strength
+        
+        // Multi-frequency chaos for more complex patterns
+        const starSeed = star.x * 0.01 + star.y * 0.01;
+        const chaos1 = Math.sin(elapsed * 0.03 + starSeed * 1.5) * 45 * chaosStrength;
+        const chaos2 = Math.cos(elapsed * 0.035 + starSeed * 2.0) * 35 * chaosStrength;
+        const chaos3 = Math.sin(elapsed * 0.04 + starSeed * 0.8) * 25 * chaosStrength;
+        const chaos4 = Math.cos(elapsed * 0.025 + starSeed * 2.5) * 20 * chaosStrength;
+        
+        chaosX = chaos1 + chaos3 + chaos4 * 0.6;
+        chaosY = chaos2 + chaos1 * 0.5 + chaos4 * 0.4;
+      }
+      
+      // Enhanced turbulence with wider range
+      let turbulenceX = 0;
+      let turbulenceY = 0;
+      
+      if (distance < 150 && delayedEffectStrength > 0) {
+        const turbulenceStrength = (150 - distance) / 150 * delayedEffectStrength * 1.3; // Increased range and strength
+        const turbulenceSeed = star.x * 0.005 + star.y * 0.005;
+        
+        // Multiple turbulence frequencies for richer motion
+        const turb1 = Math.sin(elapsed * 0.05 + turbulenceSeed * 3) * 60 * turbulenceStrength;
+        const turb2 = Math.cos(elapsed * 0.045 + turbulenceSeed * 2.5) * 50 * turbulenceStrength;
+        const turb3 = Math.sin(elapsed * 0.055 + turbulenceSeed * 4) * 30 * turbulenceStrength;
+        
+        turbulenceX = turb1 + turb3 * 0.7;
+        turbulenceY = turb2 + turb1 * 0.6;
+      }
+      
+      // Add gravitational wave effect for stars at medium distance
+      let waveX = 0;
+      let waveY = 0;
+      
+      if (distance > 100 && distance < 400 && delayedEffectStrength > 0) {
+        const waveStrength = Math.sin((distance - 100) / 300 * Math.PI) * delayedEffectStrength * 0.8;
+        const waveFreq = elapsed * 0.008 + distance * 0.002;
+        
+        waveX = Math.sin(waveFreq) * 20 * waveStrength;
+        waveY = Math.cos(waveFreq * 1.3) * 15 * waveStrength;
+      }
+      
+      // Apply all effects with dramatic variation
+      const finalX = currentPosition.x + pullX + swirlX + chaosX + turbulenceX + waveX;
+      const finalY = currentPosition.y + pullY + swirlY + chaosY + turbulenceY + waveY;
+      
+      return {
+        x: finalX,
+        y: finalY
+      };
+    }
+
+    private applyExplosionEffect(star: Star, currentPosition: { x: number; y: number }): { x: number; y: number } {
+      const currentTime = performance.now();
+      const elapsed = currentTime - this.explosionStartTime;
+      const progress = elapsed / this.explosionDuration;
+      
+      // Create a wave effect that expands outward from the center
+      const centerX = this.width / 2;
+      const centerY = this.height / 2;
+      
+      const dx = currentPosition.x - centerX;
+      const dy = currentPosition.y - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Create multiple waves with different frequencies
+      const waveRadius = progress * Math.max(this.width, this.height) * 2;
+      const waveWidth = 150; // Width of the wave
+      
+      // Primary wave
+      const wave1 = Math.sin((waveRadius - distance) * 0.02) * Math.exp(-Math.abs(waveRadius - distance) / waveWidth);
+      // Secondary wave with different frequency
+      const wave2 = Math.sin((waveRadius - distance) * 0.05) * Math.exp(-Math.abs(waveRadius - distance) / (waveWidth * 0.7));
+      
+      const combinedWave = wave1 + wave2 * 0.5;
+      
+      // Significantly increase distortion strength
+      const distortionStrength = combinedWave * 80 * (1 - progress * 0.7); // Much stronger effect
+      const angle = Math.atan2(dy, dx);
+      
+      // Add chaotic noise for more dramatic effect
+      const noise = (Math.sin(distance * 0.05 + elapsed * 0.008) + Math.cos(distance * 0.03 + elapsed * 0.012)) * 0.8;
+      const finalDistortion = distortionStrength * (1 + noise * 0.6);
+      
+      return {
+        x: currentPosition.x + Math.cos(angle) * finalDistortion,
+        y: currentPosition.y + Math.sin(angle) * finalDistortion
+      };
     }
 
     private applyBlackHoleEffects(
@@ -1087,6 +1289,22 @@ const {
 
         // Apply gravitational lensing to star position
         const lensedPosition = this.applyMultipleGravitationalLensing(star);
+        
+        // Debug: Log if we're applying effects (reduced frequency)
+        if ((this.explosionActive || this.logoBlackHoleActive) && star === this.stars[0]) {
+          const timeDiff = performance.now() - (this.explosionActive ? this.explosionStartTime : this.logoBlackHoleStartTime);
+          if (timeDiff % 500 < 16) { // Log every ~500ms
+            console.log('📍 Effects active:', {
+              original: { x: star.x, y: star.y },
+              lensed: lensedPosition,
+              explosionActive: this.explosionActive,
+              blackHoleActive: this.logoBlackHoleActive,
+              blackHoleCenter: this.logoBlackHoleCenter,
+              timeDiff: Math.round(timeDiff),
+              progress: this.logoBlackHoleActive ? Math.min(timeDiff / this.logoBlackHoleDuration, 1) : 0
+            });
+          }
+        }
 
         // Calculate black hole visual effects if enabled and orbit exists
         if (this.config.blackHole.enabled && this.orbitContainer && this.orbitRect) {
@@ -1302,6 +1520,23 @@ const {
       }
     }
 
+    private updateLogoEffects(currentTime: number): void {
+      // Check if explosion effect should end
+      if (this.explosionActive && currentTime - this.explosionStartTime > this.explosionDuration) {
+        console.log('🎆 Explosion effect ended');
+        this.explosionActive = false;
+      }
+
+      // Check if black hole effect should end
+      if (this.logoBlackHoleActive && currentTime - this.logoBlackHoleStartTime > this.logoBlackHoleDuration) {
+        console.log('🌀 Black hole effect ended');
+        this.logoBlackHoleActive = false;
+        // Clear original stars array - the effect will naturally fade out
+        this.originalStars = [];
+        console.log('🌟 Black hole effect deactivated');
+      }
+    }
+
     private animateFrame(): void {
       const currentTime = performance.now();
       const deltaTime = Math.min(currentTime - this.lastTime, 16.67); // Cap at 60fps maximum
@@ -1309,6 +1544,9 @@ const {
 
       // Update black hole rotation time
       this.blackHoleRotationTime += deltaTime;
+
+      // Update logo effects timers
+      this.updateLogoEffects(currentTime);
 
       // Throttle animation based on tab visibility and performance
       if (document.hidden || this.shouldThrottleAnimation()) {
@@ -1502,6 +1740,10 @@ const {
       if (this.canvas) {
         this.canvas.removeEventListener('mouseleave', this.handleMouseLeave);
       }
+
+      // Clean up logo effect listeners
+      window.removeEventListener('starFieldDistort', this.handleStarFieldDistort);
+      window.removeEventListener('blackHoleActivated', this.handleBlackHoleActivated);
     }
 
     private handleMouseMove = (event: MouseEvent) => {
@@ -1514,6 +1756,42 @@ const {
       // Move mouse "gravity" off-screen when mouse leaves
       this.mouseX = -1000;
       this.mouseY = -1000;
+    };
+
+    private handleStarFieldDistort = () => {
+      // Trigger explosion effect
+      console.log('🎆 Explosion effect triggered!');
+      this.explosionActive = true;
+      this.explosionStartTime = performance.now();
+    };
+
+    private handleBlackHoleActivated = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { centerX, centerY } = customEvent.detail;
+      
+      console.log('🌀 Black hole effect triggered!', { centerX, centerY });
+      
+      // Convert screen coordinates to canvas coordinates
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const canvasX = centerX - canvasRect.left;
+      const canvasY = centerY - canvasRect.top;
+      
+      console.log('🌀 Black hole canvas position:', { canvasX, canvasY });
+      
+      // Store original star positions before sucking them in
+      this.originalStars = this.stars.map(star => ({
+        x: star.x,
+        y: star.y,
+        radius: star.radius,
+        opacity: star.opacity,
+        twinkleSpeed: star.twinkleSpeed,
+        twinklePhase: star.twinklePhase
+      }));
+      
+      // Activate black hole effect
+      this.logoBlackHoleActive = true;
+      this.logoBlackHoleStartTime = performance.now();
+      this.logoBlackHoleCenter = { x: canvasX, y: canvasY };
     };
   }
 
