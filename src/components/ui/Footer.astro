@@ -23,229 +23,241 @@ const navigationLinks: NavigationLink[] = [
   { href: '#about', label: 'Principios', icon: 'heroicons:beaker' },
   { href: '#projects', label: 'Proyectos', icon: 'heroicons:adjustments-horizontal' },
   { href: '#contact', label: 'Contacto', icon: 'heroicons:envelope' },
+  { href: '#blog', label: 'Blog', icon: 'heroicons:document-text' },
 ];
 
-const socialLinks: SocialLink[] = [
-  {
-    href: 'https://github.com/agusmoura',
-    label: 'GitHub',
-    icon: 'simple-icons:github',
-    username: '@agusmoura',
-  },
-  {
-    href: 'https://linkedin.com/in/agustin-mourino',
-    label: 'LinkedIn',
-    icon: 'simple-icons:linkedin',
-    username: '/in/agustin-mourino',
-  },
-  {
-    href: '/cv.pdf',
-    label: 'Curriculum',
-    icon: 'heroicons:document-arrow-down',
-    username: 'CV 2025',
-  },
-];
+// Social links data - currently unused but kept for future implementation
+// const socialLinks: SocialLink[] = [
+//   {
+//     href: 'https://github.com/agusmoura',
+//     label: 'GitHub',
+//     icon: 'simple-icons:github',
+//     username: '@agusmoura',
+//   },
+//   {
+//     href: 'https://linkedin.com/in/agustin-mourino',
+//     label: 'LinkedIn',
+//     icon: 'simple-icons:linkedin',
+//     username: '/in/agustin-mourino',
+//   },
+//   {
+//     href: '/cv.pdf',
+//     label: 'Curriculum',
+//     icon: 'heroicons:document-arrow-down',
+//     username: 'CV 2025',
+//   },
+// ];
 
 const currentYear = new Date().getFullYear();
 ---
 
 <footer class="footer" role="contentinfo" aria-label="Información del sitio">
-  <div class="container relative mx-auto px-4 lg:px-8 max-w-6xl">
+  <div class="container relative mx-auto px-4 max-w-7xl">
     <!-- Footer Card Container -->
     <div class="footer-card">
       <!-- Main Footer Content -->
       <div class="footer-content">
-      <!-- Decorative particles container -->
-      <div class="footer-particles" aria-hidden="true">
-        <div
-          class="footer-particle"
-          style="--x: 10%; --y: 20%; --size: 2px; --speed: 4s; --delay: 0s;"
-        ></div>
-        <div
-          class="footer-particle"
-          style="--x: 85%; --y: 30%; --size: 1px; --speed: 6s; --delay: -2s;"
-        ></div>
-        <div
-          class="footer-particle"
-          style="--x: 60%; --y: 15%; --size: 1.5px; --speed: 5s; --delay: -4s;"
-        ></div>
-      </div>
-
-      <!-- Grid Layout: 1 col mobile, 3 cols desktop -->
-      <div class="footer-grid">
-        <!-- Column 1: Branding & Description -->
-        <div class="footer-brand" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
-          <div class="brand-content">
-            <!-- Logo/Brand with orbital decoration -->
-            <div class="brand-header">
-              <div class="brand-orbit-container">
-                <div class="brand-orbit" aria-hidden="true"></div>
-                <h2 class="brand-title">
-                  <span class="brand-text">Moura</span>
-                  <span class="brand-accent">.ar</span>
-                </h2>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <p
-              class="brand-description"
-              set:html={pt(
-                'Desarrollador [[**full-stack**]] y diseñador [[**UX/UI**]] creando experiencias digitales que conectan tecnología con humanidad.'
-              )}
-            />
-
-            <!-- Tagline -->
-            <div class="brand-tagline">
-              <div class="tagline-dots">
-                {
-                  [1, 2, 3].map((i) => (
-                    <div
-                      class="tagline-dot"
-                      style={{ animationDelay: `${i * 0.5}s` }}
-                      aria-hidden="true"
-                    />
-                  ))
-                }
-              </div>
-              <span class="tagline-text">Transformando ideas en realidades digitales</span>
-            </div>
+        <!-- Decorative particles container -->
+        <div class="footer-particles" aria-hidden="true">
+          <div
+            class="footer-particle"
+            style="--x: 10%; --y: 20%; --size: 2px; --speed: 4s; --delay: 0s;"
+          >
+          </div>
+          <div
+            class="footer-particle"
+            style="--x: 85%; --y: 30%; --size: 1px; --speed: 6s; --delay: -2s;"
+          >
+          </div>
+          <div
+            class="footer-particle"
+            style="--x: 60%; --y: 15%; --size: 1.5px; --speed: 5s; --delay: -4s;"
+          >
           </div>
         </div>
 
-        <!-- Column 2: Navigation Links -->
-        <div
-          class="footer-navigation"
-          data-aos="fade-up"
-          data-aos-duration="600"
-          data-aos-delay="400"
-        >
-          <h3 class="footer-section-title">
-            <Icon name="heroicons:link" class="section-icon" aria-hidden="true" />
-            Navegación
-          </h3>
+        <!-- Grid Layout: 1 col mobile, 3 cols desktop -->
+        <div class="footer-grid">
+          <!-- Column 1: Branding & Description -->
+          <div class="footer-brand" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+            <div class="brand-content">
+              <!-- Logo/Brand with SVG logo -->
+              <div class="brand-header">
+                <div class="brand-logo-container">
+                  <!-- SVG Logo without animations -->
+                  <div class="brand-logo" aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="40"
+                      height="47"
+                      fill="none"
+                      viewBox="0 0 436 512"
+                    >
+                      <g fill="currentColor" clip-path="url(#a)">
+                        <path
+                          d="M224.345 413.776a637.044 637.044 0 0 0 5.443-5.042l-5.443 5.042ZM425.37 19.949c-53.02-61.652-162.632 35.543-208.454 76.268a276.002 276.002 0 0 1 11.503 3.543C365.732-23.025 487.06-26.414 378.318 185.763a35.211 35.211 0 0 1 15.787 8.876c22.486-44.838 60.523-127.515 31.265-174.69Z"
+                        ></path>
+                        <path
+                          d="M224.344 413.777a622.6 622.6 0 0 0 5.444-5.043l-5.444 5.043Zm-87.541-54.713a24.104 24.104 0 0 1-5.777 6.913c21.149 15.807 44.222 29.063 68.649 39.034a689.477 689.477 0 0 0 5.447-5.086c-24.75-10.35-48.043-24.624-68.319-40.861Zm275.107-45.929c-1.46-23.639-8.141-46.216-18.48-67.245a35.22 35.22 0 0 1-12.12 7.324c57.289 112.983-32.701 187.899-144.056 157.6a798.142 798.142 0 0 1-5.447 5.102c79.745 26.163 185.587-2.691 180.103-102.781ZM76.658 291.874a618.03 618.03 0 0 0-7.19 12.304c7.965 11.008 16.807 21.364 26.104 30.879a24.02 24.02 0 0 1 7.675-7.795c-9.77-10.941-18.804-22.808-26.589-35.388ZM353.542 188.534a35.474 35.474 0 0 0-11.437 9.35c-41.065-42.801-93.432-74.787-151.962-84.904C83.309 94.512 16.223 168.685 65.001 270.422a804.76 804.76 0 0 0-8.523 13.848c-55.612-86.908-12.737-194.536 97-190.747 76.328 1.224 148.934 39.88 200.064 95.011Z"
+                        ></path>
+                        <path
+                          d="M359.452 253.74c-55.3 84.225-129.877 166.799-214.456 222.126-31.049 18.813-89.359 53.764-127.267 25.502-75.345-84.614 109.828-316.788 174.712-381.295 3.817.68 7.634 1.477 11.452 2.389C125.85 199.306 43.881 306.215 15.761 416.463c-5.069 22.698-10.075 58.954 9.639 75.463 21.693 16.105 54.8 2.29 75.164-7.159 103.002-55.698 176.878-144.612 243.09-240.954a35.24 35.24 0 0 0 15.798 9.927ZM398.209 219.946c.201 14.94-12.128 27.935-26.938 28.615-.099-.18-.198-.36-.301-.54-.121.191-.242.382-.364.57-23.737 1.121-38.349-26.94-23.983-45.779 16.173-21.959 51.725-10.198 51.586 17.134Z"
+                        ></path>
+                        <path
+                          d="m371.271 248.561-.665.03c.122-.188.243-.379.364-.57.103.18.202.36.301.54ZM133.198 347.476c-.561 22.764-33.926 22.793-34.502 0 .565-22.764 33.923-22.794 34.502 0Z"
+                        ></path>
+                      </g>
+                      <defs>
+                        <clipPath id="a">
+                          <path fill="currentColor" d="M0 0h436v512H0z"></path>
+                        </clipPath>
+                      </defs>
+                    </svg>
+                  </div>
+                  <h2 class="brand-title">
+                    <span class="brand-text">Agustín Mouriño</span>
+                  </h2>
+                </div>
+              </div>
 
-          <nav class="nav-links" aria-label="Enlaces de navegación del pie de página">
-            {
-              navigationLinks.map((link) => (
-                <a
-                  href={link.href}
-                  class="nav-link group"
-                  data-section={link.href.startsWith('#') ? link.href.substring(1) || 'home' : undefined}
-                >
-                  <Icon name={link.icon} class="nav-link-icon" aria-hidden="true" />
-                  <span class="nav-link-text">{link.label}</span>
-                  <div class="nav-link-glow" aria-hidden="true" />
-                </a>
-              ))
-            }
-          </nav>
+              <!-- Description -->
+              <p
+                class="brand-description"
+                set:html={pt(
+                  'Desarrollador [[**full-stack**]] y diseñador [[**UX/UI**]] creando experiencias digitales que conectan tecnología con humanidad.'
+                )}
+              />
 
-          <!-- Social Links -->
-          <div class="social-section">
-            <h4 class="social-title">Conecta conmigo</h4>
-            <div class="social-links">
+              <!-- Tagline -->
+              <div class="brand-tagline">
+                <div class="tagline-dots">
+                  {
+                    [1, 2, 3].map((i) => (
+                      <div
+                        class="tagline-dot"
+                        style={{ animationDelay: `${i * 0.5}s` }}
+                        aria-hidden="true"
+                      />
+                    ))
+                  }
+                </div>
+                <span class="tagline-text">Transformando ideas en realidades digitales</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Navigation Links -->
+          <div
+            class="footer-navigation"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="400"
+          >
+            <h3 class="footer-section-title">
+              <Icon name="heroicons:link" class="section-icon" aria-hidden="true" />
+              Navegación
+            </h3>
+
+            <nav class="nav-links" aria-label="Enlaces de navegación del pie de página">
               {
-                socialLinks.map((social) => (
+                navigationLinks.map((link) => (
                   <a
-                    href={social.href}
-                    target={social.href.startsWith('http') ? '_blank' : undefined}
-                    rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    class="social-link group"
-                    aria-label={`${social.label}: ${social.username}`}
-                    title={`${social.label}: ${social.username}`}
+                    href={link.href}
+                    class="nav-link group"
+                    data-section={
+                      link.href.startsWith('#') ? link.href.substring(1) || 'home' : undefined
+                    }
                   >
-                    <Icon name={social.icon} class="social-icon" aria-hidden="true" />
-                    <span class="social-username">{social.username}</span>
-                    <div class="social-glow" aria-hidden="true" />
+                    <Icon name={link.icon} class="nav-link-icon" aria-hidden="true" />
+                    <span class="nav-link-text">{link.label}</span>
+                    <div class="nav-link-glow" aria-hidden="true" />
                   </a>
                 ))
               }
-            </div>
+            </nav>
           </div>
-        </div>
 
-        <!-- Column 3: Legal & Meta Information -->
-        <div class="footer-meta" data-aos="fade-up" data-aos-duration="600" data-aos-delay="600">
-          <h3 class="footer-section-title">
-            <Icon name="heroicons:information-circle" class="section-icon" aria-hidden="true" />
-            Información
-          </h3>
+          <!-- Column 3: Legal & Meta Information -->
+          <div class="footer-meta" data-aos="fade-up" data-aos-duration="600" data-aos-delay="600">
+            <h3 class="footer-section-title">
+              <Icon name="heroicons:information-circle" class="section-icon" aria-hidden="true" />
+              Información
+            </h3>
 
-          <div class="meta-content">
-            <!-- Copyright -->
-            <div class="copyright">
-              <p class="copyright-text">
-                © {currentYear}
-                <span class="copyright-name">Agustín Mouriño</span>
-              </p>
-              <p class="copyright-rights">Todos los derechos reservados</p>
-            </div>
+            <div class="meta-content">
+              <!-- Copyright -->
+              <div class="copyright">
+                <p class="copyright-text">
+                  © {currentYear}
+                  <span class="copyright-name">Agustín Mouriño</span>
+                </p>
+                <p class="copyright-rights">Todos los derechos reservados</p>
+                <p class="copyright-legal">Desarrollador independiente • Buenos Aires, Argentina</p>
+              </div>
 
-            <!-- Built with -->
-            <div class="built-with">
-              <p class="built-title">Construido con</p>
-              <div class="tech-stack">
-                <span class="tech-item">
-                  <Icon name="simple-icons:astro" class="tech-icon" aria-hidden="true" />
-                  Astro
-                </span>
-                <span class="tech-item">
-                  <Icon name="simple-icons:tailwindcss" class="tech-icon" aria-hidden="true" />
-                  Tailwind
-                </span>
-                <span class="tech-item">
-                  <Icon name="heroicons:heart" class="tech-icon heart-icon" aria-hidden="true" />
-                  Amor
-                </span>
+              <!-- Built with -->
+              <div class="built-with">
+                <p class="built-title">Construido con</p>
+                <div class="tech-stack">
+                  <span class="tech-item">
+                    <Icon name="simple-icons:astro" class="tech-icon" aria-hidden="true" />
+                    Astro
+                  </span>
+                  <span class="tech-item">
+                    <Icon name="simple-icons:tailwindcss" class="tech-icon" aria-hidden="true" />
+                    Tailwind
+                  </span>
+                  <span class="tech-item">
+                    <Icon name="heroicons:heart" class="tech-icon heart-icon" aria-hidden="true" />
+                    Amor
+                  </span>
+                </div>
+              </div>
+
+              <!-- Meta info -->
+              <div class="meta-info">
+                <p class="meta-item">
+                  <Icon name="heroicons:calendar" class="meta-icon" aria-hidden="true" />
+                  Actualizado enero 2025
+                </p>
+                <p class="meta-item">
+                  <Icon name="heroicons:globe-americas" class="meta-icon" aria-hidden="true" />
+                  Buenos Aires, Argentina
+                </p>
               </div>
             </div>
-
-            <!-- Meta info -->
-            <div class="meta-info">
-              <p class="meta-item">
-                <Icon name="heroicons:calendar" class="meta-icon" aria-hidden="true" />
-                Actualizado enero 2025
-              </p>
-              <p class="meta-item">
-                <Icon name="heroicons:globe-americas" class="meta-icon" aria-hidden="true" />
-                Buenos Aires, Argentina
-              </p>
-            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Footer Bottom Bar -->
-    <div class="footer-bottom">
-      <!-- Separator -->
-      <div
-        class="footer-separator"
-        aria-hidden="true"
-      ></div>
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <!-- Separator -->
+        <div class="footer-separator" aria-hidden="true"></div>
 
-      <div class="bottom-content">
-        <!-- Minimal copyright -->
-        <p class="bottom-copyright">
-          <span class="bottom-year">{currentYear}</span>
-          <span class="bottom-separator">•</span>
-          <span class="bottom-name">Moura.ar</span>
-        </p>
+        <div class="bottom-content">
+          <!-- Minimal copyright -->
+          <p class="bottom-copyright">
+            <span class="bottom-year">{currentYear}</span>
+            <span class="bottom-separator">•</span>
+            <span class="bottom-name">Agustín Mouriño</span>
+            <span class="bottom-separator">•</span>
+            <span class="bottom-site">moura.ar</span>
+          </p>
 
-        <!-- Back to top button -->
-        <button
-          type="button"
-          class="back-to-top"
-          aria-label="Volver al inicio de la página"
-          title="Volver al inicio"
-          id="back-to-top-btn"
-        >
-          <Icon name="heroicons:arrow-up" class="back-to-top-icon" aria-hidden="true" />
-          <span class="back-to-top-text">Inicio</span>
-          <div class="back-to-top-glow" aria-hidden="true"></div>
-        </button>
-      </div>
+          <!-- Back to top button -->
+          <button
+            type="button"
+            class="back-to-top"
+            aria-label="Volver al inicio de la página"
+            title="Volver al inicio"
+            id="back-to-top-btn"
+          >
+            <Icon name="heroicons:arrow-up" class="back-to-top-icon" aria-hidden="true" />
+            <span class="back-to-top-text">Inicio</span>
+            <div class="back-to-top-glow" aria-hidden="true"></div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -261,7 +273,7 @@ const currentYear = new Date().getFullYear();
       // Smooth scroll to top
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
 
       // Update focus for accessibility
@@ -275,8 +287,8 @@ const currentYear = new Date().getFullYear();
     const handleScroll = () => {
       const scrolled = window.scrollY > 400;
       backToTopBtn.style.opacity = scrolled ? '1' : '0.6';
-      backToTopBtn.style.transform = scrolled 
-        ? 'translateY(0) scale(1)' 
+      backToTopBtn.style.transform = scrolled
+        ? 'translateY(0) scale(1)'
         : 'translateY(4px) scale(0.95)';
     };
 
@@ -291,7 +303,7 @@ const currentYear = new Date().getFullYear();
     };
 
     window.addEventListener('scroll', throttledScroll, { passive: true });
-    
+
     // Initial check
     handleScroll();
   }
@@ -299,8 +311,8 @@ const currentYear = new Date().getFullYear();
   // Smooth scroll for footer navigation links
   function initFooterNavigation() {
     const footerLinks = document.querySelectorAll('[data-section]');
-    
-    footerLinks.forEach(link => {
+
+    footerLinks.forEach((link) => {
       link.addEventListener('click', (e) => {
         const sectionId = link.getAttribute('data-section');
         const href = link.getAttribute('href');
@@ -349,14 +361,12 @@ const currentYear = new Date().getFullYear();
 
     position: relative;
     background: var(--footer-bg);
-    padding-top: 4rem;
     padding-bottom: 2rem;
     overflow: hidden;
   }
 
   @media (min-width: 768px) {
     .footer {
-      padding-top: 6rem;
       padding-bottom: 3rem;
     }
   }
@@ -377,7 +387,7 @@ const currentYear = new Date().getFullYear();
     backdrop-filter: blur(var(--footer-backdrop-blur));
     position: relative;
     overflow: hidden;
-    box-shadow: 
+    box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.12),
       0 4px 16px rgba(0, 0, 0, 0.08);
   }
@@ -422,7 +432,8 @@ const currentYear = new Date().getFullYear();
   }
 
   @keyframes footerParticleFloat {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0) scale(1);
       opacity: 0.3;
     }
@@ -500,51 +511,40 @@ const currentYear = new Date().getFullYear();
     margin-bottom: 1.5rem;
   }
 
-  .brand-orbit-container {
-    position: relative;
-    display: inline-block;
+  .brand-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .brand-orbit {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border: 2px solid var(--footer-accent);
-    border-radius: 50%;
-    opacity: 0.3;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: brandOrbit 12s linear infinite;
-    pointer-events: none;
+  .brand-logo {
+    flex-shrink: 0;
+    color: var(--footer-accent);
+    opacity: 0.9;
   }
 
-  @keyframes brandOrbit {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
+  .brand-logo svg {
+    width: 40px;
+    height: 47px;
+    display: block;
   }
 
   .brand-title {
     font-family: var(--font-serif);
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    position: relative;
-    z-index: 2;
-    line-height: 1.1;
+    line-height: 1.2;
+    margin: 0;
   }
 
   @media (min-width: 768px) {
     .brand-title {
-      font-size: 2.5rem;
+      font-size: 1.75rem;
     }
   }
 
   .brand-text {
     color: var(--footer-text);
-  }
-
-  .brand-accent {
-    color: var(--footer-accent);
   }
 
   .brand-description {
@@ -577,8 +577,15 @@ const currentYear = new Date().getFullYear();
   }
 
   @keyframes taglinePulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
   }
 
   .tagline-text {
@@ -769,6 +776,15 @@ const currentYear = new Date().getFullYear();
     opacity: 0.7;
   }
 
+  .copyright-legal {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--footer-text-muted);
+    opacity: 0.6;
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
   /* Built with section */
   .built-with {
     padding: 1rem;
@@ -817,8 +833,13 @@ const currentYear = new Date().getFullYear();
   }
 
   @keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
   }
 
   /* Meta info */
@@ -883,6 +904,11 @@ const currentYear = new Date().getFullYear();
 
   .bottom-separator {
     opacity: 0.5;
+  }
+
+  .bottom-site {
+    opacity: 0.7;
+    font-style: italic;
   }
 
   /* Back to top button */
@@ -952,7 +978,6 @@ const currentYear = new Date().getFullYear();
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .footer-particle,
-    .brand-orbit,
     .tagline-dot,
     .heart-icon {
       animation: none !important;
@@ -984,7 +1009,6 @@ const currentYear = new Date().getFullYear();
     }
 
     .footer-particle,
-    .brand-orbit,
     .tagline-dot {
       opacity: 1;
     }

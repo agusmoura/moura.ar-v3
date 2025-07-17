@@ -96,6 +96,10 @@ const navItems: readonly NavItem[] = [
       this.nav = document.querySelector('[data-mobile-nav="active-detector"]');
       if (!this.nav) return;
 
+      // Prevent multiple initializations
+      if (this.nav.dataset.initialized === 'true') return;
+      this.nav.dataset.initialized = 'true';
+
       this.links = this.nav.querySelectorAll('[data-section]');
       this.sections = new Map();
       this.isCollapsed = false;
@@ -263,11 +267,30 @@ const navItems: readonly NavItem[] = [
     return window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // Cleanup before transitions
+  function cleanupMobileNav() {
+    const nav = document.querySelector('[data-mobile-nav="active-detector"]');
+    if (nav) {
+      delete nav.dataset.initialized;
+    }
+  }
+
+  // Initialize on page load and after transitions
+  function initMobileNav() {
     if (isMobile()) {
       new MobileNavController();
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileNav);
+  } else {
+    initMobileNav();
+  }
+
+  // Handle Astro view transitions
+  document.addEventListener('astro:page-load', initMobileNav);
+  document.addEventListener('astro:before-preparation', cleanupMobileNav);
 </script>
 
 <style>

@@ -76,20 +76,20 @@ const backgroundConfig = {
     <SpaceBackground {...backgroundConfig} />
     <ScrollAnimations />
     <FocusManager />
-    
+
     <!-- Animated Logo - Fixed position top left -->
     {
       !hideMenu && (
         <div class="fixed top-6 left-6 z-50 animate-fade-in">
-          <AnimatedLogo 
-            size={56} 
+          <AnimatedLogo
+            size={56}
             className="text-primary hover:text-accent transition-colors duration-300"
             animationDelay={800}
           />
         </div>
       )
     }
-    
+
     {
       !hideMenu && (
         <>
@@ -117,14 +117,72 @@ const backgroundConfig = {
       )
     }
 
+    <!-- Console Welcome Message -->
+    <script is:inline>
+      // Space-themed console welcome message
+      (function () {
+        // Header principal con efectos visuales
+        console.log(
+          '%c🚀 ¡Bienvenido/a al cosmos de Moura.ar! 🌌',
+          'font-size: 28px; font-weight: bold; color: #ecad22; background: linear-gradient(135deg, #10100E 0%, #1a1a17 50%, #10100E 100%); padding: 15px 20px; border-radius: 12px; border: 2px solid #ecad22; text-shadow: 0 0 10px #ecad22; font-family: "Space Mono", monospace; box-shadow: 0 4px 15px rgba(236, 173, 34, 0.3);'
+        );
+
+        // Mensaje principal con estilo de terminal retro
+        console.log(
+          '%c🛸 Veo que te gusta curiosear por acá... ¡Excelente! %c🔍',
+          'font-size: 16px; font-weight: bold; color: #e0c587; background: #1e1e1a; padding: 8px 12px; border-left: 4px solid #ecad22; font-family: "Space Mono", monospace;',
+          'font-size: 18px; color: #ecad22; text-shadow: 0 0 5px #ecad22;'
+        );
+
+        console.log(
+          '%c⭐ Este sitio está construido con Astro, amor y algunas noches sin dormir.',
+          'font-size: 14px; color: #a89984; background: #262626; padding: 6px 12px; border-radius: 6px; font-family: "Space Mono", monospace; margin: 4px 0;'
+        );
+
+        console.log(
+          '%c🌟 Si encontraste algo interesante o tienes alguna sugerencia,\n   no dudes en contactarme. Siempre estoy listo para una buena conversación técnica.',
+          'font-size: 14px; color: #bdae93; background: #32302f; padding: 8px 12px; border-radius: 6px; line-height: 1.5; font-family: "Space Mono", monospace;'
+        );
+
+        // Quote con estilo especial
+        console.log(
+          '%c💫 "La lógica te llevará de A a B. La imaginación te llevará a todas partes."\n%c   — Albert Einstein',
+          'font-size: 15px; font-weight: bold; color: #ecad22; background: #1a1a17; padding: 10px 15px; border-radius: 8px; border-left: 3px solid #e0c587; font-style: italic; font-family: "Space Mono", monospace; text-shadow: 0 0 8px rgba(236, 173, 34, 0.4);',
+          'font-size: 12px; color: #928374; font-style: normal; padding-left: 15px; font-family: "Space Mono", monospace;'
+        );
+
+        // Stack info con iconos y colores
+        console.log(
+          '%c🔧 Stack Tecnológico:',
+          'font-size: 14px; font-weight: bold; color: #fb4934; background: #3c3836; padding: 6px 10px; border-radius: 6px 6px 0 0; font-family: "Space Mono", monospace;'
+        );
+
+        console.log(
+          '%c⚡ Astro v5 %c| %c💠 TypeScript %c| %c🎨 Tailwind CSS %c| %c🚀 Bun',
+          'color: #8ec07c; font-weight: bold; font-family: "Space Mono", monospace;',
+          'color: #665c54;',
+          'color: #83a598; font-weight: bold; font-family: "Space Mono", monospace;',
+          'color: #665c54;',
+          'color: #d3869b; font-weight: bold; font-family: "Space Mono", monospace;',
+          'color: #665c54;',
+          'color: #fabd2f; font-weight: bold; font-family: "Space Mono", monospace;'
+        );
+
+        // Separador final
+        console.log('%c' + '─'.repeat(60), 'color: #504945; font-family: monospace;');
+      })();
+    </script>
+
     <!-- Enhanced Analytics -->
     <script>
       // Import and initialize page analytics
-      import('/src/utils/page-analytics.js').then(() => {
-        // Page analytics auto-initializes
-      }).catch(error => {
-        console.warn('Page analytics failed to load:', error);
-      });
+      import('@/utils/page-analytics.ts')
+        .then(() => {
+          // Page analytics auto-initializes
+        })
+        .catch((error) => {
+          console.warn('Page analytics failed to load:', error);
+        });
     </script>
 
     <!-- Simplified Performance Monitoring -->

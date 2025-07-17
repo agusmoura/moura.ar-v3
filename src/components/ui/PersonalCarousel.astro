@@ -427,116 +427,158 @@ const getCardStyles = (rarity: string, colors?: PersonalCard['colors']) => {
     import 'swiper/css/effect-cards';
     import { EffectCards } from 'swiper/modules';
 
-    // Initialize Swiper with responsive configuration
-    const isMobile = window.innerWidth <= 640;
+    let swiperInstance = null;
 
-    new Swiper('.carousel', {
-      modules: [EffectCards],
-      effect: 'cards', // Keep cards effect on all devices
-      grabCursor: true,
-      centeredSlides: true,
-      slidesPerView: 'auto',
-      cardsEffect: {
-        perSlideOffset: isMobile ? 5 : 9, // Less offset on mobile
-        perSlideRotate: isMobile ? 1 : 3, // Less rotation on mobile
-        rotate: true,
-        slideShadows: true,
-      },
-      loop: true,
-      speed: 300,
-      // Prevent overflow on mobile
-      watchOverflow: true,
-      preventClicks: true,
-      preventClicksPropagation: true,
-    });
+    function initSwiper() {
+      // Initialize Swiper with responsive configuration
+      const carouselElement = document.querySelector('.carousel');
+      if (!carouselElement || swiperInstance) return;
 
-    // Card interactions - fixed logic
-    setTimeout(() => {
-      const cards = document.querySelectorAll('.card-flip');
+      const isMobile = window.innerWidth <= 640;
 
-      cards.forEach((card) => {
-        const cardElement = card as HTMLElement;
-        let rafId: number;
-
-        // Card flip on click
-        cardElement.addEventListener('click', (e: Event) => {
-          const target = e.target as HTMLElement;
-          // Don't flip if clicking on a link
-          if (target?.closest('a')) return;
-
-          // Clear any ongoing animations
-          if (rafId) cancelAnimationFrame(rafId);
-
-          // Toggle flip state
-          cardElement.classList.toggle('flipped');
-
-          // Reset any tilt effects immediately
-          cardElement.classList.remove('tilted');
-
-          // Set appropriate transform based on flip state
-          if (cardElement.classList.contains('flipped')) {
-            cardElement.style.transform = 'rotateY(180deg)';
-          } else {
-            cardElement.style.transform = '';
-          }
-
-          // Reset shimmer
-          cardElement.style.setProperty('--shimmer-angle', '45deg');
-        });
-
-        // Tilt effect - only when not flipped
-        const handleMouseMove = (e: MouseEvent) => {
-          // Don't apply tilt if flipped
-          if (cardElement.classList.contains('flipped')) return;
-
-          if (rafId) cancelAnimationFrame(rafId);
-
-          rafId = requestAnimationFrame(() => {
-            const rect = cardElement.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-            // Apply tilt transform
-            cardElement.style.transform = `
-          perspective(1000px)
-          rotateX(${y * -12}deg)
-          rotateY(${x * 12}deg)
-          scale3d(1.02, 1.02, 1)
-        `;
-
-            // Update shimmer angle
-            const angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-            cardElement.style.setProperty('--shimmer-angle', `${angle}deg`);
-            cardElement.classList.add('tilted');
-          });
-        };
-
-        const handleMouseLeave = () => {
-          if (rafId) cancelAnimationFrame(rafId);
-
-          cardElement.classList.remove('tilted');
-          cardElement.style.setProperty('--shimmer-angle', '45deg');
-
-          // Reset transform based on flip state
-          if (cardElement.classList.contains('flipped')) {
-            cardElement.style.transform = 'rotateY(180deg)';
-          } else {
-            cardElement.style.transform = '';
-          }
-        };
-
-        // Mouse enter - only start tilt if not flipped
-        cardElement.addEventListener('mouseenter', () => {
-          if (!cardElement.classList.contains('flipped')) {
-            cardElement.addEventListener('mousemove', handleMouseMove);
-          }
-        });
-
-        cardElement.addEventListener('mouseleave', () => {
-          cardElement.removeEventListener('mousemove', handleMouseMove);
-          handleMouseLeave();
-        });
+      swiperInstance = new Swiper('.carousel', {
+        modules: [EffectCards],
+        effect: 'cards', // Keep cards effect on all devices
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+        cardsEffect: {
+          perSlideOffset: isMobile ? 5 : 9, // Less offset on mobile
+          perSlideRotate: isMobile ? 1 : 3, // Less rotation on mobile
+          rotate: true,
+          slideShadows: true,
+        },
+        loop: true,
+        speed: 300,
+        // Prevent overflow on mobile
+        watchOverflow: true,
+        preventClicks: true,
+        preventClicksPropagation: true,
       });
-    }, 100);
+    }
+
+    function initCardInteractions() {
+      // Card interactions - fixed logic
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.card-flip');
+
+        cards.forEach((card) => {
+          const cardElement = card as HTMLElement;
+          let rafId: number;
+
+          // Skip if already initialized
+          if (cardElement.dataset.initialized) return;
+          cardElement.dataset.initialized = 'true';
+
+          // Card flip on click
+          cardElement.addEventListener('click', (e: Event) => {
+            const target = e.target as HTMLElement;
+            // Don't flip if clicking on a link
+            if (target?.closest('a')) return;
+
+            // Clear any ongoing animations
+            if (rafId) cancelAnimationFrame(rafId);
+
+            // Toggle flip state
+            cardElement.classList.toggle('flipped');
+
+            // Reset any tilt effects immediately
+            cardElement.classList.remove('tilted');
+
+            // Set appropriate transform based on flip state
+            if (cardElement.classList.contains('flipped')) {
+              cardElement.style.transform = 'rotateY(180deg)';
+            } else {
+              cardElement.style.transform = '';
+            }
+
+            // Reset shimmer
+            cardElement.style.setProperty('--shimmer-angle', '45deg');
+          });
+
+          // Tilt effect - only when not flipped
+          const handleMouseMove = (e: MouseEvent) => {
+            // Don't apply tilt if flipped
+            if (cardElement.classList.contains('flipped')) return;
+
+            if (rafId) cancelAnimationFrame(rafId);
+
+            rafId = requestAnimationFrame(() => {
+              const rect = cardElement.getBoundingClientRect();
+              const x = (e.clientX - rect.left) / rect.width - 0.5;
+              const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+              // Apply tilt transform
+              cardElement.style.transform = `
+            perspective(1000px)
+            rotateX(${y * -12}deg)
+            rotateY(${x * 12}deg)
+            scale3d(1.02, 1.02, 1)
+          `;
+
+              // Update shimmer angle
+              const angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+              cardElement.style.setProperty('--shimmer-angle', `${angle}deg`);
+              cardElement.classList.add('tilted');
+            });
+          };
+
+          const handleMouseLeave = () => {
+            if (rafId) cancelAnimationFrame(rafId);
+
+            cardElement.classList.remove('tilted');
+            cardElement.style.setProperty('--shimmer-angle', '45deg');
+
+            // Reset transform based on flip state
+            if (cardElement.classList.contains('flipped')) {
+              cardElement.style.transform = 'rotateY(180deg)';
+            } else {
+              cardElement.style.transform = '';
+            }
+          };
+
+          // Mouse enter - only start tilt if not flipped
+          cardElement.addEventListener('mouseenter', () => {
+            if (!cardElement.classList.contains('flipped')) {
+              cardElement.addEventListener('mousemove', handleMouseMove);
+            }
+          });
+
+          cardElement.addEventListener('mouseleave', () => {
+            cardElement.removeEventListener('mousemove', handleMouseMove);
+            handleMouseLeave();
+          });
+        });
+      }, 100);
+    }
+
+    function destroySwiper() {
+      if (swiperInstance) {
+        swiperInstance.destroy(true, true);
+        swiperInstance = null;
+      }
+      
+      // Reset card initialization flags
+      const cards = document.querySelectorAll('.card-flip');
+      cards.forEach((card) => {
+        delete card.dataset.initialized;
+      });
+    }
+
+    function initCarousel() {
+      initSwiper();
+      initCardInteractions();
+    }
+
+    // Initialize on page load and after transitions
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+      initCarousel();
+    }
+
+    // Handle Astro view transitions
+    document.addEventListener('astro:page-load', initCarousel);
+    document.addEventListener('astro:before-preparation', destroySwiper);
   </script>
 </div>

@@ -188,6 +188,34 @@ const uniqueId = `logo-${Math.random().toString(36).substring(2, 9)}`;
     }
   }
 
+  @keyframes lensDistortion {
+    0% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+      filter: blur(8px) brightness(1);
+    }
+    25% {
+      transform: scale(1.2) rotate(90deg);
+      opacity: 0.6;
+      filter: blur(4px) brightness(1.3);
+    }
+    50% {
+      transform: scale(1.5) rotate(180deg);
+      opacity: 1;
+      filter: blur(2px) brightness(1.5);
+    }
+    75% {
+      transform: scale(1.8) rotate(270deg);
+      opacity: 0.8;
+      filter: blur(3px) brightness(1.2);
+    }
+    100% {
+      transform: scale(2.5) rotate(360deg);
+      opacity: 0;
+      filter: blur(6px) brightness(0.8);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .energy-core {
       animation: simpleAppear 0.8s ease forwards;
@@ -368,159 +396,340 @@ const uniqueId = `logo-${Math.random().toString(36).substring(2, 9)}`;
       });
       window.dispatchEvent(blackHoleEvent);
 
-      // Crear múltiples capas para un efecto más dramático
+      // Crear el contenedor principal del agujero negro
       const blackHoleContainer = document.createElement('div');
       blackHoleContainer.style.cssText = `
         position: fixed;
-        left: ${centerX - 40}px;
-        top: ${centerY - 40}px;
-        width: 80px;
-        height: 80px;
+        left: ${centerX - 120}px;
+        top: ${centerY - 120}px;
+        width: 240px;
+        height: 240px;
         pointer-events: none;
         z-index: 9998;
       `;
 
-      // Capa externa - anillo de acreción
-      const accretionRing = document.createElement('div');
-      accretionRing.style.cssText = `
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: conic-gradient(from 0deg, 
-          rgba(239, 187, 71, 0.8) 0deg,
-          rgba(255, 215, 0, 0.9) 60deg,
-          rgba(255, 140, 0, 0.7) 120deg,
-          rgba(239, 187, 71, 0.8) 180deg,
-          rgba(255, 215, 0, 0.9) 240deg,
-          rgba(255, 140, 0, 0.7) 300deg,
-          rgba(239, 187, 71, 0.8) 360deg);
-        border-radius: 50%;
-        filter: blur(2px);
-        box-shadow: 0 0 30px rgba(239, 187, 71, 0.6);
-      `;
+      // 1. ONDAS GRAVITACIONALES - Ripples en el espacio-tiempo
+      for (let i = 0; i < 4; i++) {
+        const gravitationalWave = document.createElement('div');
+        gravitationalWave.style.cssText = `
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border: 2px solid rgba(139, 69, 19, ${0.3 - i * 0.05});
+          border-radius: 50%;
+          filter: blur(${1 + i}px);
+        `;
+        
+        blackHoleContainer.appendChild(gravitationalWave);
+        
+        gravitationalWave.animate([
+          { transform: 'scale(0)', opacity: 0 },
+          { transform: 'scale(1.5)', opacity: 0.6 },
+          { transform: 'scale(2.5)', opacity: 0.3 },
+          { transform: 'scale(3.5)', opacity: 0.1 },
+          { transform: 'scale(4)', opacity: 0 }
+        ], {
+          duration: 4000 + i * 600,
+          delay: i * 200,
+          easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+        });
+      }
 
-      // Capa media - distorsión gravitacional
-      const gravitationalLens = document.createElement('div');
-      gravitationalLens.style.cssText = `
-        position: absolute;
-        width: 70%;
-        height: 70%;
-        top: 15%;
-        left: 15%;
-        background: radial-gradient(circle, 
-          rgba(0, 0, 0, 0.2) 0%,
-          rgba(0, 0, 0, 0.6) 40%,
-          rgba(239, 187, 71, 0.4) 70%,
-          rgba(255, 215, 0, 0.7) 100%);
-        border-radius: 50%;
-        filter: blur(1px);
-      `;
+      // 2. DISCO DE ACRECIÓN - Material rotando a diferentes velocidades
+      for (let ring = 0; ring < 5; ring++) {
+        const accretionRing = document.createElement('div');
+        const ringSize = 200 - (ring * 25);
+        const temperature = 1 - (ring * 0.15); // Más caliente hacia el centro
+        
+        accretionRing.style.cssText = `
+          position: absolute;
+          width: ${ringSize}px;
+          height: ${ringSize}px;
+          top: ${(240 - ringSize) / 2}px;
+          left: ${(240 - ringSize) / 2}px;
+          background: conic-gradient(from 0deg,
+            transparent 0deg,
+            rgba(${255 * temperature}, ${140 * temperature}, ${30 * temperature}, ${0.8 - ring * 0.1}) 30deg,
+            rgba(${255 * temperature}, ${200 * temperature}, ${50 * temperature}, ${0.9 - ring * 0.1}) 60deg,
+            transparent 90deg,
+            transparent 180deg,
+            rgba(${255 * temperature}, ${140 * temperature}, ${30 * temperature}, ${0.7 - ring * 0.1}) 210deg,
+            rgba(${255 * temperature}, ${200 * temperature}, ${50 * temperature}, ${0.8 - ring * 0.1}) 240deg,
+            transparent 270deg,
+            transparent 360deg);
+          border-radius: 50%;
+          filter: blur(${1 + ring * 0.5}px);
+          mask: radial-gradient(circle, transparent 20%, black 40%, black 90%, transparent 100%);
+          -webkit-mask: radial-gradient(circle, transparent 20%, black 40%, black 90%, transparent 100%);
+        `;
+        
+        blackHoleContainer.appendChild(accretionRing);
+        
+        // Rotación diferencial - más rápido hacia el centro
+        const rotationSpeed = 8000 + (ring * 2000);
+        accretionRing.animate([
+          { transform: 'rotate(0deg)' },
+          { transform: 'rotate(360deg)' }
+        ], {
+          duration: rotationSpeed,
+          iterations: Infinity,
+          easing: 'linear'
+        });
 
-      // Capa interna - horizonte de eventos
+        // Aparición del disco
+        accretionRing.animate([
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(180deg)', opacity: 0.8 },
+          { transform: 'scale(1.2) rotate(360deg)', opacity: 1 },
+          { transform: 'scale(1.1) rotate(540deg)', opacity: 0.9 },
+          { transform: 'scale(0.9) rotate(720deg)', opacity: 0.6 },
+          { transform: 'scale(0.5) rotate(900deg)', opacity: 0.3 },
+          { transform: 'scale(0.1) rotate(1080deg)', opacity: 0.1 },
+          { transform: 'scale(0) rotate(1260deg)', opacity: 0 }
+        ], {
+          duration: 7000,
+          delay: ring * 300,
+          easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+        });
+      }
+
+      // 3. JETS POLARES - Chorros de material relativista
+      for (let jet = 0; jet < 2; jet++) {
+        const polarJet = document.createElement('div');
+        const jetDirection = jet === 0 ? -1 : 1; // Arriba y abajo
+        
+        polarJet.style.cssText = `
+          position: absolute;
+          width: 6px;
+          height: 80px;
+          left: 117px;
+          top: ${jet === 0 ? 20 : 140}px;
+          background: linear-gradient(${jet === 0 ? '0deg' : '180deg'},
+            rgba(135, 206, 255, 0.9) 0%,
+            rgba(100, 149, 237, 0.8) 30%,
+            rgba(65, 105, 225, 0.6) 60%,
+            transparent 100%);
+          border-radius: 3px;
+          filter: blur(1px);
+          box-shadow: 0 0 15px rgba(135, 206, 255, 0.6);
+        `;
+        
+        blackHoleContainer.appendChild(polarJet);
+        
+        // Animación de los jets
+        polarJet.animate([
+          { 
+            transform: `scaleY(0) translateY(${jetDirection * 20}px)`, 
+            opacity: 0,
+            filter: 'blur(3px)'
+          },
+          { 
+            transform: `scaleY(1.5) translateY(${jetDirection * -10}px)`, 
+            opacity: 1,
+            filter: 'blur(1px)'
+          },
+          { 
+            transform: `scaleY(2) translateY(${jetDirection * -30}px)`, 
+            opacity: 0.8,
+            filter: 'blur(0.5px)'
+          },
+          { 
+            transform: `scaleY(1.8) translateY(${jetDirection * -25}px)`, 
+            opacity: 0.6,
+            filter: 'blur(1px)'
+          },
+          { 
+            transform: `scaleY(1.2) translateY(${jetDirection * -15}px)`, 
+            opacity: 0.4,
+            filter: 'blur(1.5px)'
+          },
+          { 
+            transform: `scaleY(0.5) translateY(${jetDirection * 10}px)`, 
+            opacity: 0.2,
+            filter: 'blur(2px)'
+          },
+          { 
+            transform: `scaleY(0.1) translateY(${jetDirection * 30}px)`, 
+            opacity: 0.05,
+            filter: 'blur(3px)'
+          },
+          { 
+            transform: `scaleY(0) translateY(${jetDirection * 40}px)`, 
+            opacity: 0,
+            filter: 'blur(4px)'
+          }
+        ], {
+          duration: 5500,
+          delay: 1000 + jet * 200,
+          easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+        });
+      }
+
+      // 4. HORIZONTE DE EVENTOS - La frontera de no retorno
       const eventHorizon = document.createElement('div');
       eventHorizon.style.cssText = `
         position: absolute;
-        width: 40%;
-        height: 40%;
-        top: 30%;
-        left: 30%;
-        background: radial-gradient(circle, 
+        width: 40px;
+        height: 40px;
+        top: 100px;
+        left: 100px;
+        background: radial-gradient(circle,
           rgba(0, 0, 0, 1) 0%,
-          rgba(0, 0, 0, 0.9) 60%,
-          rgba(239, 187, 71, 0.3) 100%);
+          rgba(0, 0, 0, 0.95) 70%,
+          rgba(139, 69, 19, 0.4) 90%,
+          transparent 100%);
         border-radius: 50%;
-        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+        box-shadow: 
+          0 0 20px rgba(0, 0, 0, 0.8),
+          inset 0 0 10px rgba(139, 69, 19, 0.3);
       `;
-
-      // Núcleo central - singularidad
-      const singularity = document.createElement('div');
-      singularity.style.cssText = `
-        position: absolute;
-        width: 15%;
-        height: 15%;
-        top: 42.5%;
-        left: 42.5%;
-        background: radial-gradient(circle, 
-          rgba(0, 0, 0, 1) 0%,
-          rgba(0, 0, 0, 0.8) 100%);
-        border-radius: 50%;
-        box-shadow: 0 0 10px rgba(239, 187, 71, 0.8);
-      `;
-
-      // Ensamblar el agujero negro
-      blackHoleContainer.appendChild(accretionRing);
-      blackHoleContainer.appendChild(gravitationalLens);
+      
       blackHoleContainer.appendChild(eventHorizon);
-      blackHoleContainer.appendChild(singularity);
+      
+      eventHorizon.animate([
+        { 
+          transform: 'scale(0)', 
+          opacity: 0,
+          filter: 'brightness(1)'
+        },
+        { 
+          transform: 'scale(1)', 
+          opacity: 1,
+          filter: 'brightness(0.5)'
+        },
+        { 
+          transform: 'scale(1.1)', 
+          opacity: 1,
+          filter: 'brightness(0.3)'
+        },
+        { 
+          transform: 'scale(1.05)', 
+          opacity: 0.95,
+          filter: 'brightness(0.2)'
+        },
+        { 
+          transform: 'scale(0.95)', 
+          opacity: 0.8,
+          filter: 'brightness(0.15)'
+        },
+        { 
+          transform: 'scale(0.7)', 
+          opacity: 0.5,
+          filter: 'brightness(0.1)'
+        },
+        { 
+          transform: 'scale(0.3)', 
+          opacity: 0.2,
+          filter: 'brightness(0.05)'
+        },
+        { 
+          transform: 'scale(0)', 
+          opacity: 0,
+          filter: 'brightness(0)'
+        }
+      ], {
+        duration: 6500,
+        easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+      });
+
+      // 5. PARTÍCULAS CON SPAGHETTIFICATION - Estiramiento por fuerzas de marea
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        const angle = (i / 15) * Math.PI * 2;
+        const startDistance = 100 + Math.random() * 50;
+        const startX = Math.cos(angle) * startDistance;
+        const startY = Math.sin(angle) * startDistance;
+        
+        particle.style.cssText = `
+          position: absolute;
+          width: 3px;
+          height: 3px;
+          left: ${120 + startX}px;
+          top: ${120 + startY}px;
+          background: rgba(255, ${140 + Math.random() * 60}, 30, ${0.7 + Math.random() * 0.3});
+          border-radius: 50%;
+          filter: blur(0.5px);
+          box-shadow: 0 0 8px currentColor;
+        `;
+        
+        blackHoleContainer.appendChild(particle);
+        
+        // Crear trayectoria en espiral con estiramiento (spaghettification)
+        const spiralSteps = [];
+        const totalSteps = 30;
+        
+        for (let step = 0; step <= totalSteps; step++) {
+          const progress = step / totalSteps;
+          const spiralAngle = angle + (progress * Math.PI * 6);
+          const distance = startDistance * (1 - progress * 0.95);
+          const x = Math.cos(spiralAngle) * distance;
+          const y = Math.sin(spiralAngle) * distance;
+          
+          // Efecto de redshift - cambio hacia el rojo
+          const redShift = progress * 0.8;
+          const blueShift = 1 - redShift;
+          
+          // Estiramiento por fuerzas de marea
+          const stretch = 1 + progress * 3;
+          const compression = 1 - progress * 0.7;
+          
+          spiralSteps.push({
+            transform: `translate(${-startX + x}px, ${-startY + y}px) scale(${compression}, ${stretch}) rotate(${spiralAngle * 180 / Math.PI}deg)`,
+            opacity: (1 - progress) * (0.7 + Math.random() * 0.3),
+            filter: `blur(${0.5 + progress * 3}px) hue-rotate(${progress * 60}deg)`,
+            background: `rgba(${255 * (1 - redShift * 0.3)}, ${140 * blueShift}, 30, ${0.7 - progress * 0.4})`
+          });
+        }
+        
+        particle.animate(spiralSteps, {
+          duration: 5000 + Math.random() * 1500,
+          easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+          delay: Math.random() * 800
+        });
+      }
+
+      // 6. LENTE GRAVITACIONAL - Distorsión del espacio-tiempo
+      const gravitationalLens = document.createElement('div');
+      gravitationalLens.style.cssText = `
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        top: 40px;
+        left: 40px;
+        background: radial-gradient(ellipse 80% 40% at center,
+          transparent 0%,
+          rgba(139, 69, 19, 0.1) 40%,
+          rgba(160, 82, 45, 0.2) 60%,
+          transparent 80%);
+        border-radius: 50%;
+        filter: blur(4px);
+        backdrop-filter: blur(2px) brightness(1.2);
+        animation: lensDistortion 6s ease-in-out;
+      `;
+      
+      blackHoleContainer.appendChild(gravitationalLens);
+
       document.body.appendChild(blackHoleContainer);
 
-      // Animación del anillo de acreción
-      accretionRing.animate(
-        [
-          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
-          { transform: 'scale(1.2) rotate(180deg)', opacity: 0.8 },
-          { transform: 'scale(1.5) rotate(360deg)', opacity: 1 },
-          { transform: 'scale(2.5) rotate(720deg)', opacity: 0.6 },
-          { transform: 'scale(0.2) rotate(1080deg)', opacity: 0 },
-        ],
-        {
-          duration: 3000,
-          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        }
-      );
-
-      // Animación de la lente gravitacional
-      gravitationalLens.animate(
-        [
-          { transform: 'scale(0)', opacity: 0 },
-          { transform: 'scale(1.1)', opacity: 0.7 },
-          { transform: 'scale(1.3)', opacity: 1 },
-          { transform: 'scale(1.8)', opacity: 0.5 },
-          { transform: 'scale(0.1)', opacity: 0 },
-        ],
-        {
-          duration: 3000,
-          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        }
-      );
-
-      // Animación del horizonte de eventos
-      eventHorizon.animate(
-        [
-          { transform: 'scale(0)', opacity: 0 },
-          { transform: 'scale(1)', opacity: 1 },
-          { transform: 'scale(1.2)', opacity: 1 },
-          { transform: 'scale(1.5)', opacity: 0.8 },
-          { transform: 'scale(0)', opacity: 0 },
-        ],
-        {
-          duration: 3000,
-          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        }
-      );
-
-      // Animación de la singularidad
-      singularity
-        .animate(
-          [
-            { transform: 'scale(0)', opacity: 0 },
-            { transform: 'scale(1)', opacity: 1 },
-            { transform: 'scale(1.5)', opacity: 1 },
-            { transform: 'scale(2)', opacity: 0.9 },
-            { transform: 'scale(0)', opacity: 0 },
-          ],
-          {
-            duration: 3000,
-            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          }
-        )
-        .addEventListener('finish', () => {
+      // Crear un fade-out suave final para todo el contenedor
+      setTimeout(() => {
+        blackHoleContainer.animate([
+          { opacity: 1, filter: 'blur(0px)' },
+          { opacity: 0.7, filter: 'blur(1px)' },
+          { opacity: 0.3, filter: 'blur(2px)' },
+          { opacity: 0, filter: 'blur(4px)' }
+        ], {
+          duration: 1500,
+          easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+          fill: 'forwards'
+        }).addEventListener('finish', () => {
           blackHoleContainer.remove();
         });
+      }, 6000);
 
-      // Vibración háptica más intensa para el agujero negro
+      // Vibración háptica dramática
       if ('vibrate' in navigator) {
-        navigator.vibrate([150, 100, 150, 100, 300, 100, 150]);
+        navigator.vibrate([200, 100, 300, 150, 400, 200, 500]);
       }
     }
 

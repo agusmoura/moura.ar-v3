@@ -193,6 +193,10 @@ const navItems: readonly NavItem[] = [
       this.nav = document.querySelector('[data-nav="active-detector"]') as HTMLElement;
       if (!this.nav) return;
 
+      // Prevent multiple initializations
+      if (this.nav.dataset.initialized === 'true') return;
+      this.nav.dataset.initialized = 'true';
+
       this.links = this.nav.querySelectorAll('[data-section]') as NodeListOf<HTMLAnchorElement>;
 
       this.initializeSections();
@@ -289,9 +293,28 @@ const navItems: readonly NavItem[] = [
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // Cleanup before transitions
+  function cleanupDesktopNav() {
+    const nav = document.querySelector('[data-nav="active-detector"]');
+    if (nav) {
+      delete nav.dataset.initialized;
+    }
+  }
+
+  // Initialize on page load and after transitions
+  function initDesktopNav() {
     new ActiveNavDetector();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDesktopNav);
+  } else {
+    initDesktopNav();
+  }
+
+  // Handle Astro view transitions
+  document.addEventListener('astro:page-load', initDesktopNav);
+  document.addEventListener('astro:before-preparation', cleanupDesktopNav);
 
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
