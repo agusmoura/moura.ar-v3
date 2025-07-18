@@ -16,10 +16,6 @@ This is **Moura.ar v3**, a personal portfolio website built with Astro v5, featu
 - **Animations**: Custom space-themed background effects
 - **Bundle Analysis**: vite-bundle-visualizer
 
-## Tailwind Configuration
-
-- Este proyecto usa Tailwind 4. No utiliza la configuracion de tailwind config. Todo se condfigura desde css
-
 ## Essential Commands
 
 ```bash
@@ -38,6 +34,10 @@ bun run preview          # Preview production build
 bun run "build:test"     # Build and start server
 bun run start            # Start production server
 
+# Testing
+bun run test             # Run all tests
+bun run test:contact     # Run contact form tests specifically
+
 # Analysis
 bun run analyze          # Analyze bundle size
 ```
@@ -54,19 +54,22 @@ bun run analyze          # Analyze bundle size
 ```
 src/
 ├── components/
-│   ├── effects/       # Space-themed animations
-│   ├── sections/      # Main page sections
-│   ├── seo/          # SEO components
-│   └── ui/           # UI components
+│   ├── accessibility/    # A11y components (SkipLink, ScreenReader)
+│   ├── analytics/        # Umami analytics integration
+│   ├── effects/          # Space-themed animations
+│   ├── sections/         # Main page sections
+│   ├── seo/             # SEO components
+│   └── ui/              # UI components
 ├── content/
-│   └── projects/     # Project MDX files
-├── layouts/          # Page layouts
+│   └── projects/        # Project MDX files
+├── layouts/             # Page layouts
 ├── pages/
-│   ├── api/          # API routes (contact form)
-│   └── projects/     # Project pages
-├── styles/           # Global CSS
-├── types/            # TypeScript definitions
-└── utils/            # Utility functions
+│   ├── api/             # API routes (contact form)
+│   └── projects/        # Project pages
+├── schemas/             # Zod validation schemas
+├── styles/              # Global CSS
+├── types/               # TypeScript definitions
+└── utils/               # Utility functions
 ```
 
 ## TypeScript Configuration
@@ -87,6 +90,7 @@ The project uses strict TypeScript with path aliases:
 - Comprehensive validation and sanitization
 - Bot detection with honeypot fields
 - UTM parameter tracking
+- Rate limiting (5 requests per hour per IP)
 - Spam keyword filtering
 
 ### Space Background Effects
@@ -98,7 +102,7 @@ The project uses strict TypeScript with path aliases:
 ### Project Content System
 - MDX-based project files in `src/content/projects/`
 - Dynamic routing via `[slug].astro`
-- Rich metadata support
+- Rich metadata support with Zod schemas
 
 ## Environment Variables
 
@@ -167,8 +171,10 @@ curl -X POST http://localhost:4321/api/contact \
 - **SEO**: Comprehensive meta tags and Rich Results implementation
 - **Performance**: Prefetch strategy enabled for viewport-based loading
 
+## Tailwind Configuration
+
+This project uses Tailwind CSS v4 with CSS-based configuration (no `tailwind.config.js`). All custom design tokens, animations, and utilities are defined in `src/styles/global.css`. The project uses OKLCH color space for better color consistency and includes extensive custom animations for space-themed effects.
+
 ## Analytics Configuration
 
-- The site does not use Google Analytics
-- Using a self-hosted Umami analytics server located at https://analytics.moura.ar/
-- Tracking script for this site: `<script defer src="https://analytics.moura.ar/script.js" data-website-id="388f61d9-d676-4279-a193-9e87a38e3c4b"></script>`
+The site uses self-hosted Umami analytics server at `https://analytics.moura.ar/` with comprehensive UTM tracking and privacy-focused implementation. Analytics are embedded via the tracking script in the main layout.
