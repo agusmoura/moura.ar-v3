@@ -3,123 +3,133 @@ import type { PersonalCard } from '../types/personal-card';
 export const personalCardsData: PersonalCard[] = [
   {
     id: 1,
-    title: 'INTP',
-    subtitle: 'El logico',
-    description: 'inventores de innovación con una sed insaciable de conocimiento.',
+    primary_title: 'INTP',
+    tagline: 'El logico',
+    preview_text: 'Donde otros ven caos, yo veo un lunes en el trabajo.',
     image: 'https://cdn.moura.ar/intp.webp',
-    rarity: 'legendary',
-    tags: ['INTP', 'Logico', 'Innovador'],
-    specialTag: 'MBTI',
+    tags: ['Analítico', 'Curioso', 'Innovador'],
+    category: 'MBTI',
     colors: {
       background: 'bg-[#0a0c02]',
       border: 'from-[#8e7741] via-[#947b43] to-[#856529]',
       glow: 'ring-[#8e7741]',
     },
-    backContent: {
-      title: 'Vida de la Mente',
-      points:
-        'Exploro el mundo a través de la lógica, la curiosidad y la estructura invisible de las cosas. Me mueven las ideas complejas, la innovación conceptual y el deseo de comprender cómo y por qué funciona todo. Donde otros ven formas, yo percibo patrones. Valoro la libertad de pensar sin restricciones y convertir la abstracción en sistemas concretos y elegantes.',
+    story: {
+      title: 'La Mente que Nunca Descansa',
+      key_points: [
+        'Transformo café en arquitecturas conceptuales',
+        'Experto en encontrar patrones donde no los hay',
+        'Colecciono proyectos personales sin terminar',
+        'En mi mente ya viví esto',
+      ],
+      note: 'Sí, analizo hasta mis propios pensamientos. Es recursivo.',
+      cta: {
+        text: 'Conocé tu tipo de personalidad',
+        url: 'https://www.16personalities.com/',
+        target: '_blank',
+      },
     },
   },
   {
     id: 2,
-    title: 'Mi música favorita',
-    subtitle: 'Frecuencia Adaptativa',
-    description: 'El ritmo como herramienta de enfoque',
-    image: 'https://cdn.moura.ar/music.webp',
-    rarity: 'epic',
-    specialTag: 'Música',
+    primary_title: 'Soundtrack Neuronal',
+    tagline: 'Modulando estados mentales desde 2018',
+    preview_text: 'Mi cerebro tiene playlist para cada función cognitiva',
     tags: ['Lo-Fi', 'Techno', 'Dubstep', 'Hip-Hop'],
+    category: 'Music',
+    image: 'https://cdn.moura.ar/music.webp',
     colors: {
       background: 'bg-[#04170f]',
       border: 'from-[#436f2d] via-[#447234] to-[#2d4a1c]',
       glow: 'ring-[#436f2d]',
     },
-    backContent: {
-      title: 'Modulando el ritmo',
-      points: [
+    story: {
+      title: 'Ingeniería de Estados Mentales',
+      key_points: [
         'Lo-fi para sesiones calmas y reflexivas',
         'Techno y subgéneros para acelerar la ejecución',
         'Sonidos que influyen en el foco y el pulso',
-        'Respaldado por estudios científicos sobre música y rendimiento',
+        'Respaldado por neurociencia (y mucha cafeína)',
       ],
-      link: {
+      note: 'Tengo más playlists que proyectos terminados. Send help.',
+      cta: {
         text: 'Escuchar en Spotify',
-        url: 'https://spotify.com/playlist/lofi',
+        url: 'https://open.spotify.com/user/agusmourard',
+        target: '_blank',
       },
     },
   },
   {
     id: 3,
-    title: 'Experiencia',
-    subtitle: 'Experto Digital',
-    description: '6+ años forjando el futuro',
+    primary_title: 'El Currículum Viviente',
+    tagline: '6 años sobreviviendo al ecosistema JavaScript',
+    preview_text: 'De junior con síndrome del impostor a senior con síndrome del impostor',
     image: 'https://cdn.moura.ar/cv.webp',
-    rarity: 'rare',
     tags: ['Full-stack', 'UX/UI', 'Leadership'],
-    specialTag: 'CV',
+    category: 'CV',
     colors: {
       background: 'bg-[#050b10]',
       border: 'from-[#2f575e] via-[#ace1e4] to-[#86a095]',
       glow: 'ring-[#2f575e]',
     },
-    backContent: {
+    story: {
       title: 'Un poco de todo',
-      points: [
-        'Full-stack Developer',
-        'Themes and Plugins for Wordpress',
-        'UX/UI Designer',
-        'Product Strategy',
-        'Technical Leadership',
-        'Data Science',
-        'Design Systems',
+      key_points: [
+        'Sobreviví a jQuery, Angular.js y IE11',
+        'Sobreviví a caídas de producción un viernes a las 18:00',
+        'Lideré equipos sin morir en el intento',
+        'Especialista en traducir "¿se puede hacer rápido?" a roadmaps',
       ],
-      link: {
-        text: 'Descargar CV completo',
+      note: 'Plot twist: cada día aprendo algo que no sabía que no sabía.',
+      cta: {
+        text: 'Descargar Mi Currículum Completo',
         url: '/cv.pdf',
+        type: 'download',
       },
     },
   },
   {
     id: 4,
-    title: 'Que estoy Leyendo',
-    subtitle: 'La psicología del diseño - Don Norman',
-    description: 'La psicología del diseño',
+    primary_title: 'Que estoy Leyendo',
+    tagline: 'El diseño de las cosas cotidianas - Don Norman',
+    preview_text: 'Leyendo sobre cómo la gente no lee instrucciones',
     image: 'https://cdn.moura.ar/book.webp',
-    rarity: 'epic',
-    specialTag: 'Libro',
-    tags: ['Diseño', 'UX', 'Psicología'],
+    category: 'Hobbie',
     colors: {
       background: 'bg-[#1b1809]',
       border: 'from-[#b07924] via-[#8b2e14] to-[#996c24]',
       glow: 'ring-[#b07924]',
     },
-    backContent: {
-      title: 'EXPERIENCIA Y USO',
-      points:
+    tags: ['Diseño', 'UX', 'Psicología'],
+    story: {
+      title: 'Diseño para Humanos Reales',
+      key_points: [
         'Un libro que explora la relación entre diseño y comportamiento humano, mostrando cómo los objetos cotidianos pueden mejorar o complicar nuestras vidas. Norman presenta principios clave como visibilidad y feedback para crear experiencias intuitivas.',
+      ],
+      note: 'Irónicamente, leo sobre UX mientras procrastino mis propios proyectos.',
       link: {
         text: 'Comprar en Amazon',
         url: 'https://www.amazon.com/dp/0465050654',
+        target: '_blank',
       },
     },
   },
   {
     id: 5,
-    title: 'Boca',
-    subtitle: 'Xeneize',
-    description: 'La mitad más uno',
+    primary_title: 'Boca',
+    tagline: 'Xeneize',
+    preview_text: 'La mitad más uno',
     image: 'https://cdn.moura.ar/boca.webp',
-    rarity: 'legendary',
-    specialTag: 'Fútbol',
+    category: 'Fútbol',
     tags: ['Fútbol', 'Pasión', 'Historia'],
     colors: {
       background: 'bg-[#04151f]',
       border: 'from-[#98722f] via-[#736035] to-[#98722f]',
       glow: 'ring-[#98722f]',
     },
-    backContent: {
-      points: [
+    story: {
+      title: 'Cuando el Barrio Te Elige',
+      key_points: [
         'La Bombonera - Templo del fútbol',
         '6 Copas Libertadores',
         '3 Copas Intercontinentales',
@@ -134,64 +144,62 @@ export const personalCardsData: PersonalCard[] = [
   },
   {
     id: 6,
-    title: 'Mi zona de confort',
-    subtitle: 'Factorio',
-    description: 'Cuando necesito descansar del código... automatizo más cosas.',
+    primary_title: 'Mi zona de confort',
+    tagline: 'Factorio',
+    preview_text: 'Cuando necesito descansar del código... automatizo más cosas.',
     image: 'https://cdn.moura.ar/factorio.webp',
-    rarity: 'epic',
-    specialTag: 'Gaming',
+    category: 'Gaming',
     tags: ['Automatización', 'Horas perdidas'],
     colors: {
       background: 'bg-[#090a05]',
       border: 'from-[#a35220] via-[#c47034] to-[#a35220]',
       glow: 'ring-[#a35220]',
     },
-    backContent: {
+    story: {
       title: 'Factorio y el arte de complicar lo sencillo',
-      points: [
+      key_points: [
         'Fabricando máquinas para fabricar más máquinas',
         'Optimizando todo excepto mis horas de sueño',
         'Especialista en crear caos ordenado',
         'Mejor que ordenar mi escritorio',
       ],
-      link: {
-        text: 'Ver en Steam',
+      cta: {
+        text: 'Unirse a Mi Adicción',
         url: 'https://store.steampowered.com/app/427520/Factorio/',
+        target: '_blank',
       },
     },
   },
   {
     id: 7,
-    title: 'Pasión por el Café',
-    subtitle: 'Barista Digital',
-    description: 'Esas adicciones si se pueden ver',
+    primary_title: 'Alquimia del Café',
+    tagline: 'Barista certificado, adicto confeso',
+    preview_text: 'Esas adicciones si se pueden ver',
     image: 'https://cdn.moura.ar/coffee.webp',
-    rarity: 'rare',
-    specialTag: 'Life',
+    category: 'Life',
     tags: ['Café', 'Ritual'],
     colors: {
       background: 'bg-[#1c1103]',
       border: 'from-[#6f4e37] via-[#9a7356] to-[#6f4e37]',
       glow: 'ring-[#6f4e37]',
     },
-    backContent: {
+    story: {
       title: 'Café como ritual',
-      points: [
+      key_points: [
         'Barista certificado',
         'El café como proceso creativo y meditativo',
         'Confieso que tengo más métodos de café que proyectos',
         'Especialista en convertir cafeína en ideas',
-        'Probablemente me muera joven.',
       ],
+      note: 'Probablemente me muera joven',
     },
   },
   {
     id: 8,
-    title: 'Mango Aurelio',
-    subtitle: 'Gato naranja...',
-    description: 'Es naranja, claramente esta demente',
+    primary_title: 'Mango Aurelio',
+    tagline: 'Gato naranja...',
+    preview_text: 'Es naranja, claramente esta demente',
     image: 'https://cdn.moura.ar/mango.webp',
-    rarity: 'legendary',
     specialTag: 'Mascota',
     tags: ['Bipolar', 'Destrucción', 'Aniquilación'],
     colors: {
@@ -199,9 +207,9 @@ export const personalCardsData: PersonalCard[] = [
       border: 'from-[#d17a22] via-[#eb913e] to-[#d17a22]',
       glow: 'ring-[#d17a22]',
     },
-    backContent: {
+    story: {
       title: 'Cargos oficiales',
-      points: [
+      key_points: [
         'Homicidio agravado en tercer grado',
         'Lesiones corporales graves',
         'Hurto reiterado de alimentos',
@@ -213,25 +221,25 @@ export const personalCardsData: PersonalCard[] = [
   },
   {
     id: 9,
-    title: 'Contacto Cercano',
-    subtitle: 'Alienígenas ancestrales',
-    description: 'Desde chico, convencido de que no estamos solos (ni cuerdos).',
+    primary_title: 'Contacto Cercano',
+    tagline: 'Alienígenas ancestrales',
+    preview_text: 'Desde chico, convencido de que no estamos solos (ni cuerdos).',
     image: 'https://cdn.moura.ar/ovni.webp',
-    rarity: 'epic',
-    specialTag: 'Ovni',
+    specialTag: 'HAA',
     tags: ['Ufología', 'Misterio', 'Infinito'],
     colors: {
       background: 'bg-[#01082a]',
       border: 'from-[#7f4ec9] via-[#b37cf1] to-[#7f4ec9]',
       glow: 'ring-[#b37cf1]',
     },
-    backContent: {
+    story: {
       title: '¿Estamos solos? jaja no',
-      points: [
-        'Crecí entre revistas, documentales falopa del history channel y teorías',
+      key_points: [
+        'Crecí entre revistas, documentales falopa del History Channel y teorías conspirativas',
         'Quise ser ufólogo antes que developer, posta',
-        'Veo una luz rara en el cielo y casi siempre es un satelite',
+        'Veo una luz rara en el cielo y casi siempre es un satélite',
       ],
+      note: '(si llegan a venir en serio, estamos al horno)',
       link: {
         text: 'Ver pruebas (no fake)',
         url: 'https://www.youtube.com/watch?v=9_wKHixTXOg',

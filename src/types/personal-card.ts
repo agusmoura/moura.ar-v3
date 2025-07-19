@@ -1,29 +1,31 @@
 export interface PersonalCard {
   id: number;
-  title: string;
-  subtitle: string;
-  description: string;
+  primary_title: string;
+  tagline?: string;
+  preview_text?: string;
   image?: string;
-  icon?: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  tags?: string[];
+  category?: string;
   specialTag?: string;
-  cta?: {
-    text: string;
-    action: string;
-    icon?: string;
-  };
+  tags?: string[];
   colors?: {
     background: string;
     border: string;
     glow?: string;
   };
-  backContent?: {
+  story: {
     title?: string;
-    points: string[] | string;
+    key_points: string[] | string;
+    note?: string;
+    cta?: {
+      text: string;
+      url: string;
+      target?: string;
+      type?: string;
+    };
     link?: {
       text: string;
       url: string;
+      target?: string;
     };
   };
 }
