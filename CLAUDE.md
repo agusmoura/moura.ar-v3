@@ -117,7 +117,48 @@ Optional:
 PUBLIC_ENABLE_ANALYTICS=false
 ```
 
-## Development Standards
+## Branch Strategy & Workflow
+
+### Branch Structure
+- **`master`**: Production branch - stable, deployed code only
+- **`dev`**: Development branch - for testing and integration
+- **Feature branches**: Created from `master` for new features/fixes
+
+### Development Workflow
+**CRITICAL**: Follow this exact workflow for all changes:
+
+1. **Create Feature Branch**: Always branch from `master` (not from `dev`)
+   ```bash
+   git checkout master
+   git pull origin master
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Develop & Test**: Make changes in the feature branch
+   ```bash
+   # Make your changes
+   git add .
+   git commit -m "feat: your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+3. **Merge to Dev for Testing**: Create PR to `dev` branch first
+   ```bash
+   # Create PR: feature/your-feature-name → dev
+   # Test thoroughly in dev environment
+   ```
+
+4. **Merge to Master**: Only after successful testing in `dev`
+   ```bash
+   # Create PR: feature/your-feature-name → master
+   # Delete feature branch after merge
+   ```
+
+### Branch Protection Rules
+- **NEVER** merge `dev` directly into `master`
+- **NEVER** commit directly to `master` or `dev`
+- **ALWAYS** use feature branches for changes
+- **ALWAYS** test in `dev` before merging to `master`
 
 ### Commit Messages
 Follow conventional commits:
