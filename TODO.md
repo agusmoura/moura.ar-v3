@@ -7,6 +7,8 @@
 ## 🟡 Media Prioridad
 
 - [ ] remplaza el "construido con" amor por "Cafe" y añade el simbolo del cafe en vez de un corazon
+- [ ] hacer el sitio traducido a ingles. usar las caracteristicas de astro i18n para esto
+- [ ] detectar por ip para poner por defecto el sitio en español o ingles.
 
 ## 🟢 Baja Prioridad
 
