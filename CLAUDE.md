@@ -2,6 +2,20 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Plan & Review
+
+### Before starting work
+- Always in plan mode to make a plan
+- After get the plan, make sure you write the plan to .claude/tasks/TASK_NAME.md.
+- The plan should be a detailed implementation plan and the reasoning behind them, as well as task broke down.
+- If the task requiere external knowledege or certain package, also research to get latest knowledge (use Task tool to research)
+- Don't over plan it, alwayts think MVP
+-Once you write the plan, firstly ask me to review it. Do not continue until I approve the plan
+
+### While Implementing
+- You should update the plan as you work.
+- After you complete task in the plan, you should update and append detailed descriptions of the changes you made, so the following tasks can be easily handed over to other engineers.
+
 ## Project Overview
 
 This is **Moura.ar v3**, a personal portfolio website built with Astro v5, featuring a contact form with N8N integration and JWT authentication. The site includes space-themed animations, project showcases, and comprehensive UTM tracking.
@@ -48,6 +62,8 @@ bun run analyze          # Analyze bundle size
 - Install dependencies: `bun add` or `bun add -D`
 - Run binaries: `bunx --bun <command>`
 - NEVER use `npm`, `yarn`, `pnpm`, or `npx`
+
+
 
 ## Project Structure
 
@@ -163,7 +179,7 @@ PUBLIC_ENABLE_ANALYTICS=false
 ### Commit Messages
 Follow conventional commits:
 - `feat:` - New features
-- `fix:` - Bug fixes  
+- `fix:` - Bug fixes
 - `docs:` - Documentation changes
 - `style:` - Code formatting
 - `refactor:` - Code restructuring
