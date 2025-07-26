@@ -52,7 +52,7 @@ export default defineConfig({
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            // Vendor chunk for core libraries
+            // Vendor chunk optimization for core libraries
             if (id.includes('node_modules')) {
               // Swiper gets its own chunk (lazy loaded)
               if (id.includes('swiper')) {
@@ -62,15 +62,37 @@ export default defineConfig({
               if (id.includes('aos')) {
                 return 'aos';
               }
+              // Heavy animation libraries
+              if (id.includes('gsap') || id.includes('lottie') || id.includes('framer-motion')) {
+                return 'animations';
+              }
+              // Image processing libraries
+              if (id.includes('sharp') || id.includes('imagemin')) {
+                return 'images';
+              }
+              // Core utilities that are always needed
+              if (id.includes('zod') || id.includes('jsonwebtoken')) {
+                return 'vendor-core';
+              }
               // Other vendor libraries
               return 'vendor';
             }
-            // Component-specific chunks
-            if (id.includes('PersonalCarousel')) {
+            
+            // Component-specific chunks for better loading
+            if (id.includes('PersonalCarousel') || id.includes('Swiper')) {
               return 'carousel';
             }
-            if (id.includes('ScrollAnimations')) {
+            if (id.includes('SpaceBackground') || id.includes('effects/')) {
+              return 'space-effects';
+            }
+            if (id.includes('ScrollAnimations') || id.includes('HeroOrbit')) {
               return 'scroll-animations';
+            }
+            if (id.includes('Contact') || id.includes('contact-form')) {
+              return 'contact';
+            }
+            if (id.includes('SEO') || id.includes('analytics')) {
+              return 'seo-analytics';
             }
           },
           assetFileNames: (assetInfo) => {
@@ -92,7 +114,15 @@ export default defineConfig({
     },
     esbuild: {
       drop: ['console', 'debugger'],
+      legalComments: 'none', // Remove license comments for smaller bundles
+      minifyIdentifiers: true,
+      minifySyntax: true,
+      minifyWhitespace: true,
+      target: 'es2022', // Modern target for better optimization
     },
+    // Additional performance optimizations
+    reportCompressedSize: false, // Faster builds
+    sourcemap: false, // Disable source maps in production
   },
   experimental: {
     responsiveImages: true,

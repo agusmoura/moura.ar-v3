@@ -40,8 +40,8 @@ interface Props {
 }
 
 const {
-  // Stars Background defaults
-  starDensity = 0.00015,
+  // Stars Background defaults - Optimized for performance
+  starDensity = 0.00008, // Reduced from 0.00015 to 0.00008 (47% fewer stars)
   allStarsTwinkle = true,
   twinkleProbability = 0.7,
   minTwinkleSpeed = 0.5,
@@ -360,6 +360,9 @@ const {
     private width: number = 0;
     private height: number = 0;
     private dpr: number = 1;
+    // Performance optimization - frame counters for throttling expensive effects
+    private frameCount: number = 0;
+    private gravitationalEffectsInterval: number = 2; // Apply gravitational effects every N frames
     private shootingStarColors: { r: number; g: number; b: number };
     private trailColors: { r: number; g: number; b: number };
     private orbitContainer: Element | null = null;
@@ -624,9 +627,19 @@ const {
       const rng = new SeededRandom(masterSeed);
 
       const area = this.width * this.height;
+      // Dynamic star limit based on device capabilities
+      const getMaxStars = () => {
+        const isMobile = window.innerWidth <= 768;
+        const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+        
+        if (isMobile || isLowEnd) return 800;  // Reduced for mobile/low-end
+        if (area > 3000000) return 1500;      // Large screens: cap at 1500
+        return 1200;                          // Default: cap at 1200
+      };
+
       const numStars = Math.min(
         Math.floor(area * starDensity),
-        2500 // Maximum stars limit for performance
+        getMaxStars()
       );
 
       this.stars = Array.from({ length: numStars }, () => {
@@ -1281,14 +1294,36 @@ const {
 
       // Draw stars with gravitational lensing and black hole effects
       const time = performance.now() * 0.001;
+      
+      // Viewport culling - only render visible stars (performance optimization)
+      const padding = 50; // Small padding for smooth transitions
+      const visibleStars = this.stars.filter(star => 
+        star.x >= -padding && star.x <= this.width + padding &&
+        star.y >= -padding && star.y <= this.height + padding
+      );
 
-      for (const star of this.stars) {
+      // Increment frame counter for performance throttling
+      this.frameCount++;
+      
+      // Adaptive throttling based on visible star count
+      const shouldApplyGravitationalEffects = visibleStars.length < 500 || 
+                                              this.frameCount % this.gravitationalEffectsInterval === 0;
+
+      for (const star of visibleStars) {
         let opacity = star.opacity;
         let fillStyle = '#fff'; // Default white color
         let twinkleSpeed = star.twinkleSpeed;
 
-        // Apply gravitational lensing to star position
-        const lensedPosition = this.applyMultipleGravitationalLensing(star);
+        // Apply gravitational lensing with throttling for performance
+        let lensedPosition: { x: number; y: number };
+        if (shouldApplyGravitationalEffects) {
+          lensedPosition = this.applyMultipleGravitationalLensing(star);
+          // Cache the result in the star object for reuse
+          (star as any)._cachedLensedPosition = lensedPosition;
+        } else {
+          // Use cached position or fallback to original position
+          lensedPosition = (star as any)._cachedLensedPosition || { x: star.x, y: star.y };
+        }
         
         // Debug: Log if we're applying effects (reduced frequency)
         if ((this.explosionActive || this.logoBlackHoleActive) && star === this.stars[0]) {
@@ -1482,7 +1517,14 @@ const {
         this.ctx.clearRect(0, 0, this.width, this.height);
       }
 
-      for (const star of this.stars) {
+      // Apply viewport culling to static render as well
+      const padding = 50;
+      const visibleStars = this.stars.filter(star => 
+        star.x >= -padding && star.x <= this.width + padding &&
+        star.y >= -padding && star.y <= this.height + padding
+      );
+
+      for (const star of visibleStars) {
         let fillStyle = '#fff'; // Default white color
 
         // Apply gravitational lensing to star position
@@ -1561,11 +1603,21 @@ const {
     }
 
     private shouldThrottleAnimation(): boolean {
-      // Throttle on mobile devices or low-end hardware
-      if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
-        return Math.random() > 0.7; // Run only 70% of frames
+      // Adaptive throttling based on performance metrics
+      const isMobile = window.innerWidth <= 768;
+      const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+      const visibleStarCount = this.stars.length;
+      
+      // Throttle more aggressively on mobile or low-end devices
+      if (isMobile || isLowEnd) {
+        // Throttle more when there are many stars
+        if (visibleStarCount > 600) return Math.random() > 0.5; // Run 50% of frames
+        return Math.random() > 0.7; // Run 70% of frames
       }
-
+      
+      // Throttle based on star count on all devices
+      if (visibleStarCount > 1000) return Math.random() > 0.8; // Run 80% of frames
+      
       // Throttle based on battery status
       if ('getBattery' in navigator) {
         interface BatteryManager {
@@ -1575,7 +1627,7 @@ const {
 
         const getBattery = (navigator as { getBattery(): Promise<BatteryManager> }).getBattery;
         getBattery().then((battery: BatteryManager) => {
-          if (battery.level < 0.2) return true; // Low battery
+          if (battery.level < 0.2 && !battery.charging) return true; // Low battery and not charging
         });
       }
 

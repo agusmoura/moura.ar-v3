@@ -464,6 +464,9 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
     import 'swiper/css/effect-cards';
     import { EffectCards } from 'swiper/modules';
 
+    // Performance utilities - keeping only what we use
+    // throttle and debounce removed as they were causing TypeScript issues and not needed
+
     let swiperInstance: Swiper | null = null;
     let cardHandlers = new Map<
       HTMLElement,
@@ -487,7 +490,7 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
         effect: 'cards',
         grabCursor: true,
         centeredSlides: true,
-        slidesPerView: 'auto',
+        slidesPerView: 'auto' as const,
         cardsEffect: {
           perSlideOffset: isMobile ? 5 : 9,
           perSlideRotate: isMobile ? 1 : 3,
@@ -564,7 +567,7 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
         cardElement.style.setProperty('--shimmer-angle', '45deg');
       };
 
-      // Optimized mousemove handler with smooth transforms
+      // Optimized mousemove handler with smooth transforms - keeping shimmer effect
       const mouseMoveHandler = (e: MouseEvent) => {
         if (isFlipped || rafId) return;
 
@@ -582,7 +585,7 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
             translateZ(0)
           `;
 
-          // Update shimmer angle smoothly
+          // Update shimmer angle smoothly - RESTORED
           const angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
           cardElement.style.setProperty('--shimmer-angle', `${angle}deg`);
           cardElement.classList.add('tilted');
@@ -634,6 +637,15 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
         intersectionObserver = null;
       }
 
+      // Clean up carousel observer
+      if (carouselObserver) {
+        carouselObserver.disconnect();
+        carouselObserver = null;
+      }
+
+      // Reset initialization flag
+      isCarouselInitialized = false;
+
       // Clean up card handlers
       cardHandlers.forEach((handlers, card) => {
         card.removeEventListener('click', handlers.click);
@@ -644,12 +656,61 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
       cardHandlers.clear();
     }
 
+    // Lazy loading implementation for carousel
+    let isCarouselInitialized = false;
+    let carouselObserver: IntersectionObserver | null = null;
+
+    function initCarouselLazy() {
+      const carouselContainer = document.querySelector('.carousel-container');
+      if (!carouselContainer || isCarouselInitialized) return;
+
+      // Setup intersection observer for lazy loading
+      carouselObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !isCarouselInitialized) {
+              isCarouselInitialized = true;
+              
+              // Use RAF for smooth initialization
+              requestAnimationFrame(() => {
+                initSwiper();
+                initCardInteractions();
+              });
+              
+              // Stop observing once initialized
+              carouselObserver?.disconnect();
+              carouselObserver = null;
+            }
+          });
+        },
+        { 
+          threshold: 0.1, // Trigger when 10% of carousel is visible
+          rootMargin: '50px' // Start loading 50px before it becomes visible
+        }
+      );
+
+      carouselObserver.observe(carouselContainer);
+    }
+
     function initCarousel() {
-      // Use RAF for smooth initialization
-      requestAnimationFrame(() => {
-        initSwiper();
-        initCardInteractions();
-      });
+      // Check if carousel is already in viewport
+      const carouselContainer = document.querySelector('.carousel-container');
+      if (!carouselContainer) return;
+
+      const rect = carouselContainer.getBoundingClientRect();
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+
+      if (isInViewport) {
+        // Initialize immediately if already visible
+        isCarouselInitialized = true;
+        requestAnimationFrame(() => {
+          initSwiper();
+          initCardInteractions();
+        });
+      } else {
+        // Setup lazy loading
+        initCarouselLazy();
+      }
     }
 
     // Initialize on page load and after transitions
