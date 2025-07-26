@@ -23,6 +23,8 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/node": "^9.2.2",
+    "@astrojs/sitemap": "^3.4.1",
+    "@composio/mcp": "^1.0.7",
     "@fontsource-variable/noto-serif-jp": "^5.2.5",
     "@fontsource/space-mono": "^5.2.5",
     "@types/jsonwebtoken": "^9.0.10",
