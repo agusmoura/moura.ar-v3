@@ -8,12 +8,12 @@ export interface ServiceContainer {
   cache: CacheManager;
   logger: Logger;
   config: ConfigurationService;
-  
+
   // Business services
   analytics: AnalyticsService;
   contact: ContactService;
   content: ContentService;
-  
+
   // Effect services
   physics: SpacePhysicsEngine;
   interaction: InteractionManager;

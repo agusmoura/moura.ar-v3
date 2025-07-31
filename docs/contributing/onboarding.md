@@ -7,11 +7,13 @@ This guide will help you get up to speed with the Moura.ar v3 project architectu
 ## Quick Start
 
 ### Prerequisites
+
 - **Bun** - Fast runtime and package manager
 - **Node.js 18+** - For compatibility
 - **Git** - Version control
 
 ### Setup
+
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -35,7 +37,7 @@ The project uses a **layered architecture** with clear separation of concerns:
 ```
 src/
 ├── lib/                # 🔧 Technical utilities & libraries
-├── services/           # 💼 Business logic & domain operations  
+├── services/           # 💼 Business logic & domain operations
 ├── core/               # 🏛️ Application foundation & config
 ├── components/         # 🎨 UI components (Astro)
 ├── pages/              # 🌐 Routes & API endpoints
@@ -43,6 +45,7 @@ src/
 ```
 
 ### Key Principles
+
 1. **Dependency Flow**: UI → Services → Libraries → Core
 2. **Path Aliases**: Use `@lib/*`, `@services/*`, `@core/*` instead of relative imports
 3. **Single Responsibility**: Each layer has a clear purpose
@@ -51,9 +54,11 @@ src/
 ## 🎯 Understanding the Layers
 
 ### **lib/** - Technical Foundation
+
 **Purpose**: Reusable utilities and cross-cutting concerns
 
 **What goes here**:
+
 - Security utilities (`@lib/security/`)
 - Caching system (`@lib/cache/`)
 - Logging (`@lib/logger/`)
@@ -61,55 +66,63 @@ src/
 - Analytics (`@lib/analytics/`)
 
 **Example**:
+
 ```typescript
 // lib/validation/textParser.ts
 export function parseText(input: string): string {
   // Pure utility function
-  return sanitizeAndFormat(input)
+  return sanitizeAndFormat(input);
 }
 ```
 
 ### **services/** - Business Logic
+
 **Purpose**: Domain operations and business rules
 
 **What goes here**:
+
 - Contact form processing (`@services/contact/`)
 - Analytics tracking (`@services/analytics/`)
 - Content management (`@services/content/`)
 
 **Example**:
+
 ```typescript
 // services/contact/ContactService.ts
 export class ContactService {
   async submitForm(data: ContactFormData): Promise<ContactResult> {
     // Business logic here
-    const validation = await this.validateForm(data)
-    return this.processSubmission(validation.data)
+    const validation = await this.validateForm(data);
+    return this.processSubmission(validation.data);
   }
 }
 ```
 
-### **core/** - Application Foundation  
+### **core/** - Application Foundation
+
 **Purpose**: App-wide configuration and infrastructure
 
 **What goes here**:
+
 - Dependency injection (`@core/container/`)
 - Configuration (`@core/config/`)
 - Core types (`@core/types/`)
 
 **Example**:
+
 ```typescript
 // core/container/ServiceContainer.ts
 export interface ServiceContainer {
-  cache: CacheManager
-  logger: Logger
-  analytics: AnalyticsService
+  cache: CacheManager;
+  logger: Logger;
+  analytics: AnalyticsService;
 }
 ```
 
 ## 🛠️ Development Workflow
 
 ### 1. **Feature Development**
+
 ```bash
 # Create feature branch from master
 git checkout master
@@ -126,6 +139,7 @@ git push origin feature/your-feature-name
 ```
 
 ### 2. **Code Quality Checks**
+
 ```bash
 # Before committing, always run:
 bun run lint       # ESLint checks
@@ -135,6 +149,7 @@ bun run test       # Unit tests
 ```
 
 ### 3. **Testing Strategy**
+
 ```bash
 # Run all tests
 bun run test
@@ -149,34 +164,36 @@ bun run test src/lib/security/__tests__/security.test.ts
 ## 📝 Common Tasks
 
 ### Adding a New Utility Function
+
 ```typescript
 // 1. Create in appropriate lib/ subdirectory
 // lib/validation/emailValidator.ts
 export function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 // 2. Add unit tests
 // lib/validation/__tests__/emailValidator.test.ts
-import { validateEmail } from '@lib/validation/emailValidator'
+import { validateEmail } from '@lib/validation/emailValidator';
 
 describe('validateEmail', () => {
   it('should validate correct email', () => {
-    expect(validateEmail('test@example.com')).toBe(true)
-  })
-})
+    expect(validateEmail('test@example.com')).toBe(true);
+  });
+});
 
 // 3. Use in components with path alias
-import { validateEmail } from '@lib/validation/emailValidator'
+import { validateEmail } from '@lib/validation/emailValidator';
 ```
 
 ### Adding a New Service
+
 ```typescript
 // 1. Create service class
 // services/analytics/AnalyticsService.ts
 export class AnalyticsService {
   constructor(private config: AnalyticsConfig) {}
-  
+
   track(event: string, data?: Record<string, unknown>): void {
     // Implementation
   }
@@ -185,28 +202,29 @@ export class AnalyticsService {
 // 2. Add to service container
 // core/container/ServiceContainer.ts
 export interface ServiceContainer {
-  analytics: AnalyticsService // Add here
+  analytics: AnalyticsService; // Add here
 }
 
 // 3. Use in components
-import { serviceContainer } from '@core/container/ServiceContainer'
-const analytics = serviceContainer.analytics
+import { serviceContainer } from '@core/container/ServiceContainer';
+const analytics = serviceContainer.analytics;
 ```
 
 ### Creating a New Component
+
 ```astro
 ---
 // components/ui/NewComponent.astro
-import type { Props } from './types'
-import { parseText } from '@lib/validation/textParser'
+import type { Props } from './types';
+import { parseText } from '@lib/validation/textParser';
 
 interface Props {
-  title: string
-  content?: string
+  title: string;
+  content?: string;
 }
 
-const { title, content = '' } = Astro.props
-const processedContent = parseText(content)
+const { title, content = '' } = Astro.props;
+const processedContent = parseText(content);
 ---
 
 <div class="new-component">
@@ -226,15 +244,17 @@ const processedContent = parseText(content)
 ### Common Issues & Solutions
 
 #### Import Path Issues
+
 ```typescript
 // ❌ Don't use relative imports
-import { parseText } from '../../../lib/validation/textParser'
+import { parseText } from '../../../lib/validation/textParser';
 
 // ✅ Use path aliases
-import { parseText } from '@lib/validation/textParser'
+import { parseText } from '@lib/validation/textParser';
 ```
 
 #### TypeScript Errors
+
 ```bash
 # Check TypeScript configuration
 bun run check
@@ -246,6 +266,7 @@ bun run check
 ```
 
 #### Build Issues
+
 ```bash
 # Clean build and reinstall
 rm -rf node_modules dist
@@ -254,6 +275,7 @@ bun run build
 ```
 
 ### Debugging Tools
+
 - **Browser DevTools**: For client-side debugging
 - **Console Logging**: Use `@lib/logger/Logger` for structured logging
 - **Bundle Analysis**: `bun run analyze` for bundle size issues
@@ -262,11 +284,13 @@ bun run build
 ## 📚 Essential Resources
 
 ### Internal Documentation
+
 - **[Architecture Guide](../development/architecture.md)** - Deep dive into architecture decisions
 - **[Development Conventions](../development/conventions.md)** - Coding standards and patterns
 - **[ADR-001](../adr/001-architecture-refactor.md)** - Architecture refactoring decisions
 
 ### External Resources
+
 - **[Astro Documentation](https://docs.astro.build/)** - Framework reference
 - **[Tailwind CSS](https://tailwindcss.com/docs)** - Styling reference
 - **[TypeScript Handbook](https://www.typescriptlang.org/docs/)** - Type system reference
@@ -275,6 +299,7 @@ bun run build
 ## 🚨 Important Rules
 
 ### **ALWAYS Use Bun**
+
 ```bash
 # ✅ Correct
 bun install
@@ -288,28 +313,32 @@ pnpm install
 ```
 
 ### **ALWAYS Use Path Aliases**
+
 ```typescript
 // ✅ Correct
-import { validateForm } from '@lib/validation/formValidator'
-import { contactService } from '@services/contact/api'
+import { validateForm } from '@lib/validation/formValidator';
+import { contactService } from '@services/contact/api';
 
 // ❌ Avoid
-import { validateForm } from '../../../lib/validation/formValidator'
-import { contactService } from '../../services/contact/api'
+import { validateForm } from '../../../lib/validation/formValidator';
+import { contactService } from '../../services/contact/api';
 ```
 
 ### **ALWAYS Test Your Changes**
+
 ```bash
 # Before every commit
 bun run lint && bun run check && bun run test && bun run build
 ```
 
 ### **NEVER Commit Directly to master/dev**
+
 Always use feature branches and pull requests for code review.
 
 ## 🎓 Learning Path
 
 ### Week 1: Fundamentals
+
 - [ ] Set up development environment
 - [ ] Read architecture documentation
 - [ ] Explore codebase structure
@@ -317,18 +346,21 @@ Always use feature branches and pull requests for code review.
 - [ ] Make your first small change
 
 ### Week 2: Hands-on Development
+
 - [ ] Add a new utility function to `lib/`
 - [ ] Create a simple component
 - [ ] Modify existing service logic
 - [ ] Write unit tests for your changes
 
 ### Week 3: Advanced Topics
+
 - [ ] Understand dependency injection pattern
 - [ ] Work with content collections
 - [ ] Implement new API endpoint
 - [ ] Optimize performance
 
 ### Week 4: Mastery
+
 - [ ] Review and improve existing code
 - [ ] Contribute to documentation
 - [ ] Mentor other developers
@@ -337,18 +369,21 @@ Always use feature branches and pull requests for code review.
 ## 🤝 Getting Help
 
 ### Code Review Process
+
 1. Create descriptive PR title and description
 2. Request review from team members
 3. Address feedback promptly
 4. Ensure all CI checks pass
 
 ### Ask Questions
+
 - **Architecture**: Ask about layer responsibilities and dependencies
 - **Conventions**: Reference the conventions documentation
 - **Performance**: Use bundle analyzer and performance tools
 - **Testing**: Follow existing test patterns
 
 ### Contributing Guidelines
+
 1. Follow existing code patterns
 2. Write tests for new functionality
 3. Update documentation for significant changes
@@ -358,6 +393,7 @@ Always use feature branches and pull requests for code review.
 ## 🎉 Welcome to the Team!
 
 This architecture promotes:
+
 - **🧩 Modularity**: Clear separation of concerns
 - **🔧 Maintainability**: Easy to modify and extend
 - **🚀 Performance**: Optimized for speed and efficiency

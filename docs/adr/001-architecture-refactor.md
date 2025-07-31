@@ -1,6 +1,7 @@
 # ADR-001: Architecture Refactoring to Layered Structure
 
 ## Status
+
 **Accepted** - Implemented on 2025-07-31
 
 ## Context
@@ -10,12 +11,13 @@ The Moura.ar v3 project initially used a simple folder structure with mixed conc
 ```
 src/
 ├── utils/           # Mixed utilities (client, server, security)
-├── infrastructure/ # Cache and logging utilities  
+├── infrastructure/ # Cache and logging utilities
 ├── services/       # Single service container interface
 └── components/     # UI components
 ```
 
 This structure had several issues:
+
 - **Mixed Abstraction Levels**: Infrastructure and utilities contained different types of functionality
 - **Poor Separation of Concerns**: Client-side and server-side utilities were mixed
 - **Unclear Dependencies**: No clear dependency flow between layers
@@ -29,7 +31,7 @@ We decided to refactor the architecture to a **layered structure** with clear se
 ```
 src/
 ├── lib/         # 🆕 Core reusable libraries
-├── services/    # 🆕 Business logic services  
+├── services/    # 🆕 Business logic services
 ├── core/        # 🆕 Application foundation
 ├── components/  # UI components (unchanged)
 ├── pages/       # Routes & API (unchanged)
@@ -38,7 +40,8 @@ src/
 
 ### Key Changes
 
-1. **Created `lib/` Directory**: 
+1. **Created `lib/` Directory**:
+
    - Moved `infrastructure/cache/` → `lib/cache/`
    - Moved `infrastructure/logging/` → `lib/logger/`
    - Moved `utils/security.ts` → `lib/security/`
@@ -47,16 +50,19 @@ src/
    - Moved `utils/textParser.ts` → `lib/validation/`
 
 2. **Created `services/` Directory**:
+
    - Moved `utils/contact-form-client.ts` → `services/contact/`
    - Created structure for analytics and content services
 
 3. **Created `core/` Directory**:
+
    - Moved `services/base/ServiceContainer.ts` → `core/container/`
    - Created structure for config and core types
 
 4. **Updated Path Aliases**:
+
    - Added `@lib/*` → `src/lib/*`
-   - Added `@services/*` → `src/services/*`  
+   - Added `@services/*` → `src/services/*`
    - Added `@core/*` → `src/core/*`
 
 5. **Updated All Imports**:
@@ -69,22 +75,26 @@ src/
 ### Benefits of the New Structure
 
 1. **Clear Separation of Concerns**:
+
    - **lib/**: Pure utilities and technical capabilities
    - **services/**: Business logic and domain operations
    - **core/**: Application-wide configuration and foundation
 
 2. **Better Dependency Management**:
+
    - Components can import from lib, services, core
    - Services can import from lib, core
    - Libraries can only import from other lib modules
    - Core has minimal dependencies
 
 3. **Improved Maintainability**:
+
    - Logical grouping of related functionality
    - Easier to locate specific features
    - Clear boundaries between layers
 
 4. **Enhanced Testability**:
+
    - Each layer can be tested in isolation
    - Clear interfaces between layers
    - Easier to mock dependencies
@@ -119,26 +129,29 @@ src/
 
 ```typescript
 // Layer-aware imports (preferred order)
-import type { Config } from '@core/types/config'        // Core first
-import { logger } from '@lib/logger/Logger'             // Libraries second
-import { contactService } from '@services/contact/api'  // Services third  
-import ContactForm from '@components/ui/ContactForm.astro' // Components last
+import type { Config } from '@core/types/config'; // Core first
+import { logger } from '@lib/logger/Logger'; // Libraries second
+import { contactService } from '@services/contact/api'; // Services third
+import ContactForm from '@components/ui/ContactForm.astro'; // Components last
 ```
 
 ## Validation Results
 
 ### ✅ Testing Validation
+
 - **Unit Tests**: All 15 security tests passing
 - **Build Process**: Successful compilation (9.75s total)
 - **Type Checking**: Import resolution working correctly
 - **Coverage**: 24.89% coverage on actively tested security module
 
 ### ✅ File Structure Validation
+
 - **All Files Moved**: 9/9 files successfully relocated
 - **Old Directories Removed**: `/utils`, `/infrastructure`, `/services/base` cleaned up
 - **New Structure Created**: `/lib`, `/services`, `/core` established
 
 ### ✅ Import Migration Success
+
 - **11 files** now using new `@lib/*` imports
 - **4 files** using `@services/*` imports
 - **1 file** using `@core/*` imports
@@ -147,25 +160,30 @@ import ContactForm from '@components/ui/ContactForm.astro' // Components last
 ## Alternatives Considered
 
 ### 1. **Feature-Based Structure**
+
 ```
 src/
 ├── contact/     # All contact-related code
 ├── analytics/   # All analytics code
 └── security/    # All security code
 ```
+
 **Rejected**: Would mix UI and business logic in same folders
 
 ### 2. **Domain-Driven Design (DDD)**
+
 ```
 src/
 ├── domains/
 │   ├── contact/
-│   ├── analytics/  
+│   ├── analytics/
 │   └── portfolio/
 ```
+
 **Rejected**: Too complex for current project size
 
 ### 3. **Keep Current Structure**
+
 **Rejected**: Technical debt was accumulating and maintainability was decreasing
 
 ## Consequences
@@ -173,7 +191,7 @@ src/
 ### Positive Consequences
 
 1. **✅ Improved Code Organization**: Clear, logical structure
-2. **✅ Better Developer Experience**: Easy to find and modify code  
+2. **✅ Better Developer Experience**: Easy to find and modify code
 3. **✅ Enhanced Maintainability**: Clear boundaries and responsibilities
 4. **✅ Future-Proof**: Scalable architecture for growth
 5. **✅ Zero Breaking Changes**: All functionality preserved
@@ -181,11 +199,11 @@ src/
 ### Potential Negative Consequences
 
 1. **Learning Curve**: Developers need to learn new structure
-   - *Mitigation*: Comprehensive documentation and clear conventions
+   - _Mitigation_: Comprehensive documentation and clear conventions
 2. **Initial Migration Effort**: One-time refactoring cost
-   - *Mitigation*: Completed successfully with full validation
-3. **Path Changes**: Import paths changed across project  
-   - *Mitigation*: Path aliases make imports cleaner and more intuitive
+   - _Mitigation_: Completed successfully with full validation
+3. **Path Changes**: Import paths changed across project
+   - _Mitigation_: Path aliases make imports cleaner and more intuitive
 
 ## Follow-up Actions
 

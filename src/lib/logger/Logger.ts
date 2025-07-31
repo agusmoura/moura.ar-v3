@@ -7,7 +7,7 @@ export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
   WARN = 2,
-  ERROR = 3
+  ERROR = 3,
 }
 
 export interface LogEntry {
@@ -46,7 +46,7 @@ export class Logger {
       enableConsole: true,
       enableRemote: false,
       component: 'App',
-      ...config
+      ...config,
     };
 
     // Auto-detect environment if not specified
@@ -68,18 +68,20 @@ export class Logger {
   }
 
   error(message: string, error?: Error, metadata?: Record<string, unknown>): void {
-    const errorInfo = error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack
-    } : undefined;
+    const errorInfo = error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        }
+      : undefined;
 
     this.log(LogLevel.ERROR, message, metadata, errorInfo);
   }
 
   private log(
-    level: LogLevel, 
-    message: string, 
+    level: LogLevel,
+    message: string,
     metadata?: Record<string, unknown>,
     error?: { name: string; message: string; stack?: string }
   ): void {
@@ -94,7 +96,7 @@ export class Logger {
       message,
       metadata,
       error,
-      traceId: this.generateTraceId()
+      traceId: this.generateTraceId(),
     };
 
     // Add to buffer
@@ -117,7 +119,7 @@ export class Logger {
   private logToConsole(entry: LogEntry): void {
     const timestamp = new Date(entry.timestamp).toLocaleTimeString();
     const prefix = `[${timestamp}] ${entry.levelName} [${entry.component}]`;
-    
+
     const style = this.getConsoleStyle(entry.level);
     const message = `%c${prefix}%c ${entry.message}`;
 
@@ -149,7 +151,7 @@ export class Logger {
 
   private getConsoleStyle(level: LogLevel): string {
     const baseStyle = 'font-weight: bold; padding: 2px 6px; border-radius: 3px;';
-    
+
     switch (level) {
       case LogLevel.DEBUG:
         return `${baseStyle} background: #6b7280; color: white;`;
@@ -171,10 +173,10 @@ export class Logger {
     fetch(this.config.remoteEndpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(entry)
-    }).catch(error => {
+      body: JSON.stringify(entry),
+    }).catch((error) => {
       // Fallback to console if remote logging fails
       console.error('Failed to send log to remote:', error);
     });
@@ -188,7 +190,7 @@ export class Logger {
   child(component: string, metadata?: Record<string, unknown>): Logger {
     const childLogger = new Logger({
       ...this.config,
-      component: `${this.config.component}.${component}`
+      component: `${this.config.component}.${component}`,
     });
 
     // Override log method to include parent metadata
@@ -196,7 +198,7 @@ export class Logger {
     childLogger.log = (level, message, childMetadata?, error?) => {
       const combinedMetadata = {
         ...metadata,
-        ...childMetadata
+        ...childMetadata,
       };
       originalLog(level, message, combinedMetadata, error);
     };
@@ -211,7 +213,7 @@ export class Logger {
     const duration = performance.now() - start;
 
     this.debug(`⏱️ ${label}`, { duration: `${duration.toFixed(2)}ms` });
-    
+
     return result;
   }
 
@@ -221,7 +223,7 @@ export class Logger {
     const duration = performance.now() - start;
 
     this.debug(`⏱️ ${label}`, { duration: `${duration.toFixed(2)}ms` });
-    
+
     return result;
   }
 
@@ -242,20 +244,19 @@ export class Logger {
     recentActivity: string;
   } {
     const levelCounts: Record<string, number> = {};
-    
-    this.buffer.forEach(entry => {
+
+    this.buffer.forEach((entry) => {
       const levelName = LogLevel[entry.level];
       levelCounts[levelName] = (levelCounts[levelName] || 0) + 1;
     });
 
-    const recentActivity = this.buffer.length > 0 
-      ? this.buffer[this.buffer.length - 1].timestamp
-      : 'No recent activity';
+    const recentActivity =
+      this.buffer.length > 0 ? this.buffer[this.buffer.length - 1].timestamp : 'No recent activity';
 
     return {
       bufferSize: this.buffer.length,
       levelCounts,
-      recentActivity
+      recentActivity,
     };
   }
 }
@@ -263,9 +264,8 @@ export class Logger {
 // Global logger instance
 export const logger = new Logger({
   component: 'MouraAR',
-  level: typeof import.meta !== 'undefined' && import.meta.env?.DEV 
-    ? LogLevel.DEBUG 
-    : LogLevel.INFO
+  level:
+    typeof import.meta !== 'undefined' && import.meta.env?.DEV ? LogLevel.DEBUG : LogLevel.INFO,
 });
 
 // Component-specific logger factory

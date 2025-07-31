@@ -7,6 +7,7 @@ The application uses environment variables for configuration. Create a `.env` fi
 ## Required Variables
 
 ### N8N Integration (Contact Form)
+
 ```bash
 # N8N webhook URL for contact form submissions
 N8N_WEBHOOK_URL=https://n8n.moura.ar/webhook-test/moura-contact-form
@@ -20,12 +21,14 @@ N8N_JWT_SECRET=your-secure-jwt-secret-phrase
 ## Optional Variables
 
 ### Analytics
+
 ```bash
 # Enable/disable analytics tracking
 PUBLIC_ENABLE_ANALYTICS=false
 ```
 
 ### Development
+
 ```bash
 # Development server port (default: 4321)
 PORT=4321
@@ -37,6 +40,7 @@ DEBUG=true
 ## Environment Setup by Stage
 
 ### Development Environment
+
 ```bash
 # .env (for local development)
 N8N_WEBHOOK_URL=https://n8n.moura.ar/webhook-test/moura-contact-form
@@ -46,6 +50,7 @@ DEBUG=true
 ```
 
 ### Production Environment
+
 ```bash
 # Production environment variables
 N8N_WEBHOOK_URL=https://n8n.moura.ar/webhook/moura-contact-form
@@ -81,6 +86,7 @@ vercel env add PUBLIC_ENABLE_ANALYTICS
 ### Netlify Deployment
 
 Add in **Site settings → Environment variables**:
+
 ```bash
 N8N_WEBHOOK_URL=https://n8n.moura.ar/webhook/moura-contact-form
 N8N_JWT_SECRET=your-production-secret
@@ -92,6 +98,7 @@ PUBLIC_ENABLE_ANALYTICS=true
 ### Webhook Configuration
 
 1. **Create N8N Workflow**
+
    - Add **Webhook** trigger node
    - Set **Authentication** to `Header Auth`
    - Use header name: `Authorization`
@@ -99,6 +106,7 @@ PUBLIC_ENABLE_ANALYTICS=true
 
 2. **JWT Validation**
    The application automatically generates JWT tokens with:
+
    ```json
    {
      "form": "contact",
@@ -113,6 +121,7 @@ PUBLIC_ENABLE_ANALYTICS=true
    - Process UTM parameters and metadata
 
 ### Example N8N Workflow Structure
+
 ```
 Webhook (JWT Auth) → Validate Data → Google Sheets → Email Notification
 ```
@@ -120,6 +129,7 @@ Webhook (JWT Auth) → Validate Data → Google Sheets → Email Notification
 ## Environment Validation
 
 ### Check Configuration
+
 ```bash
 # Verify environment variables are loaded
 bun run dev
@@ -130,6 +140,7 @@ echo $PUBLIC_ENABLE_ANALYTICS
 ```
 
 ### Test Contact Form
+
 ```bash
 # Health check
 curl http://localhost:4321/api/health
@@ -147,12 +158,14 @@ curl -X POST http://localhost:4321/api/contact \
 ## Security Best Practices
 
 ### JWT Secret Security
+
 - **Use strong secrets**: Minimum 32 characters, random
 - **Rotate regularly**: Change production secrets periodically
 - **Environment isolation**: Different secrets for dev/staging/production
 - **Secure storage**: Use platform-specific secret management
 
 ### Example Strong Secret Generation
+
 ```bash
 # Generate secure JWT secret
 openssl rand -base64 32
@@ -162,6 +175,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 ### Environment File Security
+
 ```bash
 # Add .env to .gitignore (already included)
 echo ".env" >> .gitignore
@@ -175,11 +189,13 @@ git status  # Verify .env is not tracked
 ### Common Issues
 
 #### Contact Form Not Working
+
 1. Check N8N webhook URL is correct
 2. Verify JWT secret matches N8N configuration
 3. Test N8N webhook independently
 
 #### Environment Variables Not Loading
+
 ```bash
 # Check .env file exists and is readable
 ls -la .env
@@ -191,6 +207,7 @@ bun run dev
 ```
 
 #### JWT Authentication Errors
+
 1. Verify JWT secret is identical in both .env and N8N
 2. Check N8N webhook authentication settings
 3. Test JWT generation:
@@ -206,6 +223,7 @@ bun run dev
 ### Debug Mode
 
 Enable debug logging to troubleshoot issues:
+
 ```bash
 # Add to .env
 DEBUG=true
@@ -215,6 +233,7 @@ bun run dev
 ```
 
 This will show additional logging for:
+
 - Environment variable loading
 - JWT token generation
 - N8N webhook requests

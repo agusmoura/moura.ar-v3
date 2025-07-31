@@ -7,12 +7,14 @@ Moura.ar v3 follows a **layered architecture** with clear separation of concerns
 ## Architecture Principles
 
 ### 1. **Separation of Concerns**
+
 - **UI Layer**: Components focused solely on presentation
-- **Business Logic**: Services handling domain operations  
+- **Business Logic**: Services handling domain operations
 - **Infrastructure**: Libraries providing technical capabilities
 - **Core**: Application-wide utilities and configuration
 
 ### 2. **Dependency Flow**
+
 ```
 UI Components → Services → Libraries → Core
      ↓              ↓          ↓        ↓
@@ -20,6 +22,7 @@ UI Components → Services → Libraries → Core
 ```
 
 ### 3. **Import Strategy**
+
 - **Path Aliases**: Clean imports using `@lib/*`, `@services/*`, `@core/*`
 - **No Circular Dependencies**: Strict unidirectional dependency flow
 - **Framework Integration**: Astro-first with TypeScript strict mode
@@ -29,7 +32,7 @@ UI Components → Services → Libraries → Core
 ```
 src/
 ├── components/           # UI Components (Astro)
-│   ├── accessibility/   # A11y components  
+│   ├── accessibility/   # A11y components
 │   ├── analytics/       # Analytics integration
 │   ├── effects/         # Visual effects & animations
 │   ├── sections/        # Page sections
@@ -61,18 +64,20 @@ src/
 ## Layer Responsibilities
 
 ### **UI Components (`components/`)**
+
 - **Purpose**: Presentation layer
-- **Responsibilities**: 
+- **Responsibilities**:
   - Render UI elements
   - Handle user interactions
   - Compose layouts
 - **Dependencies**: Can import from `@lib/*`, `@services/*`, `@types/*`
-- **Rules**: 
+- **Rules**:
   - No business logic
   - Props-based configuration
   - Accessibility-first design
 
 ### **Libraries (`lib/`)**
+
 - **Purpose**: Reusable technical utilities
 - **Responsibilities**:
   - Cross-cutting concerns (logging, caching, security)
@@ -85,6 +90,7 @@ src/
   - No UI or business logic
 
 ### **Services (`services/`)**
+
 - **Purpose**: Business logic layer
 - **Responsibilities**:
   - Domain operations
@@ -97,6 +103,7 @@ src/
   - Interface-based design
 
 ### **Core (`core/`)**
+
 - **Purpose**: Application foundation
 - **Responsibilities**:
   - Configuration management
@@ -111,46 +118,52 @@ src/
 ## Design Patterns
 
 ### **Dependency Injection**
+
 ```typescript
 // core/container/ServiceContainer.ts
 export interface ServiceContainer {
-  cache: CacheManager
-  logger: Logger
-  analytics: AnalyticsService
+  cache: CacheManager;
+  logger: Logger;
+  analytics: AnalyticsService;
 }
 ```
 
 ### **Strategy Pattern**
+
 ```typescript
 // lib/cache/CacheManager.ts
 export enum CacheLevel {
   MEMORY = 'memory',
-  LOCAL_STORAGE = 'localStorage', 
-  SESSION_STORAGE = 'sessionStorage'
+  LOCAL_STORAGE = 'localStorage',
+  SESSION_STORAGE = 'sessionStorage',
 }
 ```
 
 ### **Factory Pattern**
+
 ```typescript
 // lib/logger/Logger.ts
 export function createLogger(component: string): Logger {
-  return logger.child(component)
+  return logger.child(component);
 }
 ```
 
 ## Performance Considerations
 
 ### **Caching Strategy**
+
 - **Memory Cache**: Fast access for frequently used data
 - **Local Storage**: Persistent cache across sessions
 - **Session Storage**: Temporary cache for current session
 
 ### **Bundle Optimization**
+
 - **Code Splitting**: Manual chunks for vendor and animation code
 - **Tree Shaking**: ES modules for optimal bundle size
 - **Asset Optimization**: Image optimization with Astro's Image component
 
 ### **Loading Strategy**
+
 - **Critical Path**: Inline critical CSS and JS
 - **Progressive Enhancement**: Layer non-critical features
 - **Prefetching**: Intelligent prefetching for navigation
@@ -158,16 +171,19 @@ export function createLogger(component: string): Logger {
 ## Security Architecture
 
 ### **Authentication Flow**
+
 ```
 Client → Contact Form → JWT Creation → N8N Webhook → Processing
 ```
 
 ### **Input Validation**
+
 - **Client-Side**: Basic validation for UX
 - **Server-Side**: Comprehensive validation with Zod schemas
 - **Sanitization**: XSS protection and input cleaning
 
 ### **Security Headers**
+
 - Content Security Policy (CSP)
 - CORS configuration
 - Rate limiting for API endpoints
@@ -175,15 +191,18 @@ Client → Contact Form → JWT Creation → N8N Webhook → Processing
 ## Testing Strategy
 
 ### **Unit Tests**
+
 - **Libraries**: Comprehensive testing of utility functions
 - **Services**: Business logic validation
 - **Components**: Accessibility and functionality testing
 
 ### **Integration Tests**
+
 - **API Routes**: End-to-end request/response testing
 - **Form Workflows**: Complete user journey testing
 
 ### **Performance Tests**
+
 - **Bundle Size**: Automated bundle analysis
 - **Load Times**: Core Web Vitals monitoring
 - **Memory Usage**: Cache efficiency testing
@@ -191,13 +210,15 @@ Client → Contact Form → JWT Creation → N8N Webhook → Processing
 ## Migration & Evolution
 
 ### **Completed Refactoring (v3.1)**
+
 - ✅ Moved `utils/` → `lib/` for better organization
-- ✅ Moved `infrastructure/` → `lib/` for consistency  
+- ✅ Moved `infrastructure/` → `lib/` for consistency
 - ✅ Created `services/` layer for business logic
 - ✅ Established `core/` for application foundation
 - ✅ Updated all import paths and configurations
 
 ### **Future Considerations**
+
 - **Micro-frontends**: Potential for component federation
 - **API Gateway**: Centralized API management
 - **Event-Driven Architecture**: Publish/subscribe patterns
@@ -206,17 +227,20 @@ Client → Contact Form → JWT Creation → N8N Webhook → Processing
 ## Conventions
 
 ### **Naming Conventions**
+
 - **Files**: kebab-case for components, camelCase for utilities
 - **Directories**: lowercase with hyphens
 - **Exports**: Named exports preferred, default for single export
 
 ### **Import Order**
+
 1. External packages
-2. Astro framework imports  
+2. Astro framework imports
 3. Internal imports (by layer: `@core`, `@lib`, `@services`, `@components`)
 4. Relative imports (avoid when possible)
 
 ### **Error Handling**
+
 - **Libraries**: Return Result types or throw typed errors
 - **Services**: Handle and transform errors appropriately
 - **Components**: Display user-friendly error messages
@@ -225,11 +249,13 @@ Client → Contact Form → JWT Creation → N8N Webhook → Processing
 ## Documentation Standards
 
 ### **Code Documentation**
+
 - **JSDoc**: Comprehensive function and class documentation
 - **Type Definitions**: Self-documenting TypeScript interfaces
 - **README Files**: Module-level documentation for complex areas
 
 ### **Architecture Documentation**
+
 - **ADRs**: Architecture Decision Records for major changes
 - **Migration Guides**: Step-by-step upgrade instructions
 - **API Documentation**: OpenAPI specs for public endpoints

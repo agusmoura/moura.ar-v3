@@ -38,7 +38,7 @@ class MemoryCacheAdapter implements CacheAdapter {
     this.cache.set(key, {
       value,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
@@ -61,13 +61,13 @@ class LocalStorageCacheAdapter implements CacheAdapter {
 
   get<T>(key: string): T | null {
     if (typeof window === 'undefined') return null;
-    
+
     try {
       const item = localStorage.getItem(this.prefix + key);
       if (!item) return null;
 
       const entry: CacheEntry<T> = JSON.parse(item);
-      
+
       // Check TTL expiration
       if (entry.ttl && Date.now() - entry.timestamp > entry.ttl) {
         this.delete(key);
@@ -82,12 +82,12 @@ class LocalStorageCacheAdapter implements CacheAdapter {
 
   set<T>(key: string, value: T, ttl?: number): void {
     if (typeof window === 'undefined') return;
-    
+
     try {
       const entry: CacheEntry<T> = {
         value,
         timestamp: Date.now(),
-        ttl
+        ttl,
       };
       localStorage.setItem(this.prefix + key, JSON.stringify(entry));
     } catch (error) {
@@ -103,14 +103,14 @@ class LocalStorageCacheAdapter implements CacheAdapter {
 
   clear(): void {
     if (typeof window === 'undefined') return;
-    
+
     const keys = this.keys();
-    keys.forEach(key => this.delete(key));
+    keys.forEach((key) => this.delete(key));
   }
 
   keys(): string[] {
     if (typeof window === 'undefined') return [];
-    
+
     const keys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -128,7 +128,7 @@ class SessionStorageCacheAdapter implements CacheAdapter {
 
   get<T>(key: string): T | null {
     if (typeof window === 'undefined') return null;
-    
+
     try {
       const item = sessionStorage.getItem(this.prefix + key);
       if (!item) return null;
@@ -142,11 +142,11 @@ class SessionStorageCacheAdapter implements CacheAdapter {
 
   set<T>(key: string, value: T): void {
     if (typeof window === 'undefined') return;
-    
+
     try {
       const entry: CacheEntry<T> = {
         value,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       sessionStorage.setItem(this.prefix + key, JSON.stringify(entry));
     } catch (error) {
@@ -161,14 +161,14 @@ class SessionStorageCacheAdapter implements CacheAdapter {
 
   clear(): void {
     if (typeof window === 'undefined') return;
-    
+
     const keys = this.keys();
-    keys.forEach(key => this.delete(key));
+    keys.forEach((key) => this.delete(key));
   }
 
   keys(): string[] {
     if (typeof window === 'undefined') return [];
-    
+
     const keys: string[] = [];
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
@@ -184,7 +184,7 @@ class SessionStorageCacheAdapter implements CacheAdapter {
 export enum CacheLevel {
   MEMORY = 'memory',
   LOCAL_STORAGE = 'localStorage',
-  SESSION_STORAGE = 'sessionStorage'
+  SESSION_STORAGE = 'sessionStorage',
 }
 
 // Main cache manager
@@ -195,7 +195,7 @@ export class CacheManager {
     this.adapters = new Map([
       [CacheLevel.MEMORY, new MemoryCacheAdapter()],
       [CacheLevel.LOCAL_STORAGE, new LocalStorageCacheAdapter()],
-      [CacheLevel.SESSION_STORAGE, new SessionStorageCacheAdapter()]
+      [CacheLevel.SESSION_STORAGE, new SessionStorageCacheAdapter()],
     ]);
   }
 
@@ -207,9 +207,9 @@ export class CacheManager {
   }
 
   async set<T>(
-    key: string, 
-    value: T, 
-    ttl?: number, 
+    key: string,
+    value: T,
+    ttl?: number,
     level: CacheLevel = CacheLevel.MEMORY
   ): Promise<void> {
     const adapter = this.adapters.get(level);
@@ -226,7 +226,7 @@ export class CacheManager {
       }
     } else {
       // Delete from all levels
-      this.adapters.forEach(adapter => adapter.delete(key));
+      this.adapters.forEach((adapter) => adapter.delete(key));
     }
   }
 
@@ -238,7 +238,7 @@ export class CacheManager {
       }
     } else {
       // Clear all levels
-      this.adapters.forEach(adapter => adapter.clear());
+      this.adapters.forEach((adapter) => adapter.clear());
     }
   }
 
@@ -270,12 +270,12 @@ export class CacheManager {
 
   // Multi-level set with replication
   async setWithReplication<T>(
-    key: string, 
-    value: T, 
+    key: string,
+    value: T,
     ttl?: number,
     levels: CacheLevel[] = [CacheLevel.MEMORY, CacheLevel.LOCAL_STORAGE]
   ): Promise<void> {
-    const promises = levels.map(level => this.set(key, value, ttl, level));
+    const promises = levels.map((level) => this.set(key, value, ttl, level));
     await Promise.all(promises);
   }
 
@@ -287,7 +287,7 @@ export class CacheManager {
       const keys = adapter.keys();
       stats[level] = {
         keys: keys.length,
-        size: this.estimateSize(keys, adapter)
+        size: this.estimateSize(keys, adapter),
       };
     });
 
@@ -296,8 +296,8 @@ export class CacheManager {
 
   private estimateSize(keys: string[], adapter: CacheAdapter): string {
     let totalSize = 0;
-    
-    keys.forEach(key => {
+
+    keys.forEach((key) => {
       const value = adapter.get(key);
       if (value) {
         try {

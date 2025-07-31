@@ -18,7 +18,7 @@ bun run build
 ## 🛠️ Tech Stack
 
 - **Astro v5** - Modern web framework with SSR
-- **Tailwind CSS v4** - CSS-based utility framework  
+- **Tailwind CSS v4** - CSS-based utility framework
 - **TypeScript** - Strict type safety
 - **Bun** - Fast runtime and package manager
 - **N8N + JWT** - Contact form automation
@@ -37,9 +37,10 @@ src/
 ```
 
 Uses path aliases for clean imports:
+
 ```typescript
-import { validateForm } from '@lib/validation/formValidator'
-import { contactService } from '@services/contact/api'
+import { validateForm } from '@lib/validation/formValidator';
+import { contactService } from '@services/contact/api';
 ```
 
 ## 🔧 Environment Setup
@@ -60,7 +61,7 @@ PUBLIC_ENABLE_ANALYTICS=false
 bun run dev              # Start development server
 bun run "dev external"   # External access
 
-# Quality & Testing  
+# Quality & Testing
 bun run lint             # ESLint checks
 bun run check            # TypeScript validation
 bun run test             # Run tests
@@ -81,6 +82,7 @@ bun run preview          # Preview build
 ## 📚 Documentation
 
 **Quick Links:**
+
 - [Setup Guide](./docs/setup/) - Detailed installation and configuration
 - [Usage Guide](./docs/usage/) - Commands and analytics
 - [API Reference](./docs/api/) - Contact form API documentation
@@ -88,6 +90,7 @@ bun run preview          # Preview build
 - [Contributing](./docs/contributing/) - Onboarding and workflow
 
 **For Developers:**
+
 - [Architecture Guide](./docs/development/architecture.md) - System design and principles
 - [Development Conventions](./docs/development/conventions.md) - Coding standards
 - [Onboarding Guide](./docs/contributing/onboarding.md) - Getting started as a developer

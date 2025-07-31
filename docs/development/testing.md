@@ -12,12 +12,14 @@ Comprehensive testing strategies and practices for Moura.ar v3.
 ## Testing Stack
 
 ### Core Framework
+
 - **Vitest** - Fast unit testing framework with Hot Module Replacement
 - **V8 Coverage** - Native Node.js coverage reporting
 - **TypeScript** - Full type safety in tests
 - **Bun Runtime** - Fast test execution
 
 ### Testing Types
+
 ```bash
 # Unit Tests - Fast, isolated component/function testing
 src/lib/**/__tests__/*.test.ts
@@ -32,10 +34,13 @@ src/components/**/__tests__/*.test.ts
 ## Current Test Suite
 
 ### Security Tests (15 tests)
+
 Located in `src/lib/security/__tests__/security.test.ts`
 
 **Coverage Areas:**
+
 - **Input Validation** (5 tests)
+
   - Email format validation
   - Required field validation
   - String length limits
@@ -43,12 +48,14 @@ Located in `src/lib/security/__tests__/security.test.ts`
   - Special character handling
 
 - **JWT Authentication** (4 tests)
+
   - Token generation with correct payload
   - Token expiration handling
   - Invalid secret detection
   - Malformed token rejection
 
 - **Rate Limiting** (3 tests)
+
   - Request counting per IP
   - Rate limit enforcement (5 requests/hour)
   - Rate limit reset behavior
@@ -59,6 +66,7 @@ Located in `src/lib/security/__tests__/security.test.ts`
   - Suspicious pattern recognition
 
 ### Test Results
+
 ```bash
 ✅ All 15 tests passing
 ✅ Coverage: Security utilities (100%)
@@ -69,6 +77,7 @@ Located in `src/lib/security/__tests__/security.test.ts`
 ## Running Tests
 
 ### Basic Commands
+
 ```bash
 # Run all tests (watch mode)
 bun run test
@@ -87,6 +96,7 @@ bun run test --run --grep "validation"
 ```
 
 ### Advanced Options
+
 ```bash
 # Watch specific files
 bun run test --watch src/lib/
@@ -104,39 +114,41 @@ bun run test:run --coverage --reporter=html
 ## Writing Tests
 
 ### Test Structure
+
 ```typescript
 // src/lib/example/__tests__/example.test.ts
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { exampleFunction } from '../exampleFunction'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { exampleFunction } from '../exampleFunction';
 
 describe('exampleFunction', () => {
   beforeEach(() => {
     // Setup before each test
-  })
+  });
 
   afterEach(() => {
     // Cleanup after each test
-  })
+  });
 
   it('should handle valid input correctly', () => {
     // Arrange
-    const input = 'valid-input'
-    
+    const input = 'valid-input';
+
     // Act
-    const result = exampleFunction(input)
-    
+    const result = exampleFunction(input);
+
     // Assert
-    expect(result).toBe('expected-output')
-  })
+    expect(result).toBe('expected-output');
+  });
 
   it('should throw error for invalid input', () => {
     // Test error conditions
-    expect(() => exampleFunction(null)).toThrow('Invalid input')
-  })
-})
+    expect(() => exampleFunction(null)).toThrow('Invalid input');
+  });
+});
 ```
 
 ### Security Test Example
+
 ```typescript
 // Example from src/lib/security/__tests__/security.test.ts
 describe('Input Validation', () => {
@@ -146,29 +158,30 @@ describe('Input Validation', () => {
       '@domain.com',
       'user@',
       'user@domain',
-      'user space@domain.com'
-    ]
+      'user space@domain.com',
+    ];
 
-    invalidEmails.forEach(email => {
-      expect(() => validateEmail(email)).toThrow('Invalid email format')
-    })
-  })
+    invalidEmails.forEach((email) => {
+      expect(() => validateEmail(email)).toThrow('Invalid email format');
+    });
+  });
 
   it('should prevent XSS injection attempts', () => {
     const maliciousInputs = [
       '<script>alert("xss")</script>',
       'javascript:alert("xss")',
-      '<img src="x" onerror="alert(1)">'
-    ]
+      '<img src="x" onerror="alert(1)">',
+    ];
 
-    maliciousInputs.forEach(input => {
-      expect(() => validateInput(input)).toThrow('Invalid characters detected')
-    })
-  })
-})
+    maliciousInputs.forEach((input) => {
+      expect(() => validateInput(input)).toThrow('Invalid characters detected');
+    });
+  });
+});
 ```
 
 ### API Testing
+
 ```typescript
 // Testing API endpoints
 describe('Contact Form API', () => {
@@ -176,52 +189,55 @@ describe('Contact Form API', () => {
     const validData = {
       name: 'John Doe',
       email: 'john@example.com',
-      message: 'Hello world'
-    }
+      message: 'Hello world',
+    };
 
     const response = await POST('/api/contact', {
       body: JSON.stringify(validData),
-      headers: { 'Content-Type': 'application/json' }
-    })
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-    expect(response.status).toBe(200)
-  })
+    expect(response.status).toBe(200);
+  });
 
   it('should reject spam submissions', async () => {
     const spamData = {
       name: 'Spammer',
       email: 'spam@spam.com',
-      message: 'Buy now! Click here! Free money!'
-    }
+      message: 'Buy now! Click here! Free money!',
+    };
 
     const response = await POST('/api/contact', {
       body: JSON.stringify(spamData),
-      headers: { 'Content-Type': 'application/json' }
-    })
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-    expect(response.status).toBe(400)
+    expect(response.status).toBe(400);
     expect(response.json()).toEqual({
-      error: 'Spam content detected'
-    })
-  })
-})
+      error: 'Spam content detected',
+    });
+  });
+});
 ```
 
 ## Testing Best Practices
 
 ### Test Organization
+
 - **One test file per module**: `module.ts` → `__tests__/module.test.ts`
 - **Descriptive test names**: Use complete sentences describing behavior
 - **Group related tests**: Use `describe` blocks for logical grouping
 - **Setup/teardown**: Use `beforeEach`/`afterEach` for test isolation
 
 ### Test Quality
+
 - **AAA Pattern**: Arrange, Act, Assert for clear test structure
 - **Edge Cases**: Test boundary conditions and error scenarios
 - **Mock External Dependencies**: Isolate units under test
 - **Fast Execution**: Keep tests under 100ms each when possible
 
 ### Coverage Goals
+
 - **Unit Tests**: 80%+ coverage for core business logic
 - **Integration Tests**: 70%+ coverage for service interactions
 - **Critical Paths**: 100% coverage for security and payment flows
@@ -230,6 +246,7 @@ describe('Contact Form API', () => {
 ## Continuous Integration
 
 ### Test Pipeline
+
 ```yaml
 # CI/CD test stages
 stages:
@@ -241,12 +258,14 @@ stages:
 ```
 
 ### Quality Gates
+
 - **All tests must pass**: No failing tests in main branch
 - **Coverage thresholds**: Minimum coverage requirements enforced
 - **Type safety**: No TypeScript errors allowed
 - **Performance**: Test suite runs in <30 seconds
 
 ### Pre-commit Hooks
+
 ```bash
 # Automatically run before each commit
 - bun run lint
@@ -259,6 +278,7 @@ stages:
 ### Common Issues
 
 #### Test Failures
+
 ```bash
 # Run failing test with verbose output
 bun run test --verbose failing-test.test.ts
@@ -271,6 +291,7 @@ bun run test --stack-trace
 ```
 
 #### Environment Issues
+
 ```bash
 # Clear test cache
 rm -rf node_modules/.vitest
@@ -283,14 +304,16 @@ bun run vitest --config
 ```
 
 #### Timeout Issues
+
 ```typescript
 // Increase timeout for slow tests
 it('slow operation', async () => {
   // Test code
-}, 10000) // 10 second timeout
+}, 10000); // 10 second timeout
 ```
 
 ### Debug Configuration
+
 ```typescript
 // vitest.config.ts debugging
 export default defineConfig({
@@ -298,23 +321,25 @@ export default defineConfig({
     // Enable debugging
     logHeapUsage: true,
     reporter: 'verbose',
-    
+
     // Timeout configuration
     testTimeout: 10000,
-    hookTimeout: 10000
-  }
-})
+    hookTimeout: 10000,
+  },
+});
 ```
 
 ## Performance Testing
 
 ### Current Metrics
+
 - **Test Execution**: <500ms for full suite
 - **Coverage Generation**: <2 seconds
 - **Memory Usage**: <100MB peak
 - **Parallel Execution**: Enabled (4 threads)
 
 ### Optimization Strategies
+
 - **Parallel Execution**: Tests run in parallel by default
 - **Smart Caching**: Vitest caches test results between runs
 - **Selective Testing**: Run only changed tests during development
@@ -323,12 +348,14 @@ export default defineConfig({
 ## Future Testing Enhancements
 
 ### Planned Additions
+
 - **E2E Testing**: Add Playwright for browser automation
 - **Visual Testing**: Screenshot comparison for UI components
 - **Performance Tests**: Load testing for API endpoints
 - **Accessibility Testing**: Automated a11y validation
 
 ### Integration Targets
+
 - **Component Library**: Test all UI components individually
 - **API Endpoints**: Comprehensive endpoint testing
 - **Business Logic**: Full service layer coverage
@@ -337,6 +364,7 @@ export default defineConfig({
 ## Testing Commands Reference
 
 ### Development Workflow
+
 ```bash
 # Quick test during development
 bun run test --watch
@@ -352,6 +380,7 @@ bun run test:run --coverage --reporter=html
 ```
 
 ### CI/CD Integration
+
 ```bash
 # Complete test pipeline
 bun run lint && bun run check && bun run test:run && bun run build
@@ -372,7 +401,7 @@ bun run test:run --coverage --reporter=json --outputFile=coverage.json
 After understanding testing:
 
 1. **[Review Architecture](./architecture.md)** - Understand system design
-2. **[Learn Conventions](./conventions.md)** - Follow coding standards  
+2. **[Learn Conventions](./conventions.md)** - Follow coding standards
 3. **[Study Components](./components.md)** - UI component patterns
 4. **[Check API Docs](../api/contact-form.md)** - API testing examples
 
