@@ -1,1 +1,8 @@
-bunx --no -- commitlint --edit "$1"
+#!/usr/bin/env sh
+
+# Add Bun to PATH
+export PATH="$HOME/.bun/bin:$PATH"
+
+# Run commitlint to validate commit message format
+echo "📝 Validating commit message..."
+./node_modules/.bin/commitlint --edit "$1"

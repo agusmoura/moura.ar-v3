@@ -157,11 +157,11 @@ function getProjectThemeColors(project: any) {
   hideMenu={true}
 >
   <main class="min-h-screen">
-    <!-- Hero Section Modernizado -->
+    {/* Hero Section Modernizado */}
     <section class="relative overflow-hidden pt-4 pb-16 min-h-screen flex items-center">
 
       <div class="container mx-auto px-4  xl:max-w-7xl w-full">
-        <!-- Breadcrumb -->
+        {/* Breadcrumb */}
         <nav class="mb-12" aria-label="Navegación" data-aos="fade-up" data-aos-duration="600">
           <div class="flex items-center gap-2 text-sm text-muted">
             <a href="/" class="hover:text-accent transition-colors">Inicio</a>
@@ -172,13 +172,13 @@ function getProjectThemeColors(project: any) {
           </div>
         </nav>
 
-        <!-- Layout principal grid asimétrico -->
+        {/* Layout principal grid asimétrico */}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start project-themed">
 
-          <!-- Columna izquierda - Contenido principal -->
+          {/* Columna izquierda - Contenido principal */}
           <div class="lg:col-span-8 space-y-8">
 
-            <!-- Categoría y metadata compacta -->
+            {/* Categoría y metadata compacta */}
             <div class="flex flex-wrap items-center gap-4 mb-6" data-aos="fade-up" data-aos-duration="600">
               <div class="inline-flex items-center gap-2 px-4 py-2 border rounded-full text-sm font-medium backdrop-blur-sm project-box">
                 <Icon name={getCategoryIcon(project.data.category)} class="h-4 w-4" />
@@ -196,7 +196,7 @@ function getProjectThemeColors(project: any) {
               </div>
             </div>
 
-            <!-- Título principal -->
+            {/* Título principal */}
             <div class="space-y-6">
               <h1
                 class="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] pb-4 mb-4t ext-balance project-title"
@@ -206,7 +206,7 @@ function getProjectThemeColors(project: any) {
                 set:html={pt(project.data.title)}
               />
 
-              <!-- Descripción -->
+              {/* Descripción */}
               <p
                 class="text-lg md:text-xl leading-relaxed max-w-3xl project-description"
                 data-aos="fade-up"
@@ -217,7 +217,7 @@ function getProjectThemeColors(project: any) {
               </p>
             </div>
 
-            <!-- Imagen de composición -->
+            {/* Imagen de composición */}
             {project.data.images?.comp && (
               <div
                 class="relative group mt-12"
@@ -226,7 +226,7 @@ function getProjectThemeColors(project: any) {
                 data-aos-delay="600"
               >
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-bborder backdrop-blur-sm" style={`background-color: ${themeColors.surface}; border-color: ${themeColors.border};`}>
-                  <!-- Efecto glassmorphism sutil -->
+                  {/* Efecto glassmorphism sutil */}
                   <div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent"></div>
 
                   <div class="relative p-3">
@@ -241,13 +241,13 @@ function getProjectThemeColors(project: any) {
                     />
                   </div>
 
-                  <!-- Subtle glow effect -->
+                  {/* Subtle glow effect */}
                   <div class="absolute inset-0 rounded-2xl ring-1 ring-accent/10 group-hover:ring-accent/20 transition-all duration-500"></div>
                 </div>
               </div>
             )}
 
-            <!-- CTAs principales -->
+            {/* CTAs principales */}
             <div
               class="flex flex-col sm:flex-row gap-4 pt-8"
               data-aos="fade-up"
@@ -290,10 +290,10 @@ function getProjectThemeColors(project: any) {
             </div>
           </div>
 
-          <!-- Columna derecha - Información del proyecto -->
+          {/* Columna derecha - Información del proyecto */}
           <div class="lg:col-span-4 space-y-8">
 
-            <!-- Colaboraciones - Diseño consistente con mejores prácticas UX/UI -->
+            {/* Colaboraciones - Diseño consistente con mejores prácticas UX/UI */}
             {(project.data.partner || project.data.client) && (
               <div class="group p-6 rounded-2xl border backdrop-blur-sm transition-all duration-300 project-box relative overflow-visible">
 
@@ -444,7 +444,7 @@ function getProjectThemeColors(project: any) {
               </div>
             )}
 
-            <!-- Mi Rol -->
+            {/* Mi Rol */}
             <div class="group p-6 rounded-2xl border backdrop-blur-sm  transition-all duration-300 project-box">
               <div class="flex items-start gap-4">
                 <div class="p-3 rounded-xl project-box-icon">
@@ -457,7 +457,7 @@ function getProjectThemeColors(project: any) {
               </div>
             </div>
 
-            <!-- Tecnologías -->
+            {/* Tecnologías */}
             {project.data.technologies && project.data.technologies.length > 0 && (
               <div class="group p-6 rounded-2xl border backdrop-blur-sm  transition-all duration-300 project-box">
                 <div class="flex items-start gap-4 mb-4">
@@ -490,10 +490,10 @@ function getProjectThemeColors(project: any) {
       </div>
     </section>
 
-    <!-- Contenido principal centrado -->
+    {/* Contenido principal centrado */}
     <section class="py-20">
       <div class="container mx-auto px-4 lg:px-8 xl:max-w-7xl">
-        <!-- Contenido del caso de estudio -->
+        {/* Contenido del caso de estudio */}
         <div
           class="project-content"
           data-aos="fade-up"
@@ -505,7 +505,7 @@ function getProjectThemeColors(project: any) {
       </div>
     </section>
 
-    <!-- Proyectos Relacionados -->
+    {/* Proyectos Relacionados */}
     {
       relatedProjects.length > 0 && (
         <section class="border-t border-border/30 py-20 bg-surface/5">
@@ -577,7 +577,7 @@ function getProjectThemeColors(project: any) {
       )
     }
 
-    <!-- Call to Action Final -->
+    {/* Call to Action Final */}
     <section class="border-t border-border/30 bg-gradient-to-b from-background to-surface/20 py-20">
       <div class="container mx-auto px-4 lg:px-8 xl:max-w-5xl text-center">
         <div class="max-w-3xl mx-auto space-y-8">

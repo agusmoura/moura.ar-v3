@@ -59,7 +59,7 @@ class DebounceManager {
     if (existingTimer) {
       clearTimeout(existingTimer);
     }
-    
+
     const timerId = setTimeout(func, delay);
     this.timers.set(key, timerId);
   }
@@ -93,7 +93,7 @@ class ContactFormManager {
     this.setupCharacterCounter();
     this.setupFormSubmission();
     this.checkFormValidity();
-    
+
     // Track form initialization
     analytics.trackFormStart('contact-form');
   }
@@ -123,7 +123,7 @@ class ContactFormManager {
       const field = this.form.querySelector(`[data-validate="${fieldName}"]`) as
         | HTMLInputElement
         | HTMLTextAreaElement;
-      
+
       if (!field) return;
 
       // Focus tracking
@@ -164,7 +164,7 @@ class ContactFormManager {
 
     const fieldContainer = field.closest('.form-field');
     const errorElement = fieldContainer?.querySelector('.form-error');
-    
+
     const error = rule.validate(value);
     const hasValue = Boolean(value && value.trim());
 
@@ -194,7 +194,7 @@ class ContactFormManager {
         const errorSpan = errorElement.querySelector('span');
         if (errorSpan) errorSpan.textContent = error;
         errorElement.setAttribute('aria-live', 'assertive');
-        
+
         // Track validation error
         analytics.trackFormFieldInteraction(fieldName, 'error');
         analytics.trackFormValidationError(fieldName, error);
@@ -210,15 +210,20 @@ class ContactFormManager {
 
   private setupProjectTypeValidation(): void {
     // Just listen for changes to validate - no manual manipulation
-    const checkboxes = this.form.querySelectorAll('input[name="project-type"]') as NodeListOf<HTMLInputElement>;
-    
+    const checkboxes = this.form.querySelectorAll(
+      'input[name="project-type"]'
+    ) as NodeListOf<HTMLInputElement>;
+
     checkboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', () => {
         // Track project type selection
-        const selectedTypes = Array.from(this.form.querySelectorAll('input[name="project-type"]:checked') as NodeListOf<HTMLInputElement>)
-          .map(cb => cb.value);
+        const selectedTypes = Array.from(
+          this.form.querySelectorAll(
+            'input[name="project-type"]:checked'
+          ) as NodeListOf<HTMLInputElement>
+        ).map((cb) => cb.value);
         analytics.trackProjectTypeSelection(selectedTypes);
-        
+
         this.validateProjectTypes();
         this.checkFormValidity();
       });
@@ -248,7 +253,7 @@ class ContactFormManager {
   private setupCharacterCounter(): void {
     const messageField = this.form.querySelector('#message') as HTMLTextAreaElement;
     const counter = this.form.querySelector('.counter-text') as HTMLElement;
-    
+
     if (!messageField || !counter) return;
 
     messageField.addEventListener('input', () => {
@@ -282,10 +287,12 @@ class ContactFormManager {
     const message = messageField?.value.trim() || '';
 
     // Direct validation
-    const nameValid = name.length >= 2 && name.length <= 50 && /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/.test(name);
+    const nameValid =
+      name.length >= 2 && name.length <= 50 && /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s'-]+$/.test(name);
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const messageValid = message.length >= 20 && message.length <= 500;
-    const projectValid = this.form.querySelectorAll('input[name="project-type"]:checked').length > 0;
+    const projectValid =
+      this.form.querySelectorAll('input[name="project-type"]:checked').length > 0;
 
     const isValid = nameValid && emailValid && messageValid && projectValid;
 
@@ -310,7 +317,9 @@ class ContactFormManager {
 
     // Final validation
     if (!this.checkFormValidity()) {
-      const firstInvalid = this.form.querySelector('.form-field.invalid input, .form-field.invalid textarea') as HTMLElement;
+      const firstInvalid = this.form.querySelector(
+        '.form-field.invalid input, .form-field.invalid textarea'
+      ) as HTMLElement;
       firstInvalid?.focus();
       return;
     }
@@ -318,7 +327,7 @@ class ContactFormManager {
     // Set submitting flag and show loading state
     this.isSubmitting = true;
     this.setLoadingState(true);
-    
+
     // Track form submission attempt
     analytics.trackFormSubmissionAttempt();
 
@@ -332,7 +341,9 @@ class ContactFormManager {
 
       // Prepare project types
       const projectTypes: string[] = [];
-      const checkedBoxes = this.form.querySelectorAll('input[name="project-type"]:checked') as NodeListOf<HTMLInputElement>;
+      const checkedBoxes = this.form.querySelectorAll(
+        'input[name="project-type"]:checked'
+      ) as NodeListOf<HTMLInputElement>;
       checkedBoxes.forEach((checkbox) => {
         projectTypes.push(checkbox.value);
       });
@@ -392,7 +403,7 @@ class ContactFormManager {
   private handleSuccess(): void {
     // Keep submitting flag as true to prevent any further submissions
     this.isSubmitting = true;
-    
+
     // Disable all form inputs
     const inputs = this.form.querySelectorAll('input, textarea, button');
     inputs.forEach((input) => {

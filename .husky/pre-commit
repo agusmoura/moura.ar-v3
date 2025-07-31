@@ -1,9 +1,22 @@
-# Formatear archivos modificados
-echo "🎨 Formateando archivos..."
-bun run format
+#!/usr/bin/env sh
 
-# Ejecutar linting
-echo "🔍 Verificando linting..."
-bun run lint
+# Add Bun to PATH
+export PATH="$HOME/.bun/bin:$PATH"
 
-# Si lint falla, el commit será cancelado
+# Format staged files
+echo "🎨 Formatting staged files..."
+bun run format || exit 1
+
+# Run linting (allow warnings, fail on errors)
+echo "🔍 Running ESLint..."
+bun run lint --max-warnings=50 || {
+    echo "❌ ESLint found critical errors. Commit blocked."
+    exit 1
+}
+
+# Run TypeScript and Astro checks (allow warnings)
+echo "🔎 Type checking..."
+bun run check || {
+    echo "⚠️  Type errors found but allowing commit. Please fix these issues."
+    echo "ℹ️  Use 'git commit --no-verify' to skip this check in emergencies."
+}

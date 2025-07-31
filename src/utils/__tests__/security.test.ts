@@ -36,7 +36,7 @@ describe('Origin Validation', () => {
   describe('Development Origins', () => {
     it('should allow localhost on standard ports', () => {
       const ports = [3000, 3001, 4321, 4322, 4323];
-      ports.forEach(port => {
+      ports.forEach((port) => {
         const request = createMockRequest(`http://localhost:${port}`);
         expect(validateOrigin(request)).toBe(true);
       });
@@ -59,8 +59,8 @@ describe('Origin Validation', () => {
         'http://192.168.100.200:3000',
         'https://192.168.1.100:4322',
       ];
-      
-      validOrigins.forEach(origin => {
+
+      validOrigins.forEach((origin) => {
         const request = createMockRequest(origin);
         expect(validateOrigin(request)).toBe(true);
       });
@@ -72,8 +72,8 @@ describe('Origin Validation', () => {
         'http://10.1.1.1:3000',
         'http://10.255.255.255:4322',
       ];
-      
-      validOrigins.forEach(origin => {
+
+      validOrigins.forEach((origin) => {
         const request = createMockRequest(origin);
         expect(validateOrigin(request)).toBe(true);
       });
@@ -85,8 +85,8 @@ describe('Origin Validation', () => {
         'http://172.20.1.1:3000',
         'http://172.31.255.255:4322',
       ];
-      
-      validOrigins.forEach(origin => {
+
+      validOrigins.forEach((origin) => {
         const request = createMockRequest(origin);
         expect(validateOrigin(request)).toBe(true);
       });
@@ -100,8 +100,8 @@ describe('Origin Validation', () => {
         'http://10.0.0.1:9000',
         'http://172.16.0.1:5000',
       ];
-      
-      invalidOrigins.forEach(origin => {
+
+      invalidOrigins.forEach((origin) => {
         const request = createMockRequest(origin);
         expect(validateOrigin(request)).toBe(false);
       });
@@ -114,8 +114,8 @@ describe('Origin Validation', () => {
         'http://193.168.1.1:4321', // Not 192.168
         'http://11.0.0.1:4321', // Not 10.x
       ];
-      
-      invalidOrigins.forEach(origin => {
+
+      invalidOrigins.forEach((origin) => {
         const request = createMockRequest(origin);
         expect(validateOrigin(request)).toBe(false);
       });
@@ -131,8 +131,8 @@ describe('Origin Validation', () => {
         'ftp://example.com',
         'ws://localhost:4321',
       ];
-      
-      invalidOrigins.forEach(origin => {
+
+      invalidOrigins.forEach((origin) => {
         const request = createMockRequest(origin);
         expect(validateOrigin(request)).toBe(false);
       });

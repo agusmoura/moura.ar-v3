@@ -31,7 +31,7 @@ export class RateLimiter {
     this.store = rateLimitStore;
     this.maxRequests = maxRequests;
     this.windowSize = windowSize;
-    
+
     // Set up periodic cleanup
     this.setupCleanup();
   }
@@ -119,7 +119,7 @@ export class RateLimiter {
       }
     }
 
-    keysToDelete.forEach(key => this.store.delete(key));
+    keysToDelete.forEach((key) => this.store.delete(key));
   }
 
   /**
@@ -143,20 +143,20 @@ export function getClientIP(request: Request): string {
   const xForwardedFor = request.headers.get('x-forwarded-for');
   const xRealIp = request.headers.get('x-real-ip');
   const cfConnectingIp = request.headers.get('cf-connecting-ip');
-  
+
   if (xForwardedFor) {
     // X-Forwarded-For can contain multiple IPs, take the first one
     return xForwardedFor.split(',')[0].trim();
   }
-  
+
   if (xRealIp) {
     return xRealIp;
   }
-  
+
   if (cfConnectingIp) {
     return cfConnectingIp;
   }
-  
+
   // Fallback to a default value
   return 'unknown';
 }
@@ -164,7 +164,11 @@ export function getClientIP(request: Request): string {
 /**
  * Create rate limit headers for response
  */
-export function createRateLimitHeaders(status: { count: number; remaining: number; resetTime: number }) {
+export function createRateLimitHeaders(status: {
+  count: number;
+  remaining: number;
+  resetTime: number;
+}) {
   return {
     'X-RateLimit-Limit': RATE_LIMIT_MAX_REQUESTS.toString(),
     'X-RateLimit-Remaining': status.remaining.toString(),
@@ -179,7 +183,7 @@ export function createRateLimitHeaders(status: { count: number; remaining: numbe
  */
 export function sanitizeForJSON(value: string): string {
   if (!value) return '';
-  
+
   // Remove or replace potentially problematic characters
   return value
     .trim()
@@ -196,7 +200,7 @@ export function sanitizeForJSON(value: string): string {
  */
 export function containsSpamKeywords(message: string, keywords: readonly string[]): boolean {
   const lowercaseMessage = message.toLowerCase();
-  return keywords.some(keyword => lowercaseMessage.includes(keyword));
+  return keywords.some((keyword) => lowercaseMessage.includes(keyword));
 }
 
 /**
@@ -213,21 +217,22 @@ export function validateOrigin(request: Request): boolean {
     'http://localhost:3000', // Alternative dev port
     'http://localhost:3001', // Alternative dev port
   ];
-  
+
   // In development, allow localhost and local network IPs
   if (origin) {
     // Allow localhost on any port
     if (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:')) {
       return true;
     }
-    
+
     // Allow local network IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x) on development ports
-    const localNetworkPattern = /^https?:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}):(3000|3001|4321|4322|4323)$/;
+    const localNetworkPattern =
+      /^https?:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}):(3000|3001|4321|4322|4323)$/;
     if (localNetworkPattern.test(origin)) {
       return true;
     }
   }
-  
+
   return origin ? allowedOrigins.includes(origin) : false;
 }
 

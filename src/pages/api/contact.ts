@@ -25,7 +25,7 @@ import {
 function extractFormData(formData: FormData): ContactFormData {
   const projectTypes: string[] = [];
   const checkedTypes = formData.getAll('project-type');
-  
+
   checkedTypes.forEach((type) => {
     if (typeof type === 'string' && type.trim()) {
       projectTypes.push(type.trim());
@@ -47,29 +47,29 @@ function extractFormData(formData: FormData): ContactFormData {
 function extractUTMParams(request: Request, formData: FormData): Record<string, string> {
   const url = new URL(request.url);
   const utmParams: Record<string, string> = {};
-  
+
   const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id'];
-  
+
   utmKeys.forEach((key) => {
     // Try form data first (hidden fields)
     let value = formData.get(key) as string;
-    
+
     // Fallback to URL parameters
     if (!value) {
       value = url.searchParams.get(key) || '';
     }
-    
+
     if (value && value.trim()) {
       utmParams[key] = sanitizeForJSON(value.trim());
     }
   });
-  
+
   // Add referrer if available
   const referrer = request.headers.get('referer');
   if (referrer) {
     utmParams.referrer = sanitizeForJSON(referrer);
   }
-  
+
   return utmParams;
 }
 
@@ -84,7 +84,7 @@ function detectBot(formData: FormData): boolean {
     url: (formData.get('url') as string) || '',
     company: (formData.get('company') as string) || '',
   };
-  
+
   const validation = validateHoneypot(honeypotData);
   return !validation.success;
 }
@@ -97,7 +97,7 @@ function detectSpam(formData: ContactFormData): boolean {
   if (containsSpamKeywords(formData.message, SPAM_KEYWORDS)) {
     return true;
   }
-  
+
   // Check for suspicious patterns
   const suspiciousPatterns = [
     /http[s]?:\/\//gi, // URLs in message
@@ -105,8 +105,8 @@ function detectSpam(formData: ContactFormData): boolean {
     /(.)\1{10,}/g, // Repeated characters
     /\b\d{4}-\d{4}-\d{4}-\d{4}\b/g, // Credit card patterns
   ];
-  
-  return suspiciousPatterns.some(pattern => pattern.test(formData.message));
+
+  return suspiciousPatterns.some((pattern) => pattern.test(formData.message));
 }
 
 /**
@@ -119,11 +119,11 @@ async function sendToN8N(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const webhookUrl = import.meta.env.N8N_WEBHOOK_URL;
-    
+
     if (!webhookUrl) {
       throw new Error('N8N_WEBHOOK_URL not configured');
     }
-    
+
     // Prepare N8N payload
     const payload: N8NPayload = {
       name: sanitizeForJSON(formData.name),
@@ -140,29 +140,29 @@ async function sendToN8N(
         origin: sanitizeForJSON(request.headers.get('origin') || 'unknown'),
       },
     };
-    
+
     // Validate payload
     const validatedPayload = N8NPayloadSchema.parse(payload);
-    
+
     // Create JWT token
     const token = createContactJWT();
-    
+
     // Send to N8N
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'User-Agent': 'moura.ar-contact-form/2.0',
       },
       body: JSON.stringify(validatedPayload),
     });
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`N8N webhook failed: ${response.status} - ${errorText}`);
     }
-    
+
     return { success: true };
   } catch (error) {
     console.error('Error sending to N8N:', error);
@@ -180,16 +180,13 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     // Validate origin
     if (!validateOrigin(request)) {
-      return createSecureResponse(
-        JSON.stringify({ success: false, error: 'Invalid origin' }),
-        403
-      );
+      return createSecureResponse(JSON.stringify({ success: false, error: 'Invalid origin' }), 403);
     }
-    
+
     // Rate limiting
     const clientIP = getClientIP(request);
     const rateLimitResult = contactFormRateLimiter.isAllowed(clientIP);
-    
+
     if (!rateLimitResult.allowed) {
       return createSecureResponse(
         JSON.stringify({
@@ -200,10 +197,10 @@ export const POST: APIRoute = async ({ request }) => {
         createRateLimitHeaders(contactFormRateLimiter.getStatus(clientIP))
       );
     }
-    
+
     // Parse form data
     const formData = await request.formData();
-    
+
     // Bot detection - return fake success to confuse bots
     if (detectBot(formData)) {
       return createSecureResponse(
@@ -215,11 +212,11 @@ export const POST: APIRoute = async ({ request }) => {
         createRateLimitHeaders(contactFormRateLimiter.getStatus(clientIP))
       );
     }
-    
+
     // Extract and validate form data
     const extractedData = extractFormData(formData);
     const validation = validateContactForm(extractedData);
-    
+
     if (!validation.success) {
       const errors: Record<string, string> = {};
       validation.error.errors.forEach((error) => {
@@ -227,7 +224,7 @@ export const POST: APIRoute = async ({ request }) => {
           errors[error.path[0]] = error.message;
         }
       });
-      
+
       return createSecureResponse(
         JSON.stringify({
           success: false,
@@ -238,12 +235,12 @@ export const POST: APIRoute = async ({ request }) => {
         createRateLimitHeaders(contactFormRateLimiter.getStatus(clientIP))
       );
     }
-    
+
     // Additional spam detection
     if (detectSpam(validation.data)) {
       // Log spam attempt but return success to not reveal detection
       console.warn('Spam detected from IP:', clientIP, 'Data:', validation.data);
-      
+
       return createSecureResponse(
         JSON.stringify({
           success: true,
@@ -253,16 +250,16 @@ export const POST: APIRoute = async ({ request }) => {
         createRateLimitHeaders(contactFormRateLimiter.getStatus(clientIP))
       );
     }
-    
+
     // Extract UTM parameters
     const utmData = extractUTMParams(request, formData);
-    
+
     // Send to N8N
     const result = await sendToN8N(validation.data, utmData, request);
-    
+
     if (!result.success) {
       console.error('N8N submission failed:', result.error);
-      
+
       return createSecureResponse(
         JSON.stringify({
           success: false,
@@ -272,7 +269,7 @@ export const POST: APIRoute = async ({ request }) => {
         createRateLimitHeaders(contactFormRateLimiter.getStatus(clientIP))
       );
     }
-    
+
     // Success response
     return createSecureResponse(
       JSON.stringify({
@@ -282,10 +279,9 @@ export const POST: APIRoute = async ({ request }) => {
       200,
       createRateLimitHeaders(contactFormRateLimiter.getStatus(clientIP))
     );
-    
   } catch (error) {
     console.error('Contact form error:', error);
-    
+
     // Don't reveal internal errors to clients
     return createSecureResponse(
       JSON.stringify({

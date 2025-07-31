@@ -670,22 +670,22 @@ const getCardStyles = (colors?: PersonalCard['colors']) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting && !isCarouselInitialized) {
               isCarouselInitialized = true;
-              
+
               // Use RAF for smooth initialization
               requestAnimationFrame(() => {
                 initSwiper();
                 initCardInteractions();
               });
-              
+
               // Stop observing once initialized
               carouselObserver?.disconnect();
               carouselObserver = null;
             }
           });
         },
-        { 
+        {
           threshold: 0.1, // Trigger when 10% of carousel is visible
-          rootMargin: '50px' // Start loading 50px before it becomes visible
+          rootMargin: '50px', // Start loading 50px before it becomes visible
         }
       );
 

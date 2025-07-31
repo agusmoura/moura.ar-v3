@@ -7,13 +7,13 @@ import { JWTPayloadSchema, type JWTPayload } from '@/schemas/contact';
  */
 export function createContactJWT(): string {
   const secret = import.meta.env.N8N_JWT_SECRET;
-  
+
   if (!secret) {
     throw new Error('N8N_JWT_SECRET environment variable is not configured');
   }
 
   const now = Math.floor(Date.now() / 1000);
-  
+
   const payload: JWTPayload = {
     iss: 'https://moura.ar',
     aud: 'moura-contact-form-api',
@@ -34,7 +34,9 @@ export function createContactJWT(): string {
       noTimestamp: true, // We're providing iat manually
     });
   } catch (error) {
-    throw new Error(`Failed to create JWT token: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create JWT token: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -43,14 +45,14 @@ export function createContactJWT(): string {
  */
 export function validateContactJWT(token: string): JWTPayload {
   const secret = import.meta.env.N8N_JWT_SECRET;
-  
+
   if (!secret) {
     throw new Error('N8N_JWT_SECRET environment variable is not configured');
   }
 
   try {
     const decoded = jwt.verify(token, secret) as JWTPayload;
-    
+
     // Validate the payload structure
     const validationResult = JWTPayloadSchema.safeParse(decoded);
     if (!validationResult.success) {
@@ -73,7 +75,7 @@ export function isJWTExpired(token: string): boolean {
   try {
     const decoded = jwt.decode(token) as JWTPayload | null;
     if (!decoded || !decoded.exp) return true;
-    
+
     const now = Math.floor(Date.now() / 1000);
     return decoded.exp < now;
   } catch {
@@ -88,7 +90,7 @@ export function getJWTTimeToExpiry(token: string): number {
   try {
     const decoded = jwt.decode(token) as JWTPayload | null;
     if (!decoded || !decoded.exp) return 0;
-    
+
     const now = Math.floor(Date.now() / 1000);
     return Math.max(0, decoded.exp - now);
   } catch {

@@ -25,14 +25,14 @@ export const ANALYTICS_EVENTS = {
   FORM_SUBMIT_SUCCESS: 'form_submit_success',
   FORM_SUBMIT_ERROR: 'form_submit_error',
   FORM_ABANDON: 'form_abandon',
-  
+
   // Navigation tracking
   SCROLL_DEPTH: 'scroll_depth',
   SECTION_VIEW: 'section_view',
   PROJECT_CLICK: 'project_click',
   CV_DOWNLOAD: 'cv_download',
   EXTERNAL_LINK: 'external_link',
-  
+
   // Performance tracking
   PAGE_LOAD_TIME: 'page_load_time',
   FORM_COMPLETION_TIME: 'form_completion_time',
@@ -90,7 +90,7 @@ export class UmamiAnalytics {
     try {
       // Ensure event name is within 50 character limit
       const eventName = event.length > 50 ? event.substring(0, 50) : event;
-      
+
       // Add timestamp and page context
       const enrichedData = {
         ...data,
@@ -135,7 +135,7 @@ export class UmamiAnalytics {
     if (!this.formState || this.formState.hasSubmitted) return;
 
     this.formState.fieldsInteracted.add(fieldName);
-    
+
     const eventMap = {
       focus: ANALYTICS_EVENTS.FORM_FIELD_FOCUS,
       blur: ANALYTICS_EVENTS.FORM_FIELD_BLUR,
@@ -158,7 +158,7 @@ export class UmamiAnalytics {
     if (!this.formState || this.formState.hasSubmitted) return;
 
     this.formState.errorCount++;
-    
+
     this.track(ANALYTICS_EVENTS.FORM_VALIDATION_ERROR, {
       field_name: fieldName,
       error_message: errorMessage.substring(0, 100),
@@ -171,7 +171,7 @@ export class UmamiAnalytics {
     if (!this.formState || this.formState.hasSubmitted) return;
 
     this.formState.projectTypesSelected = selectedTypes;
-    
+
     this.track(ANALYTICS_EVENTS.FORM_PROJECT_SELECTED, {
       selected_types: selectedTypes.join(','),
       selection_count: selectedTypes.length,
@@ -194,7 +194,7 @@ export class UmamiAnalytics {
     if (!this.formState || this.formState.hasSubmitted) return;
 
     this.formState.hasSubmitted = true;
-    
+
     this.track(ANALYTICS_EVENTS.FORM_SUBMIT_SUCCESS, {
       completion_time: Date.now() - this.formState.startTime,
       fields_interacted: this.formState.fieldsInteracted.size,
@@ -225,7 +225,7 @@ export class UmamiAnalytics {
     if (!this.formState || this.formState.hasSubmitted || this.formState.hasAbandoned) return;
 
     this.formState.hasAbandoned = true;
-    
+
     this.track(ANALYTICS_EVENTS.FORM_ABANDON, {
       time_spent: Date.now() - this.formState.startTime,
       fields_interacted: this.formState.fieldsInteracted.size,
@@ -268,10 +268,13 @@ export class UmamiAnalytics {
     // Track page load performance
     window.addEventListener('load', () => {
       setTimeout(() => {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const navigation = performance.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming;
         this.track(ANALYTICS_EVENTS.PAGE_LOAD_TIME, {
           load_time: navigation.loadEventEnd - navigation.loadEventStart,
-          dom_content_loaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+          dom_content_loaded:
+            navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
           first_paint: this.getFirstPaintTime(),
         });
       }, 100);
@@ -280,11 +283,13 @@ export class UmamiAnalytics {
 
   private setupScrollTracking(): void {
     const thresholds = [25, 50, 75, 90, 100];
-    
+
     const handleScroll = () => {
-      const scrollPercent = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
-      
-      thresholds.forEach(threshold => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+
+      thresholds.forEach((threshold) => {
         if (scrollPercent >= threshold && !this.scrollThresholds.has(threshold)) {
           this.scrollThresholds.add(threshold);
           this.track(ANALYTICS_EVENTS.SCROLL_DEPTH, {
@@ -301,14 +306,14 @@ export class UmamiAnalytics {
   private setupEngagementTracking(): void {
     // Track user engagement (time spent actively on page)
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-    
+
     const resetEngagementTimer = () => {
       this.lastActivityTime = Date.now();
-      
+
       if (this.engagementTimer) {
         clearTimeout(this.engagementTimer);
       }
-      
+
       // Track engagement every 30 seconds of activity
       this.engagementTimer = setTimeout(() => {
         this.track(ANALYTICS_EVENTS.USER_ENGAGEMENT, {
@@ -318,10 +323,10 @@ export class UmamiAnalytics {
       }, 30000);
     };
 
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, resetEngagementTimer, { passive: true });
     });
-    
+
     // Track when user leaves page
     window.addEventListener('beforeunload', () => {
       const totalTime = Date.now() - this.pageLoadTime;
@@ -330,7 +335,7 @@ export class UmamiAnalytics {
         active_time: Date.now() - this.lastActivityTime,
         page_section: this.getCurrentSection(),
       });
-      
+
       // Track form abandon if applicable
       if (this.formState && !this.formState.hasSubmitted) {
         this.trackFormAbandon();
@@ -343,14 +348,14 @@ export class UmamiAnalytics {
    */
   private getCurrentSection(): string {
     const sections = document.querySelectorAll('section[id]');
-    
+
     for (const section of sections) {
       const rect = section.getBoundingClientRect();
       if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
         return section.id;
       }
     }
-    
+
     return 'unknown';
   }
 
@@ -361,26 +366,29 @@ export class UmamiAnalytics {
 
   private getFirstPaintTime(): number {
     const paintEntries = performance.getEntriesByType('paint');
-    const firstPaint = paintEntries.find(entry => entry.name === 'first-paint');
+    const firstPaint = paintEntries.find((entry) => entry.name === 'first-paint');
     return firstPaint ? firstPaint.startTime : 0;
   }
 
   private throttle(func: Function, delay: number): Function {
     let timeoutId: number;
     let lastExecTime = 0;
-    
+
     return function (this: any, ...args: any[]) {
       const currentTime = Date.now();
-      
+
       if (currentTime - lastExecTime > delay) {
         func.apply(this, args);
         lastExecTime = currentTime;
       } else {
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          func.apply(this, args);
-          lastExecTime = Date.now();
-        }, delay - (currentTime - lastExecTime));
+        timeoutId = setTimeout(
+          () => {
+            func.apply(this, args);
+            lastExecTime = Date.now();
+          },
+          delay - (currentTime - lastExecTime)
+        );
       }
     };
   }

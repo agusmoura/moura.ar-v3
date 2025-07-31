@@ -4,24 +4,25 @@
 
 <script>
   class FocusManager {
-    private focusableElements: string = 'a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
+    private focusableElements: string =
+      'a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
     private trapStack: HTMLElement[] = [];
-    
+
     constructor() {
       this.init();
     }
-    
+
     private init() {
       // Enhanced focus indicators
       this.enhanceFocusIndicators();
-      
+
       // Skip link functionality
       this.setupSkipLinks();
-      
+
       // Keyboard navigation enhancements
       this.setupKeyboardNavigation();
     }
-    
+
     private enhanceFocusIndicators() {
       const style = document.createElement('style');
       style.textContent = `
@@ -59,7 +60,7 @@
       `;
       document.head.appendChild(style);
     }
-    
+
     private setupSkipLinks() {
       document.addEventListener('keydown', (e) => {
         // Alt + S to skip to main content
@@ -71,11 +72,12 @@
             mainContent.scrollIntoView({ behavior: 'smooth' });
           }
         }
-        
+
         // Alt + N to skip to navigation
         if (e.altKey && e.key === 'n') {
           e.preventDefault();
-          const nav = document.querySelector('nav') || document.querySelector('[role="navigation"]');
+          const nav =
+            document.querySelector('nav') || document.querySelector('[role="navigation"]');
           if (nav) {
             const firstLink = nav.querySelector('a, button');
             if (firstLink) {
@@ -85,26 +87,26 @@
         }
       });
     }
-    
+
     private setupKeyboardNavigation() {
       // Escape key to close modals/dropdowns
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           // Close any open modals
           const modals = document.querySelectorAll('[aria-modal="true"]');
-          modals.forEach(modal => {
+          modals.forEach((modal) => {
             if (modal instanceof HTMLElement) {
               modal.style.display = 'none';
               modal.setAttribute('aria-hidden', 'true');
             }
           });
-          
+
           // Close any open dropdowns
           const dropdowns = document.querySelectorAll('[aria-expanded="true"]');
-          dropdowns.forEach(dropdown => {
+          dropdowns.forEach((dropdown) => {
             dropdown.setAttribute('aria-expanded', 'false');
           });
-          
+
           // Restore focus to last focused element
           if (this.trapStack.length > 0) {
             const lastFocused = this.trapStack.pop();
@@ -115,16 +117,16 @@
         }
       });
     }
-    
+
     // Focus trap for modals
     public trapFocus(element: HTMLElement) {
       const focusableElements = element.querySelectorAll(this.focusableElements);
       const firstFocusable = focusableElements[0] as HTMLElement;
       const lastFocusable = focusableElements[focusableElements.length - 1] as HTMLElement;
-      
+
       // Store current focus
       this.trapStack.push(document.activeElement as HTMLElement);
-      
+
       element.addEventListener('keydown', (e) => {
         if (e.key === 'Tab') {
           if (e.shiftKey) {
@@ -140,11 +142,11 @@
           }
         }
       });
-      
+
       // Focus first element
       firstFocusable?.focus();
     }
-    
+
     // Release focus trap
     public releaseFocus() {
       const lastFocused = this.trapStack.pop();
@@ -153,7 +155,7 @@
       }
     }
   }
-  
+
   // Initialize focus management
   document.addEventListener('DOMContentLoaded', () => {
     new FocusManager();

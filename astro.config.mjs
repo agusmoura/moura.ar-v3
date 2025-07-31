@@ -77,7 +77,7 @@ export default defineConfig({
               // Other vendor libraries
               return 'vendor';
             }
-            
+
             // Component-specific chunks for better loading
             if (id.includes('PersonalCarousel') || id.includes('Swiper')) {
               return 'carousel';

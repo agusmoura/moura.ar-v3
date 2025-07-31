@@ -5,7 +5,7 @@ beforeAll(() => {
   // Set up environment variables for tests
   process.env.N8N_JWT_SECRET = 'test-secret-key-for-unit-tests';
   process.env.N8N_WEBHOOK_URL = 'https://test-webhook.example.com';
-  
+
   // Mock global functions that might be used in tests
   if (!global.crypto) {
     Object.defineProperty(global, 'crypto', {

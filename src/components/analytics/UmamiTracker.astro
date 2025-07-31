@@ -24,13 +24,15 @@ const {
 } = Astro.props;
 ---
 
-<script define:vars={{ 
-  enableScrollTracking,
-  enableEngagementTracking, 
-  enableFormTracking,
-  enableDownloadTracking,
-  pageEvents 
-}}>
+<script
+  define:vars={{
+    enableScrollTracking,
+    enableEngagementTracking,
+    enableFormTracking,
+    enableDownloadTracking,
+    pageEvents,
+  }}
+>
   // TypeScript declarations for Umami
   declare global {
     interface Window {
@@ -61,12 +63,12 @@ const {
       }
 
       this.setupPageTracking();
-      
+
       if (enableScrollTracking) this.setupScrollTracking();
       if (enableEngagementTracking) this.setupEngagementTracking();
       if (enableFormTracking) this.setupFormTracking();
       if (enableDownloadTracking) this.setupDownloadTracking();
-      
+
       this.setupNavigationTracking();
       this.setupGenericElementTracking();
     }
@@ -79,20 +81,22 @@ const {
 
     private setupPageTracking(): void {
       // Track page-specific events
-      pageEvents.forEach(({ event, data }: { event: string; data?: Record<string, string | number | boolean> }) => {
-        this.track(event, {
-          ...data,
-          page: window.location.pathname,
-          timestamp: new Date().toISOString()
-        });
-      });
+      pageEvents.forEach(
+        ({ event, data }: { event: string; data?: Record<string, string | number | boolean> }) => {
+          this.track(event, {
+            ...data,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      );
 
       // Track page type
       const pageType = this.getPageType();
       this.track('Page Type View', {
         type: pageType,
         path: window.location.pathname,
-        referrer: document.referrer || 'Direct'
+        referrer: document.referrer || 'Direct',
       });
     }
 
@@ -113,13 +117,13 @@ const {
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrollPercent = Math.round((scrollTop / docHeight) * 100);
 
-        this.scrollThresholds.forEach(threshold => {
+        this.scrollThresholds.forEach((threshold) => {
           if (scrollPercent >= threshold && !this.scrollTracked.has(threshold)) {
             this.scrollTracked.add(threshold);
             this.track('Scroll Depth', {
               percentage: threshold,
               page: window.location.pathname,
-              pixels: scrollTop
+              pixels: scrollTop,
             });
           }
         });
@@ -146,7 +150,7 @@ const {
           this.isEngaged = true;
           this.track('Engagement Start', {
             page: window.location.pathname,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
         this.lastActiveTime = Date.now();
@@ -158,20 +162,21 @@ const {
           this.track('Engagement End', {
             duration: engagementTime,
             page: window.location.pathname,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
           this.isEngaged = false;
         }
       };
 
       // Track active engagement
-      ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+      ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach((event) => {
         document.addEventListener(event, trackEngagement, { passive: true });
       });
 
       // Track when user becomes inactive
       const checkInactivity = () => {
-        if (Date.now() - this.lastActiveTime > 30000) { // 30 seconds
+        if (Date.now() - this.lastActiveTime > 30000) {
+          // 30 seconds
           endEngagement();
         }
       };
@@ -194,12 +199,12 @@ const {
         if (form.tagName === 'FORM') {
           const formId = form.id || form.className || 'unknown';
           const formAction = form.action || window.location.href;
-          
+
           this.track('Form Submit', {
             formId,
             action: formAction,
             method: form.method || 'GET',
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
       });
@@ -210,12 +215,12 @@ const {
         if (['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)) {
           const form = element.closest('form');
           const formId = form?.id || form?.className || 'unknown';
-          
+
           this.track('Form Field Focus', {
             fieldType: element.tagName.toLowerCase(),
             fieldName: (element as HTMLInputElement).name || 'unnamed',
             formId,
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
       });
@@ -234,7 +239,7 @@ const {
           this.track('External Link Click', {
             url: href,
             text: link.textContent?.trim() || 'No text',
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
 
@@ -244,7 +249,7 @@ const {
           this.track('File Download', {
             filename: href.split('/').pop() || 'unknown',
             url: href,
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
 
@@ -252,14 +257,14 @@ const {
         if (href.startsWith('mailto:')) {
           this.track('Email Link Click', {
             email: href.replace('mailto:', ''),
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
 
         if (href.startsWith('tel:')) {
           this.track('Phone Link Click', {
             phone: href.replace('tel:', ''),
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
       });
@@ -270,16 +275,16 @@ const {
       document.addEventListener('click', (e) => {
         const element = e.target as HTMLElement;
         const navLink = element.closest('[data-section]') as HTMLAnchorElement;
-        
+
         if (navLink) {
           const section = navLink.getAttribute('data-section');
           const linkText = navLink.textContent?.trim() || 'Unknown';
-          
+
           this.track('Navigation Click', {
             section: section || 'unknown',
             text: linkText,
             type: navLink.closest('.side-nav') ? 'desktop' : 'mobile',
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         }
       });
@@ -290,17 +295,17 @@ const {
       document.addEventListener('click', (e) => {
         const element = e.target as HTMLElement;
         const trackingElement = element.closest('[data-umami-event]') as HTMLElement;
-        
+
         if (trackingElement) {
           const eventName = trackingElement.getAttribute('data-umami-event');
           if (eventName) {
             // Collect all data-umami-event-* attributes
             const eventData: Record<string, string> = {
               page: window.location.pathname,
-              element: trackingElement.tagName.toLowerCase()
+              element: trackingElement.tagName.toLowerCase(),
             };
 
-            Array.from(trackingElement.attributes).forEach(attr => {
+            Array.from(trackingElement.attributes).forEach((attr) => {
               if (attr.name.startsWith('data-umami-event-')) {
                 const key = attr.name.replace('data-umami-event-', '');
                 eventData[key] = attr.value;

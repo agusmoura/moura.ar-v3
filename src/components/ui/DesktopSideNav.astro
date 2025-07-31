@@ -125,8 +125,8 @@ const navItems: readonly NavItem[] = [
       this.sectionObserver = new IntersectionObserver(
         (entries) => {
           // Filter only intersecting entries
-          const intersectingEntries = entries.filter(entry => entry.isIntersecting);
-          
+          const intersectingEntries = entries.filter((entry) => entry.isIntersecting);
+
           if (intersectingEntries.length === 0) return;
 
           // Find the most visible section
@@ -135,13 +135,13 @@ const navItems: readonly NavItem[] = [
           }, intersectingEntries[0]);
 
           // Special handling for contact section near bottom of page
-          const contactEntry = intersectingEntries.find(entry => entry.target.id === 'contact');
+          const contactEntry = intersectingEntries.find((entry) => entry.target.id === 'contact');
           if (contactEntry && contactEntry.intersectionRatio > 0) {
             // If contact section is visible and we're near bottom, prioritize it
             const scrollPosition = window.scrollY + window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
             const nearBottom = scrollPosition >= documentHeight * 0.9;
-            
+
             if (nearBottom) {
               mostVisible = contactEntry;
             }

@@ -5,14 +5,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Plan & Review
 
 ### Before starting work
+
 - Always in plan mode to make a plan
 - After get the plan, make sure you write the plan to .claude/tasks/TASK_NAME.md.
 - The plan should be a detailed implementation plan and the reasoning behind them, as well as task broke down.
 - If the task requiere external knowledege or certain package, also research to get latest knowledge (use Task tool to research)
 - Don't over plan it, alwayts think MVP
--Once you write the plan, firstly ask me to review it. Do not continue until I approve the plan
+  -Once you write the plan, firstly ask me to review it. Do not continue until I approve the plan
 
 ### While Implementing
+
 - You should update the plan as you work.
 - After you complete task in the plan, you should update and append detailed descriptions of the changes you made, so the following tasks can be easily handed over to other engineers.
 
@@ -59,11 +61,10 @@ bun run analyze          # Analyze bundle size
 ## Runtime Requirements
 
 **CRITICAL**: Always use Bun as the runtime:
+
 - Install dependencies: `bun add` or `bun add -D`
 - Run binaries: `bunx --bun <command>`
 - NEVER use `npm`, `yarn`, `pnpm`, or `npx`
-
-
 
 ## Project Structure
 
@@ -91,6 +92,7 @@ src/
 ## TypeScript Configuration
 
 The project uses strict TypeScript with path aliases:
+
 - `@/*` → `src/*`
 - `@components/*` → `src/components/*`
 - `@layouts/*` → `src/layouts/*`
@@ -102,6 +104,7 @@ The project uses strict TypeScript with path aliases:
 ## Key Features
 
 ### Contact Form API (`src/pages/api/contact.ts`)
+
 - JWT authentication with N8N webhook
 - Comprehensive validation and sanitization
 - Bot detection with honeypot fields
@@ -110,12 +113,14 @@ The project uses strict TypeScript with path aliases:
 - Spam keyword filtering
 
 ### Space Background Effects
+
 - Custom particle system with gravity simulation
 - Mouse interaction effects
 - Configurable star density and animation speeds
 - Performance-optimized rendering
 
 ### Project Content System
+
 - MDX-based project files in `src/content/projects/`
 - Dynamic routing via `[slug].astro`
 - Rich metadata support with Zod schemas
@@ -123,12 +128,14 @@ The project uses strict TypeScript with path aliases:
 ## Environment Variables
 
 Required for contact form:
+
 ```bash
 N8N_WEBHOOK_URL=https://n8n.moura.ar/webhook-test/moura-contact-form
 N8N_JWT_SECRET=your-jwt-secret-phrase
 ```
 
 Optional:
+
 ```bash
 PUBLIC_ENABLE_ANALYTICS=false
 ```
@@ -136,14 +143,17 @@ PUBLIC_ENABLE_ANALYTICS=false
 ## Branch Strategy & Workflow
 
 ### Branch Structure
+
 - **`master`**: Production branch - stable, deployed code only
 - **`dev`**: Development branch - for testing and integration
 - **Feature branches**: Created from `master` for new features/fixes
 
 ### Development Workflow
+
 **CRITICAL**: Follow this exact workflow for all changes:
 
 1. **Create Feature Branch**: Always branch from `master` (not from `dev`)
+
    ```bash
    git checkout master
    git pull origin master
@@ -151,6 +161,7 @@ PUBLIC_ENABLE_ANALYTICS=false
    ```
 
 2. **Develop & Test**: Make changes in the feature branch
+
    ```bash
    # Make your changes
    git add .
@@ -159,6 +170,7 @@ PUBLIC_ENABLE_ANALYTICS=false
    ```
 
 3. **Merge to Dev for Testing**: Create PR to `dev` branch first
+
    ```bash
    # Create PR: feature/your-feature-name → dev
    # Test thoroughly in dev environment
@@ -171,13 +183,16 @@ PUBLIC_ENABLE_ANALYTICS=false
    ```
 
 ### Branch Protection Rules
+
 - **NEVER** merge `dev` directly into `master`
 - **NEVER** commit directly to `master` or `dev`
 - **ALWAYS** use feature branches for changes
 - **ALWAYS** test in `dev` before merging to `master`
 
 ### Commit Messages
+
 Follow conventional commits:
+
 - `feat:` - New features
 - `fix:` - Bug fixes
 - `docs:` - Documentation changes
@@ -190,12 +205,14 @@ Follow conventional commits:
 - `chore:` - Maintenance tasks
 
 ### Code Quality
+
 - All code must pass `bun run lint` and `bun run check`
 - Use TypeScript strict mode - no `any` types
 - Prefer `.astro` components over framework-specific components
 - Always use Bun for package management and script execution
 
 ### Performance Considerations
+
 - Images optimized with Astro's `<Image>` component
 - Manual chunk splitting for vendor and animation code
 - CSS minification with LightningCSS
