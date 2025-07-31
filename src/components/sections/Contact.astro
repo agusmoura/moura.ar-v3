@@ -1,5 +1,5 @@
 ---
-import { parseText } from '@/utils/textParser';
+import { parseText } from '@lib/validation/textParser';
 import { Icon } from 'astro-icon/components';
 
 const pt = (text: string) => parseText(text);
@@ -1365,7 +1365,7 @@ const projectTypes: ProjectType[] = [
 
 <script>
   // Lazy load the contact form functionality
-  import { initContactForm } from '@/utils/contact-form-client';
+  import { initContactForm } from '@services/contact/contact-form-client';
 
   // Initialize contact form when DOM is ready
   if (document.readyState === 'loading') {

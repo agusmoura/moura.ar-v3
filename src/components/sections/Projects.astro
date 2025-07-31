@@ -2,7 +2,7 @@
 import TechStackOrbit from '@/components/effects/TechStackOrbit.astro';
 import BentoProjectCard from '@/components/ui/BentoProjectCard.astro';
 import type { Project } from '@/types/project';
-import { parseText } from '@/utils/textParser';
+import { parseText } from '@lib/validation/textParser';
 import { Icon } from 'astro-icon/components';
 
 const pt = (text: string) => parseText(text);

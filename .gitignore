@@ -1,53 +1,110 @@
-# build output
+# Build Output
 dist/
+.output/
+build/
+.next/
+.nuxt/
+.vercel/
+.netlify/
 
-# generated types
+# Generated Types & Cache
 .astro/
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
 
-# dependencies
+# Dependencies
 node_modules/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
 
-# logs
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+dev-debug.log
 
-# environment variables
-.env
-.env.production
+# Runtime & Testing
+coverage/
+.nyc_output/
+lib-cov/
+.coverage/
+*.lcov
+test-results/
+playwright-report/
+test-results.xml
 
-# macOS-specific files
+# Package Manager Lock Files (Keep only Bun)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# OS Specific
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
-# jetbrains setting folder
-.idea/
-
-# VSCode
+# Editor Directories
 .vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-project
+*.sublime-workspace
 
-# Husky
+# Development Tools
 .husky/_/
-
-# Cursor
 .cursorignore
 
-# Logs
-logs
-*.log
-dev-debug.log
-# Dependency directories
-# Environment variables
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-# OS specific
+# Temporary Files
+*.temp
+*.tmp
+.temp/
+.tmp/
 
-# Task files
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.bz2
+
+# Backup Files
+*.backup
+*.bak
+*.old
+*.orig
+
+# Claude Code Tasks (Optional - uncomment if using)
+# .claude/tasks/
 # tasks.json
-# tasks/ 

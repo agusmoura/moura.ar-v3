@@ -8,7 +8,7 @@ import {
   type ContactFormData,
   type N8NPayload,
 } from '@/schemas/contact';
-import { createContactJWT } from '@/utils/jwt';
+import { createContactJWT } from '@lib/security/jwt';
 import {
   contactFormRateLimiter,
   getClientIP,
@@ -17,7 +17,7 @@ import {
   containsSpamKeywords,
   validateOrigin,
   createSecureResponse,
-} from '@/utils/security';
+} from '@lib/security/security';
 
 /**
  * Extract and validate form data from FormData

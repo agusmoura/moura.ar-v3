@@ -4,7 +4,7 @@
  */
 
 // Contact form client-side functionality - optimized for performance
-import { analytics } from './umami-analytics';
+import { analytics } from '@lib/analytics/umami-analytics';
 
 // Type declarations for analytics
 declare global {

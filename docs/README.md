@@ -1,241 +1,90 @@
-# Documentation Index - Moura.ar v3
+# Documentation Hub
 
-Welcome to the comprehensive documentation for the Moura.ar v3 portfolio website. This documentation provides complete information about the project architecture, components, APIs, and development processes.
+Welcome to the Moura.ar v3 documentation! This guide will help you find the information you need.
 
 ## 📚 Documentation Structure
 
-### 🎯 [Project Index](PROJECT_INDEX.md)
+### 🚀 Getting Started
+- **[Installation Guide](./setup/installation.md)** - Set up your development environment
+- **[Environment Configuration](./setup/environment.md)** - Configure environment variables and settings
 
-**Main project overview and architecture**
+### 📖 Usage Guides
+- **[Available Commands](./usage/commands.md)** - Complete command reference
+- **[Analytics System](./usage/analytics.md)** - Analytics configuration and usage
 
-- Project structure and technology stack
-- Development workflow and commands
-- Configuration and environment setup
-- Security features and performance optimizations
-- Design system and development standards
+### 🔌 API Reference
+- **[Contact Form API](./api/contact-form.md)** - Contact form endpoint documentation
 
-### 📡 [API Documentation](API_DOCUMENTATION.md)
+### 🏗️ Development
+- **[Architecture Guide](./development/architecture.md)** - System design and principles
+- **[Development Conventions](./development/conventions.md)** - Coding standards and patterns
+- **[Component Guide](./development/components.md)** - UI component documentation
+- **[Testing Guide](./development/testing.md)** - Testing strategies and examples
 
-**Contact Form API reference**
+### 🤝 Contributing
+- **[Developer Onboarding](./contributing/onboarding.md)** - Getting started as a developer
+- **[Git Workflow](./contributing/git-workflow.md)** - Git hooks and workflow guidelines
 
-- Endpoint specifications and request/response formats
-- Security features (rate limiting, bot detection, spam filtering)
-- N8N webhook integration with JWT authentication
-- Testing examples and troubleshooting guide
-- Error handling and monitoring
+### 📋 Architecture Decisions
+- **[ADR-001: Architecture Refactor](./adr/001-architecture-refactor.md)** - Layered architecture decision
 
-### 🧩 [Component Guide](COMPONENT_GUIDE.md)
+## 🎯 Quick Navigation
 
-**Complete component reference**
+**I want to...**
+- **Get started quickly** → [Installation Guide](./setup/installation.md)
+- **Understand the architecture** → [Architecture Guide](./development/architecture.md)
+- **Learn coding conventions** → [Development Conventions](./development/conventions.md)
+- **Work with the contact form** → [Contact Form API](./api/contact-form.md)
+- **Set up analytics** → [Analytics System](./usage/analytics.md)
+- **Contribute to the project** → [Developer Onboarding](./contributing/onboarding.md)
 
-- All 24+ components with props and usage examples
-- Component categories (Analytics, Accessibility, Effects, Sections, SEO, UI)
-- Best practices for component development
-- Responsive design patterns and accessibility features
+## 📊 Project Overview
 
-### 📊 [Analytics System](../ANALYTICS.md)
+**Moura.ar v3** is a modern personal portfolio built with:
+- **Astro v5** with SSR
+- **Tailwind CSS v4** 
+- **TypeScript** strict mode
+- **Layered Architecture** with clear separation of concerns
+- **Comprehensive Testing** with Vitest
+- **N8N Integration** for contact form automation
 
-**Advanced Umami analytics implementation**
-
-- Comprehensive tracking system for forms, navigation, and performance
-- Event catalog with 15+ tracked interactions
-- Privacy-compliant, cookie-free analytics
-- Implementation examples and monitoring setup
-
-## 🚀 Quick Start
-
-### Essential Files
-
-- [README.md](../README.md) - Project quick start guide
-- [CLAUDE.md](../CLAUDE.md) - AI assistant instructions
-- [TODO.md](../TODO.md) - Project roadmap and tasks
-
-### Development Setup
-
-```bash
-# Install dependencies
-bun install
-
-# Start development server
-bun run dev
-
-# Run quality checks
-bun run lint && bun run check
-```
-
-### Key Commands
-
-```bash
-bun run dev              # Development server
-bun run build            # Production build
-bun run test             # Run tests
-bun run analyze          # Bundle analysis
-```
-
-## 🏗️ Architecture Overview
-
-### Framework Stack
-
-- **Astro v5**: SSR with Node.js adapter
-- **Tailwind CSS v4**: CSS-based configuration
-- **TypeScript**: Strict type checking
-- **Bun**: Runtime and package manager
-
-### Key Features
-
-- 🌌 **Space-themed animations** with particle physics
-- 📧 **Smart contact form** with N8N integration
-- 📊 **Advanced analytics** with Umami tracking
-- ♿ **Accessibility-first** design (WCAG compliant)
-- 🔒 **Security-focused** (rate limiting, input sanitization)
-- ⚡ **Performance-optimized** (code splitting, image optimization)
-
-### Project Structure
-
+### Architecture Highlights
 ```
 src/
-├── components/
-│   ├── accessibility/    # A11y components
-│   ├── analytics/        # Umami integration
-│   ├── effects/          # Space animations
-│   ├── sections/         # Page sections
-│   ├── seo/             # SEO components
-│   └── ui/              # UI elements
-├── content/projects/     # Project MDX files
-├── pages/api/           # API endpoints
-├── utils/               # Utility functions
-└── schemas/             # Validation schemas
+├── lib/         # Core utilities & libraries  
+├── services/    # Business logic layer
+├── core/        # Application foundation
+├── components/  # UI components (Astro)
+└── pages/       # Routes & API endpoints
 ```
 
-## 🔧 Configuration
+## 🔍 Finding Information
 
-### Environment Variables
+### By Role
+- **Frontend Developer** → [Components](./development/components.md), [Conventions](./development/conventions.md)
+- **Backend Developer** → [Architecture](./development/architecture.md), [API Reference](./api/contact-form.md)
+- **DevOps Engineer** → [Environment Setup](./setup/environment.md), [Git Workflow](./contributing/git-workflow.md)
+- **Project Manager** → [Architecture Overview](./development/architecture.md), [Testing Guide](./development/testing.md)
 
-```bash
-# Contact Form
-N8N_WEBHOOK_URL=https://n8n.moura.ar/webhook-test/moura-contact-form
-N8N_JWT_SECRET=your-jwt-secret
+### By Task
+- **Setting up locally** → [Installation](./setup/installation.md) → [Environment](./setup/environment.md)
+- **Making changes** → [Conventions](./development/conventions.md) → [Testing](./development/testing.md)
+- **Deploying** → [Commands](./usage/commands.md) → [Environment](./setup/environment.md)
+- **Understanding codebase** → [Architecture](./development/architecture.md) → [Components](./development/components.md)
 
-# Analytics (optional)
-PUBLIC_ENABLE_ANALYTICS=false
-```
+## 📝 Documentation Standards
 
-### TypeScript Paths
+All documentation follows these principles:
+- **Actionable** - Clear steps and examples
+- **Current** - Updated with latest changes
+- **Organized** - Logical structure and navigation
+- **Accessible** - Easy to find and understand
 
-```typescript
-@/*           → src/*
-@components/* → src/components/*
-@layouts/*    → src/layouts/*
-@utils/*      → src/utils/*
-```
-
-## 🧪 Testing & Quality
-
-### Available Tests
-
-```bash
-bun run test            # All tests
-bun run test:contact    # Contact form tests
-```
-
-### Quality Checks
-
-```bash
-bun run lint            # ESLint
-bun run format          # Prettier
-bun run check           # Astro + TypeScript
-```
-
-### Security Features
-
-- Rate limiting (5 req/hour per IP)
-- Bot detection with honeypot fields
-- Spam filtering with keyword detection
-- Input sanitization and XSS prevention
-- CORS protection and origin validation
-
-## 📈 Performance
-
-### Optimizations
-
-- Code splitting (vendor + animation chunks)
-- Image optimization with Astro's `<Image>`
-- CSS minification with LightningCSS
-- Prefetch strategy for viewport-based loading
-- Bundle analysis with vite-bundle-visualizer
-
-### Monitoring
-
-- Umami analytics for performance tracking
-- Error tracking and logging
-- Core Web Vitals monitoring
-- Form conversion funnel analysis
-
-## 🔄 Development Workflow
-
-### Branch Strategy
-
-```
-master (production) ← feature/* → dev (testing)
-```
-
-### Commit Convention
-
-- `feat:` New features
-- `fix:` Bug fixes
-- `docs:` Documentation
-- `refactor:` Code restructuring
-- `perf:` Performance improvements
-
-### Code Standards
-
-- TypeScript strict mode (no `any`)
-- ESLint compliance required
-- Prettier formatting enforced
-- WCAG accessibility compliance
-
-## 🌐 Deployment
-
-### Production Environment
-
-- Coolify for deployment automation
-- Environment variables secured
-- HTTPS enforcement
-- CDN integration for assets
-
-### Health Monitoring
-
-```bash
-# Health check endpoint
-curl https://moura.ar/api/health
-```
-
-## 📞 Support & Resources
-
-### External Documentation
-
-- [Astro Documentation](https://docs.astro.build)
-- [Tailwind CSS v4](https://tailwindcss.com)
-- [N8N Documentation](https://docs.n8n.io)
-- [Umami Analytics](https://umami.is)
-
-### Project Links
-
-- **Live Site**: [moura.ar](https://moura.ar)
-- **Analytics**: [analytics.moura.ar](https://analytics.moura.ar)
-- **N8N Instance**: [n8n.moura.ar](https://n8n.moura.ar)
+### Last Updated
+- **Architecture**: 2025-07-31 (v3.1 refactor)
+- **Components**: 2025-07-31 (current structure)
+- **API**: 2025-07-31 (latest endpoints)
 
 ---
 
-## 📋 Documentation Checklist
-
-- ✅ **Project Index** - Complete architecture overview
-- ✅ **API Documentation** - Contact form endpoint reference
-- ✅ **Component Guide** - All 24+ components documented
-- ✅ **Analytics System** - Comprehensive tracking documentation
-- ✅ **README Integration** - Links to quick start guide
-- ✅ **TODO Integration** - Project roadmap reference
-
-**Documentation Version**: 1.0.0  
-**Last Updated**: 2025-07-31  
-**Coverage**: 100% of project components and APIs
+**Need help?** Check the [Onboarding Guide](./contributing/onboarding.md) or refer to the specific documentation section above.

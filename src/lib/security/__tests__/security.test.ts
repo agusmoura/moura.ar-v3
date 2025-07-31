@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateOrigin } from '@/utils/security';
+import { validateOrigin } from '@lib/security/security';
 
 describe('Origin Validation', () => {
   // Helper to create a mock request with origin header
