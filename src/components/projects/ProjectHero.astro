@@ -1,0 +1,188 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import { parseText } from '@lib/validation/textParser';
+import CategoryBadge from './CategoryBadge.astro';
+import type { CollectionEntry } from 'astro:content';
+import type { ProjectThemeColors } from '@/utils/project-helpers';
+
+export interface Props {
+  project: CollectionEntry<'projects'>['data'];
+  themeColors: ProjectThemeColors;
+}
+
+const { project, themeColors } = Astro.props;
+const pt = (text: string) => parseText(text);
+---
+
+<section class="relative overflow-hidden pt-4 pb-16 min-h-screen flex items-center">
+  <div class="container mx-auto px-4 xl:max-w-7xl w-full">
+    {/* Breadcrumb */}
+    <nav class="mb-12" aria-label="Navegación" data-aos="fade-up" data-aos-duration="600">
+      <div class="flex items-center gap-2 text-sm text-muted">
+        <a href="/" class="hover:text-accent transition-colors">Inicio</a>
+        <Icon name="heroicons:chevron-right" class="h-4 w-4" />
+        <a href="/projects" class="hover:text-accent transition-colors">Proyectos</a>
+        <Icon name="heroicons:chevron-right" class="h-4 w-4" />
+        <span class="text-foreground">{project.title}</span>
+      </div>
+    </nav>
+
+    {/* Layout principal grid asimétrico */}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      {/* Columna izquierda - Contenido principal */}
+      <div class="lg:col-span-8 space-y-8">
+        {/* Categoría y metadata compacta */}
+        <div class="flex flex-wrap items-center gap-4 mb-6">
+          <CategoryBadge category={project.category} />
+          <div class="flex items-center gap-4 text-sm project-tag">
+            <div class="flex items-center gap-2">
+              <Icon name="heroicons:calendar-days" class="h-4 w-4 project-tag-icon" />
+              <span>{project.date}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <Icon name="heroicons:clock" class="h-4 w-4 project-tag-icon" />
+              <span>{project.duration}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Título principal */}
+        <div class="space-y-6">
+          <h1
+            class="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] pb-4 mb-4 text-balance project-title"
+            data-aos="fade-up"
+            data-aos-duration="800"
+            data-aos-delay="200"
+            set:html={pt(project.title)}
+          />
+
+          {/* Descripción */}
+          <p
+            class="text-lg md:text-xl leading-relaxed max-w-3xl project-description"
+            data-aos="fade-up"
+            data-aos-duration="800"
+            data-aos-delay="600"
+          >
+            {project.description}
+          </p>
+        </div>
+
+        {/* Imagen de composición */}
+        {
+          project.images?.comp && (
+            <div
+              class="relative group mt-12"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="600"
+            >
+              <div
+                class="relative overflow-hidden rounded-2xl bg-gradient-to-b border backdrop-blur-sm"
+                style={`background-color: ${themeColors.surface}; border-color: ${themeColors.border};`}
+              >
+                {/* Efecto glassmorphism sutil */}
+                <div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent" />
+
+                <div class="relative p-3">
+                  <Image
+                    src={project.images.comp.src}
+                    alt={project.images.comp.alt}
+                    class="w-full h-auto rounded-xl shadow-2xl group-hover:scale-[1.02] transition-transform duration-700"
+                    width={800}
+                    height={450}
+                    loading="eager"
+                    quality={90}
+                  />
+                </div>
+
+                {/* Subtle glow effect */}
+                <div class="absolute inset-0 rounded-2xl ring-1 ring-accent/10 group-hover:ring-accent/20 transition-all duration-500" />
+              </div>
+            </div>
+          )
+        }
+
+        {/* CTAs principales */}
+        <div
+          class="flex flex-col sm:flex-row gap-4 pt-8"
+          data-aos="fade-up"
+          data-aos-duration="600"
+          data-aos-delay="800"
+        >
+          {
+            project.links?.live && (
+              <a
+                href={project.links.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+                style={`background: ${themeColors.surface}; color: ${themeColors.foreground};`}
+              >
+                <Icon name="heroicons:globe-alt" class="h-6 w-6" />
+                <span>Ver Proyecto Live</span>
+                <Icon
+                  name="heroicons:arrow-top-right-on-square"
+                  class="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                />
+              </a>
+            )
+          }
+
+          {
+            project.links?.github && (
+              <a
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group inline-flex items-center justify-center gap-3 border-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm"
+                style={`border-color: ${themeColors.border}; color: ${themeColors.foreground}`}
+              >
+                <Icon name="heroicons:code-bracket" class="h-6 w-6" />
+                <span>Ver Código</span>
+                <Icon
+                  name="heroicons:arrow-top-right-on-square"
+                  class="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                />
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      {/* Columna derecha - Información del proyecto */}
+      <div class="lg:col-span-4">
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style
+  define:vars={{
+    projectPrimary: themeColors.primary,
+    projectForeground: themeColors.foreground,
+    projectTitleGradient:
+      project.theme?.title_gradient || 'linear-gradient(to right, #121FCF 45%, #CF1512 100%)',
+  }}
+>
+  .project-title {
+    background: var(--projectTitleGradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+  }
+
+  .project-tag {
+    color: var(--projectForeground);
+  }
+
+  .project-tag-icon {
+    color: var(--projectPrimary);
+  }
+
+  .project-description {
+    color: var(--projectForeground);
+  }
+</style>

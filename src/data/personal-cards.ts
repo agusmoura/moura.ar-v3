@@ -104,7 +104,7 @@ export const personalCardsData: PersonalCard[] = [
     story: {
       title: 'Diseño para Humanos Reales',
       key_points: [
-        'Un libro que explora la relación entre diseño y comportamiento humano, mostrando cómo los objetos cotidianos pueden mejorar o complicar nuestras vidas. Norman presenta principios clave como visibilidad y feedback para crear experiencias intuitivas.',
+        'Un libro sobre cómo el diseño influye en el comportamiento humano, con principios como visibilidad y feedback para experiencias intuitivas.',
       ],
       note: 'Irónicamente, leo sobre UX mientras procrastino mis propios proyectos.',
       link: {

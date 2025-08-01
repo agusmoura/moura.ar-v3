@@ -1,0 +1,57 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { ProjectThemeColors } from '@/utils/project-helpers';
+
+export interface Props {
+  role: string;
+  themeColors: ProjectThemeColors;
+  class?: string;
+}
+
+const { role, themeColors, class: className = '' } = Astro.props;
+---
+
+<div
+  class={`group p-6 rounded-2xl border backdrop-blur-sm transition-all duration-300 project-box ${className}`}
+>
+  <div class="flex items-start gap-4">
+    <div class="p-3 rounded-xl project-box-icon">
+      <Icon name="heroicons:user-circle" class="h-6 w-6" />
+    </div>
+    <div>
+      <div class="text-sm mb-2">Mi Rol</div>
+      <div class="font-semibold text-lg">{role}</div>
+    </div>
+  </div>
+</div>
+
+<style
+  define:vars={{
+    projectPrimary: themeColors.primary,
+    projectSurface: themeColors.surface,
+    projectForeground: themeColors.foreground,
+    projectBorder: themeColors.border,
+  }}
+>
+  .project-box {
+    background: color-mix(in srgb, var(--projectSurface) 10%, transparent);
+    border-color: color-mix(in srgb, var(--projectBorder) 20%, transparent);
+    color: var(--projectForeground);
+    transition: all 0.3s ease;
+  }
+
+  .project-box:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: color-mix(in srgb, var(--projectBorder) 40%, transparent);
+  }
+
+  .project-box-icon {
+    color: var(--projectPrimary);
+    background: color-mix(in srgb, var(--projectSurface) 100%, transparent);
+    transition: all 0.3s ease;
+  }
+
+  .project-box:hover .project-box-icon {
+    background: color-mix(in srgb, var(--projectSurface) 40%, transparent);
+  }
+</style>

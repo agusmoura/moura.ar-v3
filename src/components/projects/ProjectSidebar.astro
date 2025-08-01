@@ -1,0 +1,26 @@
+---
+import ProjectCollaborations from './ProjectCollaborations.astro';
+import ProjectRole from './ProjectRole.astro';
+import ProjectTechStack from './ProjectTechStack.astro';
+import type { CollectionEntry } from 'astro:content';
+import type { ProjectThemeColors } from '@/utils/project-helpers';
+
+export interface Props {
+  project: CollectionEntry<'projects'>['data'];
+  themeColors: ProjectThemeColors;
+  class?: string;
+}
+
+const { project, themeColors, class: className = '' } = Astro.props;
+---
+
+<div class={`space-y-8 ${className}`}>
+  {/* Colaboraciones */}
+  <ProjectCollaborations project={project} themeColors={themeColors} />
+
+  {/* Mi Rol */}
+  <ProjectRole role={project.role} themeColors={themeColors} />
+
+  {/* Tecnologías */}
+  <ProjectTechStack technologies={project.technologies} themeColors={themeColors} />
+</div>

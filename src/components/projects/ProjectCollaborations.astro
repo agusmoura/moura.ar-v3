@@ -1,0 +1,228 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import type { ProjectThemeColors } from '@/utils/project-helpers';
+
+export interface Props {
+  project: CollectionEntry<'projects'>['data'];
+  themeColors: ProjectThemeColors;
+  class?: string;
+}
+
+const { project, themeColors, class: className = '' } = Astro.props;
+---
+
+{
+  (project.partner || project.client) && (
+    <div
+      class={`group p-6 rounded-2xl border backdrop-blur-sm transition-all duration-300 project-box relative overflow-visible ${className}`}
+    >
+      {/* Partner compacto en esquina superior derecha */}
+      {project.partner && (
+        <div class="absolute -top-2 -right-2 z-10">
+          {/* Badge pequeño de colaboración en la parte superior */}
+          <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 z-20">
+            <div class="group/tag relative">
+              {/* Fondo principal con gradiente */}
+              <div class="absolute inset-0 rounded-full bg-gradient-to-r from-slate-900 to-slate-800 shadow-sm" />
+
+              {/* Border de acento */}
+              <div
+                class="absolute inset-0 rounded-full p-[1px]"
+                style={`background: linear-gradient(135deg, ${themeColors.primary}60, ${themeColors.primary}30)`}
+              >
+                <div class="w-full h-full rounded-full bg-gradient-to-r from-slate-900 to-slate-800" />
+              </div>
+
+              {/* Contenido más compacto */}
+              <div class="relative flex items-center gap-1 px-2 py-0.5 transition-all duration-300 group-hover/tag:scale-105">
+                <div
+                  class="flex items-center justify-center w-2 h-2 rounded-full"
+                  style={`background: ${themeColors.primary}`}
+                >
+                  <Icon name="heroicons:users" class="h-1.5 w-1.5 text-white" />
+                </div>
+                <span class="text-white text-[10px] font-medium tracking-wide whitespace-nowrap">
+                  Partner
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="group/partner backdrop-blur-lg rounded-lg shadow-xl transition-all duration-300 hover:scale-105 border pt-3"
+            style={`background: rgba(from ${themeColors.surface} r g b / 0.9); border-color: ${themeColors.primary}40; box-shadow: 0 6px 24px ${themeColors.primary}20`}
+          >
+            {project.partner_logo ? (
+              <div class="relative p-3">
+                {/* Logo principal */}
+                <Image
+                  src={project.partner_logo}
+                  alt={`Logo de ${project.partner}`}
+                  width={56}
+                  height={56}
+                  class="h-14 w-14 object-contain filter brightness-110 transition-all duration-300 group-hover/partner:scale-110 partner-logo"
+                  quality={100}
+                />
+              </div>
+            ) : (
+              <div class="relative p-3">
+                {/* Contenedor para nombre sin logo */}
+                <div
+                  class="flex flex-col items-center justify-center h-14 w-14 rounded-lg"
+                  style={`background: ${themeColors.primary}15`}
+                >
+                  <Icon
+                    name="heroicons:sparkles"
+                    class="h-6 w-6 mb-1 transition-all duration-300 group-hover/partner:scale-110"
+                    style={`color: ${themeColors.primary}`}
+                  />
+                  <div
+                    class="text-xs font-bold leading-none text-center max-w-[50px] truncate"
+                    style={`color: ${themeColors.foreground}EE`}
+                  >
+                    {project.partner.split(' ')[0]}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Header consistente con otros elementos */}
+      <div class="flex items-start gap-4 mb-4">
+        <div class="p-3 rounded-xl project-box-icon">
+          <Icon name="heroicons:users" class="h-6 w-6" />
+        </div>
+        <div>
+          <div class="text-sm mb-2">Cliente Principal</div>
+          <div class="font-semibold text-lg">
+            {project.client ? project.client : project.partner}
+          </div>
+        </div>
+      </div>
+
+      {/* Logo del cliente destacado en el centro */}
+      {project.client && (
+        <div class="flex items-center justify-center py-4 group/logo">
+          <div
+            class="relative p-3 rounded-xl transition-all duration-300 group-hover/logo:scale-105"
+            style={`background: linear-gradient(135deg, ${themeColors.surface}20, ${themeColors.surface}40);`}
+          >
+            {/* Área del logo con dimensiones optimizadas */}
+            <div class="flex items-center justify-center w-50 h-32">
+              {project.client_logo ? (
+                <Image
+                  src={project.client_logo}
+                  alt={`Logo de ${project.client}`}
+                  width={200}
+                  height={128}
+                  class="max-w-full max-h-full object-contain filter brightness-110 contrast-110 transition-all duration-300"
+                  quality={100}
+                />
+              ) : (
+                <div
+                  class="text-xl font-bold text-center"
+                  style={`color: ${themeColors.foreground}EE`}
+                >
+                  {project.client}
+                </div>
+              )}
+            </div>
+
+            {/* Indicador sutil */}
+            <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+              <div
+                class="h-1 w-12 rounded-full transition-all duration-300 group-hover/logo:w-16"
+                style={`background: linear-gradient(90deg, transparent, ${themeColors.primary}60, transparent)`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Caso especial: Solo partner sin cliente */}
+      {!project.client && project.partner && (
+        <div class="flex items-center justify-center py-4 group/logo">
+          <div
+            class="relative p-3 rounded-xl transition-all duration-300 group-hover/logo:scale-105"
+            style={`background: linear-gradient(135deg, ${themeColors.surface}20, ${themeColors.surface}40); border: 1px solid ${themeColors.border}30`}
+          >
+            {/* Área del logo con dimensiones optimizadas */}
+            <div class="flex items-center justify-center w-48 h-24">
+              {project.partner_logo ? (
+                <Image
+                  src={project.partner_logo}
+                  alt={`Logo de ${project.partner}`}
+                  width={192}
+                  height={96}
+                  class="max-w-full max-h-full object-contain filter brightness-110 contrast-110 transition-all duration-300"
+                  quality={100}
+                />
+              ) : (
+                <div
+                  class="text-xl font-bold text-center"
+                  style={`color: ${themeColors.foreground}EE`}
+                >
+                  {project.partner}
+                </div>
+              )}
+            </div>
+
+            {/* Indicador sutil */}
+            <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+              <div
+                class="h-1 w-12 rounded-full transition-all duration-300 group-hover/logo:w-16"
+                style={`background: linear-gradient(90deg, transparent, ${themeColors.primary}60, transparent)`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+<style
+  define:vars={{
+    projectPrimary: themeColors.primary,
+    projectSurface: themeColors.surface,
+    projectForeground: themeColors.foreground,
+    projectBorder: themeColors.border,
+  }}
+>
+  .project-box {
+    background: color-mix(in srgb, var(--projectSurface) 10%, transparent);
+    border-color: color-mix(in srgb, var(--projectBorder) 20%, transparent);
+    color: var(--projectForeground);
+    transition: all 0.3s ease;
+  }
+
+  .project-box:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: color-mix(in srgb, var(--projectBorder) 40%, transparent);
+  }
+
+  .project-box-icon {
+    color: var(--projectPrimary);
+    background: color-mix(in srgb, var(--projectSurface) 100%, transparent);
+    transition: all 0.3s ease;
+  }
+
+  .project-box:hover .project-box-icon {
+    background: color-mix(in srgb, var(--projectSurface) 40%, transparent);
+  }
+
+  /* Efecto glow para los logos de colaboración - mejorado */
+  .project-box img {
+    filter: brightness(110%) contrast(110%);
+    transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-box:hover img:not(.partner-logo) {
+    filter: brightness(110%) contrast(110%) drop-shadow(0 0 16px var(--projectPrimary))
+      drop-shadow(0 0 32px rgba(from var(--projectPrimary) r g b / 0.4));
+  }
+</style>
